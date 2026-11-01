@@ -164,7 +164,7 @@ export const shellActions = {
   fit:
     () =>
     ({ zoom }) => {
-      const { fit, size } = measureFit(zoom.scale)
+      const { fit, size } = measureFit()
       //a hidden window has no size, it fits again when shown
       if (!size || sameSize(size, zoom.seen)) return null
       const scale = zoom.maximised ? maxZoom(fit) : fitZoom(zoom.chosen, fit)
@@ -176,7 +176,7 @@ export const shellActions = {
     () =>
     ({ zoom }) => {
       const maximised = !zoom.maximised
-      const { fit, size } = measureFit(zoom.scale)
+      const { fit, size } = measureFit()
       const scale = maximised ? maxZoom(fit) : fitZoom(zoom.chosen, fit)
       if (!Number.isFinite(scale)) return { menu: null }
       saveMaximised(maximised)
@@ -187,7 +187,7 @@ export const shellActions = {
   zoom:
     (direction) =>
     ({ zoom }) => {
-      const { fit, size } = measureFit(zoom.scale)
+      const { fit, size } = measureFit()
       const chosen = direction ? stepZoom(zoom.scale, direction) : 1
       const scale = direction ? chosen : fitZoom(chosen, fit)
       saveZoom(chosen)

@@ -34,13 +34,16 @@ export const applyZoom = (scale) => root.style.setProperty('--scale', scale)
 export const saveZoom = (scale) => save('scale', scale)
 
 let gameWindow = null
-//page pixels of explanation panel below the board, left out of layout and fitting
+//unzoomed pixels of explanation panel below the board, left out of layout and fitting
 let hanging = 0
 
 //the largest zoom that fits, and the window's unzoomed size and room
-export const measureFit = (scale) => {
-  const rect = gameWindow && gameWindow.getBoundingClientRect()
-  if (!rect || !rect.width || !rect.height) return { fit: Infinity, size: null }
+//offset sizes are unzoomed in every engine, rects only since chrome 128 (android 15's first
+//webview, 124, left them unzoomed, so dividing by the zoom shrank the window and fit never settled)
+export const measureFit = () => {
+  if (!gameWindow || !gameWindow.offsetWidth || !gameWindow.offsetHeight) {
+    return { fit: Infinity, size: null }
+  }
   //the margin is outside the zoom; inner sizes ignore scrollbars
   const frame = getComputedStyle(gameWindow.parentElement.parentElement)
   const width = innerWidth - parseFloat(frame.marginLeft) - parseFloat(frame.marginRight)
@@ -49,8 +52,8 @@ export const measureFit = (scale) => {
   const bar = (parseFloat(main.paddingBottom) || 0) + (parseFloat(main.paddingTop) || 0)
   const height = innerHeight - parseFloat(frame.marginTop) - parseFloat(frame.marginBottom) - bar
   const size = {
-    width: rect.width / scale,
-    height: (rect.height - hanging) / scale,
+    width: gameWindow.offsetWidth,
+    height: gameWindow.offsetHeight - hanging,
     room: `${width}x${height}`,
   }
   //borders and text do not scale exactly, so leave 1% to spare
@@ -66,15 +69,14 @@ export const sameSize = (a, b) =>
 
 //the explanation under the board hangs below the window's place instead of growing it
 //so the board never moves under the pointer when one appears or goes, nor does the zoom
+//measured inside the window, so unzoomed; the margin outside it scales by the zoom
+const bottom = (el) => el.offsetTop + el.offsetHeight
 const hang = (panel) => {
-  const height = panel
-    ? panel.getBoundingClientRect().bottom -
-      panel.previousElementSibling.getBoundingClientRect().bottom
-    : 0
+  const height = panel ? bottom(panel) - bottom(panel.previousElementSibling) : 0
   if (!gameWindow || Math.abs(height - hanging) < 0.5) return
   hanging = height
   gameWindow.parentElement.style.marginBottom = height
-    ? `calc(env(safe-area-inset-bottom) - ${height}px)`
+    ? `calc(env(safe-area-inset-bottom) - ${height}px * var(--scale, 1))`
     : ''
 }
 
