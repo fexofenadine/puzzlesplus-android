@@ -1,4 +1,4 @@
-# Puzzles Plus
+# <img src="docs/puzzlesplus.png" alt="" width="48" align="top"> Puzzles Plus
 
 Windows style puzzle games with hints that explain their reasoning, boards you can solve by logic alone and animated themes ported from xscreensaver, on a little Windows 95 desktop with a taskbar and Start menu. All three games share the window, the six themes and their backgrounds, pause and the boss key, and your theme and zoom carry over between them.
 
