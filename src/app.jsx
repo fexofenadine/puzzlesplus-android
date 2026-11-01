@@ -159,7 +159,8 @@ const bestTimes = (hinted) =>
     return {
       level,
       name: load(`${key}Name`) || 'Anonymous',
-      time: Math.min(999, parseInt(load(key), 10) || 0) || 999,
+      //an empty slot shows 999 and any time beats it; a record past 999 shows as it is
+      time: parseInt(load(key), 10) || 999,
     }
   })
 

@@ -298,6 +298,17 @@ it('zooms in steps from the size shown and remembers the choice', () => {
   localStorage.clear()
 })
 
+it('shows 999 for an empty best time and a record past 999 as it is', () => {
+  localStorage.clear()
+  localStorage.setItem('intermediate', '1200')
+  wired.toggleBestTime()
+  wired.peek()
+  const times = Object.fromEntries(current.bestTime.clean.map(({ level, time }) => [level, time]))
+  expect(times.beginner).toBe(999)
+  expect(times.intermediate).toBe(1200)
+  localStorage.clear()
+})
+
 it('steps the zoom with + and -, and leaves maximised when it does', () => {
   localStorage.clear()
   start({ zoom: { chosen: 1, scale: 1.4, seen: null, maximised: true } })

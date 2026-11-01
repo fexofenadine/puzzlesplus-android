@@ -192,11 +192,13 @@ it('marks a cell that breaks no rule yet but does not fit the solution', () => {
   if (hint.kind === 'wrong') expect(hint.marks).toEqual({ [i]: 'wrong' })
 })
 
+//a generous budget so a busy machine can't run out of time and settle for an easier board,
+//as the 1.5 s default sometimes did with the android emulator running
 it('deals every size at every level, needing exactly that level', () => {
   for (const n of sizes) {
     for (let level = 0; level < levels.length; level++) {
       if (!allowed(n, level)) continue
-      const { givens, solution, level: got } = makeGame(n, level, random(n * 10 + level))
+      const { givens, solution, level: got } = makeGame(n, level, random(n * 10 + level), 30000)
       expect(got).toBe(level)
       expect(rate(givens, n).level).toBe(level)
       if (level) expect(rate(givens, n, level - 1)).toBe(null)
