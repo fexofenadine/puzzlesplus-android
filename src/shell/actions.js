@@ -1,7 +1,7 @@
 import { makeSheet } from './Boss'
 import { load, save } from './storage'
 import { themes } from './themes'
-import { closeDialog, leave, listenBack, pageUrl, phone } from './phone'
+import { closeDialog, leave, listenPhone, pageUrl, phone } from './phone'
 import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
 import {
   applyZoom,
@@ -56,7 +56,7 @@ export const listen = (actions) => {
       actions.setPortrait(event.matches),
     )
   }
-  listenBack(actions)
+  listenPhone(actions)
 }
 
 //keys typed into a dialog's fields are not shortcuts

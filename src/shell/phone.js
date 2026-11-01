@@ -30,7 +30,29 @@ export const closeDialog = () => {
 //past the drawer and dialogs, a guide goes back to its game and a game to the home screen
 export const leave = (home) => (home ? location.assign(pageUrl(home)) : App.minimizeApp())
 
-//android's back button runs the back action
-export const listenBack = (actions) => {
-  if (phone) App.addListener('backButton', () => actions.back())
+//any css colour as #rrggbb, which android's colour parser takes
+const hex = (colour) => {
+  const probe = document.createElement('i')
+  probe.style.color = colour
+  document.body.append(probe)
+  const [r, g, b] = getComputedStyle(probe).color.match(/\d+/g).map(Number)
+  probe.remove()
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
+//the system bars take the theme's title bar colour, through MainActivity's PuzzlesBars
+const matchBars = () => {
+  const colour = getComputedStyle(document.documentElement).getPropertyValue('--title-start')
+  if (window.PuzzlesBars && colour.trim()) window.PuzzlesBars.set(hex(colour.trim()))
+}
+
+//android's back button runs the back action, and the system bars follow the theme
+export const listenPhone = (actions) => {
+  if (!phone) return
+  App.addListener('backButton', () => actions.back())
+  matchBars()
+  new MutationObserver(matchBars).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  })
 }
