@@ -7,7 +7,7 @@ import BackgroundSettings from '../shell/BackgroundSettings'
 import Boss from '../shell/Boss'
 import Taskbar from '../shell/Taskbar'
 import PhoneBar from '../shell/PhoneBar'
-import { phone } from '../shell/phone'
+import { pageUrl, phone } from '../shell/phone'
 import ThemeMenu from '../shell/ThemeMenu'
 import { listen, shellActions, shellState, shortcut } from '../shell/actions'
 import { startBackgrounds } from '../shell/backgrounds'
@@ -84,7 +84,7 @@ export const startGuide = ({ page, root = '../../', home = '../', title, icon, p
         <Dialog
           hidden={state.windowState !== 'open'}
           title={!phone && title}
-          onClose={() => location.assign(home)}
+          onClose={() => location.assign(pageUrl(home))}
         >
           {!phone && (
             <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>
@@ -122,7 +122,7 @@ export const Figure = ({ caption }, children) => (
 
 //a link to another page of the site
 export const Page = ({ href }, children) => (
-  <a class={s.inline} href={href}>
+  <a class={s.inline} href={pageUrl(href)}>
     {children}
   </a>
 )

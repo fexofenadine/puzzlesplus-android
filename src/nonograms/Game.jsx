@@ -9,14 +9,14 @@ import WindowControls, { windowProps } from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { guideTopic } from './hint'
 import { watchWindow } from '../shell/zoom'
-import { phone } from '../shell/phone'
+import { pageUrl, phone } from '../shell/phone'
 import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, FILL, CROSS, breaks, cellsOf, fillsLeft, lineDone } from './rules'
 
 //the guide's section on a hint, none for a solved board
-const more = (hint) => guideTopic(hint) && `guide/#${guideTopic(hint)}`
+const more = (hint) => guideTopic(hint) && pageUrl(`guide/#${guideTopic(hint)}`)
 
 export const running = ({ start, win, dealing }) => start >= 0 && !win && !dealing
 

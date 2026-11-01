@@ -1,7 +1,7 @@
 import { makeSheet } from './Boss'
 import { load, save } from './storage'
 import { themes } from './themes'
-import { closeDialog, leave, listenBack, phone } from './phone'
+import { closeDialog, leave, listenBack, pageUrl, phone } from './phone'
 import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
 import {
   applyZoom,
@@ -110,7 +110,7 @@ export const shellActions = {
   //another game is another page, this one comes back with a fresh game
   openGame: (id) => (state) => {
     if (id !== state.page) {
-      location.assign(`${state.root}${id}/`)
+      location.assign(pageUrl(`${state.root}${id}/`))
       return { menu: null }
     }
     return { menu: null, openGames: null, windowState: 'open' }

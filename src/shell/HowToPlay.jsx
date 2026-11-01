@@ -4,6 +4,7 @@ import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
 import { Link } from './About'
+import { pageUrl } from './phone'
 
 //a short rules summary in the about box's style, each game gives its own paragraphs
 const HowToPlay = ({ key, name, actions }, children) => (
@@ -12,8 +13,8 @@ const HowToPlay = ({ key, name, actions }, children) => (
       <div class={s.wide}>
         {children}
         <p>
-          The <Link href="guide/">{name} guide</Link> explains every solving technique with
-          examples.
+          The <Link href={pageUrl('guide/')}>{name} guide</Link> explains every solving technique
+          with examples.
         </p>
         <p>
           Every game: F2 or N starts a new game, H gives a hint, P pauses, + and - zoom, and Esc

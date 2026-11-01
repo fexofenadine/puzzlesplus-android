@@ -3,6 +3,7 @@ import s from './PhoneBar.module.css'
 import { games } from './GameLinks'
 import { book, help, icons } from './Taskbar'
 import avatar from './avatar.png'
+import { pageUrl } from './phone'
 
 const MENU = 'M3 5h18v2.5H3zM3 10.75h18v2.5H3zM3 16.5h18V19H3z'
 const BACK = 'M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z'
@@ -16,7 +17,7 @@ const Icon = ({ d }) => (
 )
 
 const Link = ({ icon, href, on }, children) => (
-  <a class={on ? s.linkOn : s.link} href={href}>
+  <a class={on ? s.linkOn : s.link} href={pageUrl(href)}>
     <span class={s.icon}>{icon && <img src={icon} alt="" width="24" height="24" />}</span>
     {children}
   </a>
@@ -36,7 +37,7 @@ const PhoneBar = (
   <div key={key}>
     <header class={s.bar}>
       {back ? (
-        <a class={s.button} href={back} title="Back">
+        <a class={s.button} href={pageUrl(back)} title="Back">
           <Icon d={BACK} />
         </a>
       ) : (
