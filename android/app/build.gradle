@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 
+//the version lives in package.json; 1.2.3 gives version code 10203
+def appVersion = new groovy.json.JsonSlurper().parse(file('../../package.json')).version
+def appVersionCode = appVersion.tokenize('.').inject(0) { code, part -> code * 100 + part.toInteger() }
+
+//the release key stays outside the repo, in ~/.android/puzzlesplus-release.properties
+def releaseProps = new Properties()
+def releasePropsFile = new File(System.getProperty('user.home'), '.android/puzzlesplus-release.properties')
+if (releasePropsFile.exists()) releasePropsFile.withInputStream { releaseProps.load(it) }
+
 android {
     namespace "io.github.fexofenadine.puzzlesplus"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +16,8 @@ android {
         applicationId "io.github.fexofenadine.puzzlesplus"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode appVersionCode
+        versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,11 +25,29 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (releasePropsFile.exists()) {
+                storeFile file(releaseProps.storeFile)
+                storePassword releaseProps.storePassword
+                keyAlias releaseProps.keyAlias
+                keyPassword releaseProps.keyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            if (releasePropsFile.exists()) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+}
+
+//puzzlesplus-1.0.0.apk, puzzlesplus-1.0.0-debug.apk
+android.applicationVariants.all { variant ->
+    variant.outputs.all {
+        outputFileName = "puzzlesplus-${variant.versionName}${variant.buildType.name == 'release' ? '' : '-debug'}.apk"
     }
 }
 
