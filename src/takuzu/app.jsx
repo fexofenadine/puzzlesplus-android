@@ -6,7 +6,7 @@ import Boss from '../shell/Boss'
 import Taskbar from '../shell/Taskbar'
 import PhoneBar from '../shell/PhoneBar'
 import { phone } from '../shell/phone'
-import Menu from './Menu'
+import PhoneMenu, { look } from './PhoneMenu'
 import OpenGames from '../shell/OpenGames'
 import { load, remove, save } from '../shell/storage'
 import { records } from '../shell/records'
@@ -251,10 +251,11 @@ export const view = (state, actions) => (
         page="takuzu"
         paused={state.game.paused}
         canPause={running(state.game)}
+        look={look(state, actions)}
         state={state}
         actions={actions}
       >
-        <Menu state={state} actions={actions} />
+        <PhoneMenu state={state} actions={actions} />
       </PhoneBar>
     ) : (
       <Taskbar key="h" name="Takuzu Plus" state={state} actions={actions} />

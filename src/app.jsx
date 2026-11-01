@@ -11,7 +11,7 @@ import Boss from './shell/Boss'
 import Taskbar from './shell/Taskbar'
 import PhoneBar from './shell/PhoneBar'
 import { phone } from './shell/phone'
-import Menu from './Menu'
+import PhoneMenu from './PhoneMenu'
 import OpenGames from './shell/OpenGames'
 import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
@@ -565,7 +565,7 @@ export const view = (state, actions) => (
         state={state}
         actions={actions}
       >
-        <Menu state={state} actions={actions} />
+        <PhoneMenu state={state} actions={actions} />
       </PhoneBar>
     ) : (
       <Taskbar key="h" name="Minesweeper Plus" state={state} actions={actions} />

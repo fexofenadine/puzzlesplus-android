@@ -87,6 +87,7 @@ export const shellActions = {
   toggleDrawer:
     () =>
     ({ drawer }) => ({ menu: null, drawer: !drawer }),
+  closeDrawer: () => ({ menu: null, drawer: false }),
   //android's back button: the drawer, then a dialog, then leave
   back: () => (state) => {
     if (state.drawer) return { menu: null, drawer: false }

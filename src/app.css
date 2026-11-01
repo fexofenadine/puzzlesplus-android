@@ -524,3 +524,14 @@ main::before {
   justify-content: flex-start;
   padding-top: var(--phone-bar);
 }
+
+/*a little more wallpaper round the window than the 8px small screens get*/
+:root[data-phone] [class*='Dialog_a'] {
+  margin: 16px;
+}
+
+/*dialogs open below the top bar*/
+:root[data-phone] [class*='Overlay_root'] {
+  top: var(--phone-bar);
+  height: calc(100% - var(--phone-bar));
+}
