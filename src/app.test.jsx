@@ -86,11 +86,13 @@ it('double click does nothing when the flags do not match the number', () => {
 })
 
 it('tap on a satisfied number opens its unflagged neighbours', () => {
-  const rect = { left: 0, right: 16, top: 0, bottom: 16 }
-  wired.touch({ event: { currentTarget: { getBoundingClientRect: () => rect } }, x: 1, y: 1 })
+  const cell = document.createElement('button')
+  document.elementFromPoint = (x, y) => (x < 16 && y < 16 ? cell : null)
+  wired.touch({ event: { currentTarget: cell }, x: 1, y: 1 })
   const end = new Event('touchend')
   end.changedTouches = [{ clientX: 8, clientY: 8 }]
   window.dispatchEvent(end)
+  delete document.elementFromPoint
   const { field, lose } = game()
   expect(lose).toBe(false)
   for (const [x, y] of neighbours) expect(field[y][x].opened).toBe(true)

@@ -245,17 +245,14 @@ export const actions = {
     ({ event, x, y }) =>
     ({ game }, actions) => {
       if (game.win || game.lose || game.paused) return null
-      const rect = event.currentTarget.getBoundingClientRect()
+      //the finger stays on the cell while the cell is what it touches; hit testing is right at
+      //any zoom, where chrome before 128 gave a zoomed cell's rect unzoomed and cancelled every tap
+      const cell = event.currentTarget
+      const on = ({ clientX, clientY }) =>
+        cell.contains(document.elementFromPoint(clientX, clientY))
       const timer = setTimeout(actions.flag, 600)
       const move = ({ touches }) => {
-        if (
-          !touches ||
-          touches.length !== 1 ||
-          touches[0].clientX < rect.left ||
-          touches[0].clientX > rect.right ||
-          touches[0].clientY < rect.top ||
-          touches[0].clientY > rect.bottom
-        ) {
+        if (!touches || touches.length !== 1 || !on(touches[0])) {
           clearTimeout(timer)
           actions.move({ x: -1, y: -1 })
         }
