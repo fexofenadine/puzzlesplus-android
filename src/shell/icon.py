@@ -1,4 +1,4 @@
-#draws the puzzles plus icon: a raised grey jigsaw piece with a raised navy plus on windows 95 teal
+#draws the puzzles plus icon: a raised jigsaw piece with a raised plus, in the nord colours
 #writes the site's icons, readme header and social preview; with --android <res folder> also the
 #app's launcher icons and splash screens. needs python with pillow and numpy
 import argparse
@@ -8,13 +8,31 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 N = 768
-TEAL = (0, 128, 128)
-SHADOW_TEAL = (0, 64, 64)
-GREY = (192, 192, 192)
-LIGHT = (255, 255, 255)
-SHADOW = (128, 128, 128)
-DARK = (64, 64, 64)
-NAVY = (10, 36, 106)
+#nord, no white: a frost blue piece with a light frost plus on polar night slate
+NIGHT = (46, 52, 64)
+SNOW = (216, 222, 233)
+BACKGROUND = (76, 86, 106)
+PIECE = (94, 129, 172)
+PLUS = (136, 192, 208)
+LIGHT = (236, 239, 244)
+FROST = (136, 192, 208)
+
+
+def mix(a, b, t):
+    return tuple(round(x + (y - x) * t) for x, y in zip(a, b))
+
+
+#a raised bevel from the fill itself, lightened toward snow storm and darkened toward polar night
+def bands(fill, outer):
+    return [
+        (outer, mix(fill, SNOW, 0.5), mix(fill, NIGHT, 0.6)),
+        (7, mix(fill, SNOW, 0.25), mix(fill, NIGHT, 0.3)),
+    ]
+
+
+DROP_SHADOW = mix(BACKGROUND, (0, 0, 0), 0.35)
+PIECE_BANDS = bands(PIECE, 10)
+PLUS_BANDS = bands(PLUS, 12)
 
 
 #an arc from p to q around centre, the way round that passes the angle via (radians, y down)
@@ -48,8 +66,9 @@ def piece_outline(a=150, b=620, r=62):
     return pts
 
 
-#the plus clockwise, a little above the piece's middle so it looks centred between knob and notch
-def plus_outline(cx=400, cy=362, a=158, h=62):
+#the plus clockwise, a little up and right of the piece's middle so it sits evenly between the knobs
+#and notches, its arms stopping 8px short of the notches' 17px bevels
+def plus_outline(cx=408, cy=362, a=150, h=62):
     return [
         (cx - h, cy - a), (cx + h, cy - a), (cx + h, cy - h), (cx + a, cy - h), (cx + a, cy + h),
         (cx + h, cy + h), (cx + h, cy + a), (cx - h, cy + a), (cx - h, cy + h), (cx - a, cy + h),
@@ -113,35 +132,63 @@ def bevel_by_distance(px, outline, bands):
 
 
 #the middle of a shape's area; the knobs and notches pull it off the square's middle
-def centroid(points):
-    pts = np.array(points, dtype=float)
-    x, y = pts[:, 0], pts[:, 1]
-    x1, y1 = np.roll(x, -1), np.roll(y, -1)
-    cross = x * y1 - x1 * y
-    area = cross.sum() / 2
-    return (x + x1) @ cross / (6 * area), (y + y1) @ cross / (6 * area)
+#the smallest circle round some points, (x, y, radius): randomised incremental, as in welzl's
+def enclosing_circle(points, seed=0):
+    def two(p, q):
+        return ((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, np.hypot(p[0] - q[0], p[1] - q[1]) / 2)
+
+    def three(p, q, r):
+        ax, ay = p
+        bx, by = q
+        cx, cy = r
+        d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
+        if abs(d) < 1e-9:
+            return max((two(p, q), two(q, r), two(p, r)), key=lambda c: c[2])
+        ux = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d
+        uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d
+        return (ux, uy, np.hypot(ax - ux, ay - uy))
+
+    def inside(c, p):
+        return c is not None and np.hypot(p[0] - c[0], p[1] - c[1]) <= c[2] + 1e-6
+
+    pts = list(points)
+    np.random.default_rng(seed).shuffle(pts)
+    c = None
+    for i, p in enumerate(pts):
+        if inside(c, p):
+            continue
+        c = (p[0], p[1], 0)
+        for j, q in enumerate(pts[:i]):
+            if inside(c, q):
+                continue
+            c = two(p, q)
+            for r in pts[:j]:
+                if not inside(c, r):
+                    c = three(p, q, r)
+    return c
 
 
-#the icon at N pixels; without a background the teal is left transparent, for android's foreground
-#the piece is centred by its area, which looks centred where its bounding box looked low and left
+#the icon at N pixels; without a background it is left transparent, for android's foreground
+#the piece is centred on the smallest circle round it, so in a round mask the square's corners
+#and the knobs clear the edge alike; its centre of mass had sat it low and left
 def draw(background=True):
-    im = Image.new('RGBA', (N, N), TEAL + (255,) if background else (0, 0, 0, 0))
+    im = Image.new('RGBA', (N, N), BACKGROUND + (255,) if background else (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     outline = piece_outline()
-    cx, cy = centroid(outline)
+    cx, cy, _ = enclosing_circle(outline)
     dx, dy = N / 2 - cx, N / 2 - cy
     outline = [(x + dx, y + dy) for x, y in outline]
-    d.polygon([(x + 18, y + 18) for x, y in outline], fill=SHADOW_TEAL + (255,))
-    d.polygon(outline, fill=GREY + (255,))
+    d.polygon([(x + 18, y + 18) for x, y in outline], fill=DROP_SHADOW + (255,))
+    d.polygon(outline, fill=PIECE + (255,))
     px = np.array(im)
-    bands = [(10, LIGHT + (255,), DARK + (255,)), (7, (223, 223, 223, 255), SHADOW + (255,))]
-    bevel_by_distance(px, outline, bands)
+    bevel_by_distance(px, outline, [(w, lit + (255,), dark + (255,)) for w, lit, dark in PIECE_BANDS])
     im = Image.fromarray(px)
     d = ImageDraw.Draw(im)
     plus = [(x + dx, y + dy) for x, y in plus_outline()]
-    d.polygon(plus, fill=NAVY + (255,))
-    inner = band(d, plus, 12, LIGHT + (255,), (20, 20, 20, 255))
-    band(d, inner, 7, (70, 104, 196, 255), (4, 16, 56, 255))
+    d.polygon(plus, fill=PLUS + (255,))
+    inner = plus
+    for w, lit, dark in PLUS_BANDS:
+        inner = band(d, inner, w, lit + (255,), dark + (255,))
     return im
 
 
@@ -155,29 +202,29 @@ def site(root, icon):
     sized(icon, 512).save(public / 'icon-512.png')
     sized(icon, 48).save(public / 'favicon.ico', sizes=[(16, 16), (32, 32), (48, 48)])
     sized(icon, 160).save(root / 'docs' / 'puzzlesplus.png')
-    #github's social preview, 1280x640: the icon and the name on the teal desktop
-    preview = Image.new('RGB', (1280, 640), TEAL)
+    #github's social preview, 1280x640: the icon and the name on polar night
+    preview = Image.new('RGB', (1280, 640), BACKGROUND)
     preview.paste(sized(icon, 400), (110, 120), sized(icon, 400))
     d = ImageDraw.Draw(preview)
     font = ImageFont.truetype('arialbd.ttf', 96)
     small = ImageFont.truetype('arial.ttf', 40)
     d.text((560, 220), 'Puzzles Plus', fill=LIGHT, font=font)
-    d.text((564, 350), 'Minesweeper, Takuzu and Nonograms', fill=(200, 230, 230), font=small)
-    d.text((564, 405), 'Windows style, with hints that explain', fill=(200, 230, 230), font=small)
+    d.text((564, 350), 'Minesweeper, Takuzu and Nonograms', fill=FROST, font=small)
+    d.text((564, 405), 'Windows style, with hints that explain', fill=FROST, font=small)
     preview.save(root / 'docs' / 'social-preview.png')
 
 
-#launcher icons per density: the adaptive foreground within the 66dp safe circle of its 108dp
-#canvas over a teal background, and legacy square and round icons; splashes keep the icon small
+#launcher icons per density: the adaptive foreground with the piece's circle 31dp across the 33dp
+#safe radius of its 108dp canvas, over the background colour, and legacy square and round icons;
+#splashes keep the icon small
 def android(res, icon):
     fg = draw(background=False)
-    box = fg.getbbox()
-    width = box[2] - box[0]
+    radius = enclosing_circle(piece_outline())[2]
     densities = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
     for name, scale in densities.items():
         canvas = round(108 * scale)
         layer = Image.new('RGBA', (canvas, canvas), (0, 0, 0, 0))
-        whole = sized(fg, round(N * 52 * scale / width))
+        whole = sized(fg, round(N * 31 * scale / radius))
         layer.paste(whole, ((canvas - whole.width) // 2, (canvas - whole.height) // 2), whole)
         layer.save(res / f'mipmap-{name}' / 'ic_launcher_foreground.png')
         legacy = round(48 * scale)
@@ -189,8 +236,8 @@ def android(res, icon):
         round_icon.save(res / f'mipmap-{name}' / 'ic_launcher_round.png')
     for path in res.glob('drawable*/splash.png'):
         w, h = Image.open(path).size
-        splash = Image.new('RGB', (w, h), TEAL)
-        whole = sized(fg, round(N * min(w, h) * 0.32 / width))
+        splash = Image.new('RGB', (w, h), BACKGROUND)
+        whole = sized(fg, round(N * min(w, h) * 0.18 / radius))
         splash.paste(whole, ((w - whole.width) // 2, (h - whole.height) // 2), whole)
         splash.save(path)
 
