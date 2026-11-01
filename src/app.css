@@ -513,3 +513,14 @@ main::before {
   main::before {
   background: none;
 }
+
+/*the android app: a top bar instead of the taskbar, the game window filling the rest*/
+:root[data-phone] {
+  --taskbar: 0px;
+  --phone-bar: calc(52px + env(safe-area-inset-top));
+}
+
+:root[data-phone] main {
+  justify-content: flex-start;
+  padding-top: var(--phone-bar);
+}

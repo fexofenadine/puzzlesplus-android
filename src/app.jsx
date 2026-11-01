@@ -9,6 +9,9 @@ import About from './About'
 import HowToPlay from './HowToPlay'
 import Boss from './shell/Boss'
 import Taskbar from './shell/Taskbar'
+import PhoneBar from './shell/PhoneBar'
+import { phone } from './shell/phone'
+import Menu from './Menu'
 import OpenGames from './shell/OpenGames'
 import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
@@ -555,7 +558,21 @@ export const actions = {
 export const view = (state, actions) => (
   <main oncontextmenu={prevent} ondragstart={prevent} oncreate={actions.init}>
     {state.game && <Game key="a" state={state} actions={actions} />}
-    <Taskbar key="h" name="Minesweeper Plus" state={state} actions={actions} />
+    {phone ? (
+      <PhoneBar
+        key="h"
+        title={state.theme === 'classic' ? 'Minesweeper' : 'Minesweeper Plus'}
+        page="minesweeper"
+        paused={state.game && state.game.paused}
+        canPause={state.game && running(state.game)}
+        state={state}
+        actions={actions}
+      >
+        <Menu state={state} actions={actions} />
+      </PhoneBar>
+    ) : (
+      <Taskbar key="h" name="Minesweeper Plus" state={state} actions={actions} />
+    )}
     {state.winner && <Winner key="b" state={state.winner} actions={actions} />}
     {state.bestTime && <BestTime key="c" state={state.bestTime} actions={actions} />}
     {state.customField && <CustomField key="d" state={state.customField} actions={actions} />}

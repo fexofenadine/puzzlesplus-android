@@ -158,3 +158,8 @@
     max-height: 22vh;
   }
 }
+
+/*on a phone the top bar replaces the title bar and menu bar*/
+:global(:root[data-phone]) .body {
+  height: calc(100dvh - var(--phone-bar) - 2 * var(--gap) - 12px);
+}

@@ -15,9 +15,13 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "dependencies": {
+    "@capacitor/app": "^7",
+    "@capacitor/core": "^7",
     "hyperapp": "^1.2.9"
   },
   "devDependencies": {
+    "@capacitor/android": "^7",
+    "@capacitor/cli": "^7",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.13.0",
     "gh-pages": "^6.3.0",
@@ -35,6 +39,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "predeploy": "vite build",
-    "deploy": "gh-pages --dist build"
+    "deploy": "gh-pages --dist build",
+    "start:android": "vite --mode android",
+    "build:android": "vite build --mode android --outDir www"
   }
 }

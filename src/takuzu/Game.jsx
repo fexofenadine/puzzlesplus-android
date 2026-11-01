@@ -9,6 +9,7 @@ import WindowControls, { windowProps } from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { guideTopic } from './hint'
 import { watchWindow } from '../shell/zoom'
+import { phone } from '../shell/phone'
 import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
@@ -29,7 +30,7 @@ const Game = ({ key, state, actions }) => {
     <Dialog
       key={key}
       hidden={state.windowState !== 'open'}
-      title={state.theme === 'classic' ? 'Takuzu' : 'Takuzu Plus'}
+      title={!phone && (state.theme === 'classic' ? 'Takuzu' : 'Takuzu Plus')}
       titleHint="Double-click for 100% zoom"
       onTitleDoubleClick={() => actions.zoom(0)}
       controls={<WindowControls {...windowProps(state, actions, paused, running(game))} />}
@@ -39,7 +40,7 @@ const Game = ({ key, state, actions }) => {
         actions.fit()
       }}
     >
-      <Menu state={state} actions={actions} />
+      {!phone && <Menu state={state} actions={actions} />}
       <div class={g.root}>
         <div class={g.scoreboard}>
           <Digit value={game.dealing ? 0 : left} />

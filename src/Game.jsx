@@ -10,6 +10,7 @@ import WindowControls, { windowProps } from './shell/WindowControls'
 import { PausedCover, HintPanel } from './shell/Board'
 import { guideTopic } from './hint'
 import { watchWindow } from './shell/zoom'
+import { phone } from './shell/phone'
 import { clockDigits } from './shell/clock'
 
 //the guide's section on a hint, none for a solved board
@@ -39,7 +40,7 @@ const Game = ({ key, state, actions }) => (
   <Dialog
     key={key}
     hidden={state.windowState !== 'open'}
-    title={state.theme === 'classic' ? 'Minesweeper' : 'Minesweeper Plus'}
+    title={!phone && (state.theme === 'classic' ? 'Minesweeper' : 'Minesweeper Plus')}
     titleHint="Double-click for 100% zoom"
     onTitleDoubleClick={() => actions.zoom(0)}
     controls={
@@ -51,7 +52,7 @@ const Game = ({ key, state, actions }) => (
       actions.fit()
     }}
   >
-    <Menu state={state} actions={actions} />
+    {!phone && <Menu state={state} actions={actions} />}
     <div class={s.root}>
       <div class={s.scoreboard}>
         <Digit value={state.game.flags} />

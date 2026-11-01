@@ -6,6 +6,8 @@ import Dialog from '../Dialog'
 import BackgroundSettings from '../shell/BackgroundSettings'
 import Boss from '../shell/Boss'
 import Taskbar from '../shell/Taskbar'
+import PhoneBar from '../shell/PhoneBar'
+import { phone } from '../shell/phone'
 import ThemeMenu from '../shell/ThemeMenu'
 import { listen, shellActions, shellState, shortcut } from '../shell/actions'
 import { startBackgrounds } from '../shell/backgrounds'
@@ -61,7 +63,7 @@ const Article = ({ parts }) => (
 
 //starts a guide page: page names it for the taskbar, home is where closing goes
 export const startGuide = ({ page, root = '../../', home = '../', title, icon, parts }) => {
-  const state = { ...shellState(page, root) }
+  const state = { ...shellState(page, root), home }
   const actions = {
     ...shellActions,
     init: () => (state, actions) => {
@@ -81,19 +83,25 @@ export const startGuide = ({ page, root = '../../', home = '../', title, icon, p
       <div key="a" class={s.page}>
         <Dialog
           hidden={state.windowState !== 'open'}
-          title={title}
+          title={!phone && title}
           onClose={() => location.assign(home)}
         >
-          <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>
-            <ThemeMenu state={state} actions={actions} />
-          </ul>
+          {!phone && (
+            <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>
+              <ThemeMenu state={state} actions={actions} />
+            </ul>
+          )}
           <div class={s.body}>
             <Contents parts={parts} />
             <Article parts={parts} />
           </div>
         </Dialog>
       </div>
-      <Taskbar key="h" own={{ title, icon }} state={state} actions={actions} />
+      {phone ? (
+        <PhoneBar key="h" title={title} back={home} state={state} actions={actions} />
+      ) : (
+        <Taskbar key="h" own={{ title, icon }} state={state} actions={actions} />
+      )}
       {state.backgroundSettings && (
         <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
       )}

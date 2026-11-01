@@ -1,6 +1,7 @@
 import { makeSheet } from './Boss'
 import { load, save } from './storage'
 import { themes } from './themes'
+import { closeDialog, leave, listenBack, phone } from './phone'
 import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
 import {
   applyZoom,
@@ -32,12 +33,17 @@ export const shellState = (page, root = '../') => ({
   windowState: 'open',
   //the game picked in the open games dialog, null while it is shut
   openGames: null,
+  //the phone's side drawer
+  drawer: false,
+  //where back leaves to on a phone, a guide's game, otherwise the home screen
+  home: null,
   theme: loadTheme(),
   boss: null,
   backgrounds: loadSettings(),
   backgroundSettings: null,
   howTo: false,
-  zoom: { chosen: loadZoom(), scale: loadZoom(), seen: null, maximised: loadMaximised() },
+  //a phone always fills the screen
+  zoom: { chosen: loadZoom(), scale: loadZoom(), seen: null, maximised: phone || loadMaximised() },
   portrait: Boolean(window.matchMedia && matchMedia('(orientation: portrait)').matches),
 })
 
@@ -50,6 +56,7 @@ export const listen = (actions) => {
       actions.setPortrait(event.matches),
     )
   }
+  listenBack(actions)
 }
 
 //keys typed into a dialog's fields are not shortcuts
@@ -62,7 +69,7 @@ export const shortcut = (event, state, actions) => {
   if (event.keyCode === 27) {
     //an open menu closes first, as in windows
     if (state.menu) actions.closeMenu()
-    else actions.boss()
+    else if (!phone) actions.boss()
     return null
   }
   //the spreadsheet only answers to esc, and a hidden window to nothing
@@ -77,6 +84,15 @@ export const shortcut = (event, state, actions) => {
 
 export const shellActions = {
   closeMenu: () => ({ menu: null }),
+  toggleDrawer:
+    () =>
+    ({ drawer }) => ({ menu: null, drawer: !drawer }),
+  //android's back button: the drawer, then a dialog, then leave
+  back: () => (state) => {
+    if (state.drawer) return { menu: null, drawer: false }
+    if (!closeDialog()) leave(state.home)
+    return null
+  },
   toggleStart:
     () =>
     ({ menu }) => ({ menu: menu && menu.start ? null : { start: true } }),
@@ -194,7 +210,8 @@ export const shellActions = {
       if (event.type === 'click') {
         return { menu: menu && menu[name] ? null : { [name]: true } }
       }
-      if (event.type === 'mouseenter') {
+      //a tap also sends mouseenter, which would open the section the click then shuts
+      if (event.type === 'mouseenter' && !phone) {
         return menu ? { menu: { [name]: true } } : null
       }
       if (event.type === 'focusout' && !event.currentTarget.contains(event.relatedTarget)) {
