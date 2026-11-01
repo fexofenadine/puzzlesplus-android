@@ -112,11 +112,25 @@ def bevel_by_distance(px, outline, bands):
             edge += w
 
 
+#the middle of a shape's area; the knobs and notches pull it off the square's middle
+def centroid(points):
+    pts = np.array(points, dtype=float)
+    x, y = pts[:, 0], pts[:, 1]
+    x1, y1 = np.roll(x, -1), np.roll(y, -1)
+    cross = x * y1 - x1 * y
+    area = cross.sum() / 2
+    return (x + x1) @ cross / (6 * area), (y + y1) @ cross / (6 * area)
+
+
 #the icon at N pixels; without a background the teal is left transparent, for android's foreground
+#the piece is centred by its area, which looks centred where its bounding box looked low and left
 def draw(background=True):
     im = Image.new('RGBA', (N, N), TEAL + (255,) if background else (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     outline = piece_outline()
+    cx, cy = centroid(outline)
+    dx, dy = N / 2 - cx, N / 2 - cy
+    outline = [(x + dx, y + dy) for x, y in outline]
     d.polygon([(x + 18, y + 18) for x, y in outline], fill=SHADOW_TEAL + (255,))
     d.polygon(outline, fill=GREY + (255,))
     px = np.array(im)
@@ -124,7 +138,7 @@ def draw(background=True):
     bevel_by_distance(px, outline, bands)
     im = Image.fromarray(px)
     d = ImageDraw.Draw(im)
-    plus = plus_outline()
+    plus = [(x + dx, y + dy) for x, y in plus_outline()]
     d.polygon(plus, fill=NAVY + (255,))
     inner = band(d, plus, 12, LIGHT + (255,), (20, 20, 20, 255))
     band(d, inner, 7, (70, 104, 196, 255), (4, 16, 56, 255))
@@ -158,14 +172,13 @@ def site(root, icon):
 def android(res, icon):
     fg = draw(background=False)
     box = fg.getbbox()
-    content = fg.crop(box)
+    width = box[2] - box[0]
     densities = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
     for name, scale in densities.items():
         canvas = round(108 * scale)
         layer = Image.new('RGBA', (canvas, canvas), (0, 0, 0, 0))
-        side = round(52 * scale)
-        piece = content.resize((side, round(side * content.height / content.width)), Image.LANCZOS)
-        layer.paste(piece, ((canvas - piece.width) // 2, (canvas - piece.height) // 2), piece)
+        whole = sized(fg, round(N * 52 * scale / width))
+        layer.paste(whole, ((canvas - whole.width) // 2, (canvas - whole.height) // 2), whole)
         layer.save(res / f'mipmap-{name}' / 'ic_launcher_foreground.png')
         legacy = round(48 * scale)
         sized(icon, legacy).convert('RGB').save(res / f'mipmap-{name}' / 'ic_launcher.png')
@@ -177,9 +190,8 @@ def android(res, icon):
     for path in res.glob('drawable*/splash.png'):
         w, h = Image.open(path).size
         splash = Image.new('RGB', (w, h), TEAL)
-        side = round(min(w, h) * 0.32)
-        piece = content.resize((side, round(side * content.height / content.width)), Image.LANCZOS)
-        splash.paste(piece, ((w - piece.width) // 2, (h - piece.height) // 2), piece)
+        whole = sized(fg, round(N * min(w, h) * 0.32 / width))
+        splash.paste(whole, ((w - whole.width) // 2, (h - whole.height) // 2), whole)
         splash.save(path)
 
 
