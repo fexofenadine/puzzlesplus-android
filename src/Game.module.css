@@ -7,6 +7,7 @@
 
 .scoreboard {
   display: flex;
+  gap: 6px;
   justify-content: space-between;
   align-items: flex-start;
   margin: 0 0 6px;
@@ -19,6 +20,11 @@
 .buttons {
   display: flex;
   gap: 4px;
+}
+
+/*counters and buttons keep their width, a narrow window grows to fit them instead of wrapping digits*/
+.scoreboard > * {
+  flex: none;
 }
 
 /*as wide as its cells and centred, when the menu bar makes the window wider*/
