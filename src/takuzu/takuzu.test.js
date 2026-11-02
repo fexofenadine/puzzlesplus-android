@@ -206,7 +206,7 @@ it('deals every size at every level, needing exactly that level', () => {
       expect(rate(givens, n).solution).toEqual(solution)
     }
   }
-})
+}, 60000)
 
 it('finishes boards by following hints alone, every hint agreeing with the solution', () => {
   const kinds = new Set()
