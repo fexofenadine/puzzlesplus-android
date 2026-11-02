@@ -148,6 +148,23 @@ it('no guessing opens an area on the first click and deals a solvable board', ()
   }
 })
 
+it('a win flags every mine left and empties the mine counter', () => {
+  const won = chordGame(false)
+  won.field.flat().forEach((c) => (c.opened = !c.mined))
+  won.field[2][2].opened = false
+  won.field[3][4].mark = true
+  start({ game: { ...won, left: 1, flags: 10 } })
+  wired.down({ event: { button: 0, buttons: 1 }, x: 2, y: 2 })
+  wired.up()
+  const { field, flags, win } = game()
+  expect(win).toBe(true)
+  expect(flags).toBe(0)
+  for (const c of field.flat()) {
+    expect(c.flag).toBe(c.mined)
+    expect(c.mark).toBe(false)
+  }
+})
+
 it('asking for a hint marks the game as hinted and shows the reasoning', () => {
   wired.hint()
   wired.peek()

@@ -429,6 +429,14 @@ export const actions = {
         cancelAnimationFrame(game.raf)
         if (!lose) actions.win()
       }
+      //a win flags the mines left, as windows did
+      if (win && !lose) {
+        field.forEach((row) =>
+          row.forEach((c) => {
+            if (c.mined) Object.assign(c, { flag: true, mark: false })
+          }),
+        )
+      }
 
       //keep explanations until the board changes, so it never moves mid double click
       const changed = left !== game.left || lose || begin
@@ -438,6 +446,7 @@ export const actions = {
           ...game,
           left,
           field,
+          flags: win && !lose ? 0 : game.flags,
           openedAt:
             !wasOpened && cell.opened
               ? { x: pressedX, y: pressedY, time: performance.now() }
