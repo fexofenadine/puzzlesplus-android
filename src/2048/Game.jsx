@@ -17,8 +17,6 @@ export const running = ({ start, over }) => start >= 0 && !over
 //cells shrink a little as boards grow, so every size makes a similar window
 export const cellSizes = { 3: 72, 4: 60, 5: 52, 6: 46 }
 
-//a tile's look: its power of two picks the colour and the css the text that reads on it
-//its digit count picks the font size
 //slides a tile from the cell it was drawn on to its new one in the original's 100 ms
 //animated from script because a keyed update can put a tile back into the page, which cancels a
 //css transition
@@ -35,6 +33,8 @@ const glide = (element, from, to) => {
   })
 }
 
+//a tile's look: its power of two picks the colour and the css the text that reads on it
+//its digit count picks the font size
 //offset is where a drag holds it, in cells; still means the finger moves it, so no glide
 export const Tile = ({ tile, n, offset, still }) => {
   const k = Math.log2(tile.value)
