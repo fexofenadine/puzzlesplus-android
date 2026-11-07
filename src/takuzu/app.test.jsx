@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { app, h } from 'hyperapp'
-import { state, actions, view, createGame, upgradeLadder } from './app'
+import { state, actions, view, createGame, saved, upgradeLadder } from './app'
 import { EMPTY } from './rules'
 import { makeGame, random } from './generate'
 
@@ -284,4 +284,44 @@ it('clears the old best times once when tricky arrives, keeping a hard choice ha
   upgradeLadder()
   expect(localStorage.getItem('takuzu.8.2')).toBe('40')
   expect(localStorage.getItem('takuzu.level')).toBe('3')
+})
+
+it('keeps no best time with the timer off, even once it is back on', () => {
+  wired.toggleTimer()
+  expect(now().timer).toBe(false)
+  expect(localStorage.getItem('takuzu.timer')).toBe('off')
+  wired.toggleTimer()
+  fill(now().game.solution)
+  expect(now().game.win).toBe(true)
+  expect(now().winner).toBe(null)
+})
+
+it('comes back to a game in progress paused at its time, and forgets it once won', () => {
+  const i = emptyCell()
+  wired.play({ event: left, i })
+  wired.hint()
+  saved.keep(now().game)
+  const back = saved.restore()
+  expect(back.paused).toBe(true)
+  expect(back.dealing).toBe(false)
+  expect(back.hinted).toBe(true)
+  expect([...back.board]).toEqual([...now().game.board])
+  expect([...back.givens]).toEqual([...now().game.givens])
+  expect(back.history).toEqual(now().game.history)
+  start({ game: back })
+  wired.pause(false)
+  expect(now().game.paused).toBe(false)
+  wired.play({ event: left, i })
+  expect(now().game.board[i]).toBe(1)
+  fill(now().game.solution)
+  saved.keep(now().game)
+  expect(localStorage.getItem('takuzu.saved')).toBe(null)
+  expect(saved.restore()).toBe(null)
+})
+
+it('drops a saved game that does not fit', () => {
+  localStorage.setItem('takuzu.saved', '{"version":1,"elapsed":5,"game":{"n":7}}')
+  expect(saved.restore()).toBe(null)
+  localStorage.setItem('takuzu.saved', 'nonsense')
+  expect(saved.restore()).toBe(null)
 })

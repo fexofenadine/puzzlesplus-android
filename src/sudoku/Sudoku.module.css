@@ -1,0 +1,106 @@
+/*the field and the pad under it, as wide as the field and centred*/
+.board {
+  --size: 32px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/*lines between cells are the field's own colour showing through the gaps between tracks*/
+.field {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tracks);
+  grid-template-rows: var(--rows);
+  background: var(--dark-shadow);
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.active {
+  composes: field;
+  cursor: pointer;
+}
+
+.inactive {
+  composes: field;
+  cursor: default;
+}
+
+/*the pad's digits line up under the field's columns*/
+.pad {
+  margin: 6px 0 0;
+  padding: 0 3px 0 2px;
+}
+
+.digits {
+  display: grid;
+}
+
+.tools {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0 0;
+}
+
+.tools .key {
+  flex: 1;
+  height: 24px;
+  font: 11px var(--ui-font);
+}
+
+/*raised like the scoreboard's buttons, sunk while picked or on*/
+.key {
+  position: relative;
+  display: block;
+  height: var(--size);
+  margin: 0;
+  padding: 0;
+  color: var(--glyph);
+  font: bold 16px var(--text-font);
+  background: var(--cell);
+  border: 1px solid var(--cell-shadow);
+  outline: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.key::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+.key:active:not(:disabled),
+.picked {
+  padding: 2px 0 0 2px;
+}
+
+.key:active:not(:disabled)::before,
+.picked::before {
+  border-width: 1px 0 0 1px;
+  border-color: var(--cell-shadow);
+}
+
+.picked {
+  background: var(--sd-same);
+}
+
+/*a digit placed n times already*/
+.used {
+  color: var(--cell-shadow);
+}
+
+.key:disabled {
+  color: var(--cell-shadow);
+  cursor: default;
+}

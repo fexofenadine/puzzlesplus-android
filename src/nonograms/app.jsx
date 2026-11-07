@@ -14,7 +14,8 @@ import BestTimes from '../shell/BestTimes'
 import Prompt from '../shell/Prompt'
 import { showRain } from '../shell/rain'
 import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
-import { pauseAction } from '../shell/clock'
+import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from '../shell/clock'
+import { check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
 import { CROSS, EMPTY, FILL, emptyBoard, fillsLeft, sizes, solved } from './rules'
 import { deal } from './deal'
@@ -51,6 +52,44 @@ export const createGame = ({ n, level }) => ({
   pausedAt: 0,
   win: false,
   hinted: false,
+  untimed: false,
+})
+
+//a board of empty, cross and fill cells for size n
+const boardOf = (cells, n) => {
+  check(Array.isArray(cells) && cells.length === n * n && cells.every((v) => v >= -1 && v <= 1))
+  return Int8Array.from(cells)
+}
+
+//the game in progress, kept so a reload comes back to it paused
+//a half done stroke is left out, the board it started from is kept
+export const saved = resumable({
+  key: 'nonograms.saved',
+  running,
+  pack: ({ n, level, clues, solution, board, stroke, history, hinted, untimed }) => ({
+    n,
+    level,
+    clues,
+    solution: Array.from(solution),
+    board: Array.from(stroke ? stroke.before : board),
+    history,
+    hinted,
+    untimed,
+  }),
+  unpack: ({ n, level, clues, solution, board, history, hinted, untimed }) => {
+    check(sizes.includes(n) && level >= 0 && level < levelNames.length && Array.isArray(history))
+    check(Array.isArray(clues) && clues.length === 2 * n && clues.every(Array.isArray))
+    return {
+      ...createGame({ n, level }),
+      clues,
+      solution: boardOf(solution, n),
+      board: boardOf(board, n),
+      history,
+      hinted: Boolean(hinted),
+      untimed: Boolean(untimed),
+      dealing: false,
+    }
+  },
 })
 
 const { actions: recordActions } = records('nonograms', sizes, levelNames)
@@ -74,18 +113,18 @@ const prevent = (event) => {
 const begin = (game, actions) => {
   if (game.start >= 0) return game
   game.raf = requestAnimationFrame(actions.tick)
-  return { ...game, start: performance.now(), time: 1 }
+  return { ...game, start: clock(), time: 1 }
 }
 
 //after a stroke or undo: a win stops the clock, and any hint is out of date
 //a board with all its fills placed that isn't solved asks about a hint, at once when settled,
 //otherwise only if nothing changes for a moment
-const changed = (game, board, history, actions, settled = false) => {
+const changed = (state, game, board, history, actions, settled = false) => {
   const next = { ...game, board, history, change: ++changes }
   next.win = solved(board, next.n, next.clues)
   if (next.win) {
     cancelAnimationFrame(next.raf)
-    actions.win(next)
+    if (timed({ ...state, game: next })) actions.win(next)
   }
   const stuck = !next.win && fillsLeft(board, next.n, next.clues) === 0
   if (stuck && !settled) setTimeout(() => actions.ask(next.change), ASK_AFTER)
@@ -136,12 +175,13 @@ export const state = {
   hint: null,
   prompt: false,
   errors: Boolean(load('nonograms.errors')),
+  timer: loadTimer('nonograms.timer'),
   rain: Boolean(load('nonograms.rain')),
   //touch screens have no right click, so a tap fills or crosses as this says
   touch: Boolean(window.matchMedia && matchMedia('(pointer: coarse)').matches),
   mode: FILL,
   about: false,
-  game: createGame(loadChoice()),
+  game: saved.restore() || createGame(loadChoice()),
   winner: null,
   bestTime: null,
 }
@@ -158,7 +198,8 @@ export const actions = {
     window.addEventListener('pointercancel', () => actions.up())
     listen(actions)
     showRain(state.rain)
-    actions.reset()
+    //a resumed game is already dealt
+    if (state.game.dealing) actions.reset()
   },
   press: (event) => (state, actions) => {
     //undo is the one shortcut with a modifier
@@ -233,29 +274,27 @@ export const actions = {
     },
   //a stroke is one undo step, and the board is only judged once it ends
   //only a single mouse click that fills may still be on its way to a cross
-  up:
-    () =>
-    ({ game }, actions) => {
-      const { stroke, board } = game
-      if (!stroke) return null
-      const step = [...board.keys()]
-        .filter((c) => board[c] !== stroke.before[c])
-        .map((c) => [c, stroke.before[c]])
-      const history = step.length ? [...game.history, step] : game.history
-      const passing =
-        step.length === 1 && stroke.from === EMPTY && stroke.to === FILL && !stroke.touch
-      return changed({ ...game, stroke: null }, board, history, actions, !passing)
-    },
-  undo:
-    () =>
-    ({ game }, actions) => {
-      if (!game.history.length || game.win || game.paused || game.dealing || game.stroke) {
-        return { menu: null }
-      }
-      const board = game.board.slice()
-      for (const [c, from] of game.history[game.history.length - 1]) board[c] = from
-      return { menu: null, ...changed(game, board, game.history.slice(0, -1), actions) }
-    },
+  up: () => (state, actions) => {
+    const { game } = state
+    const { stroke, board } = game
+    if (!stroke) return null
+    const step = [...board.keys()]
+      .filter((c) => board[c] !== stroke.before[c])
+      .map((c) => [c, stroke.before[c]])
+    const history = step.length ? [...game.history, step] : game.history
+    const passing =
+      step.length === 1 && stroke.from === EMPTY && stroke.to === FILL && !stroke.touch
+    return changed(state, { ...game, stroke: null }, board, history, actions, !passing)
+  },
+  undo: () => (state, actions) => {
+    const { game } = state
+    if (!game.history.length || game.win || game.paused || game.dealing || game.stroke) {
+      return { menu: null }
+    }
+    const board = game.board.slice()
+    for (const [c, from] of game.history[game.history.length - 1]) board[c] = from
+    return { menu: null, ...changed(state, game, board, game.history.slice(0, -1), actions) }
+  },
   //the delayed question, dropped if the board changed or the game moved on meanwhile
   ask:
     (change) =>
@@ -285,6 +324,7 @@ export const actions = {
     save('nonograms.errors', state.errors ? '' : 'yes')
     return { menu: null, errors: !state.errors }
   },
+  toggleTimer: timerAction('nonograms.timer'),
   toggleRain: () => (state) => {
     save('nonograms.rain', state.rain ? '' : 'yes')
     showRain(!state.rain)
@@ -296,18 +336,24 @@ export const actions = {
   //a half done stroke is kept as it is
   pause: pauseAction(running),
   tick:
-    (now) =>
+    () =>
     ({ game }, actions) => {
       game.raf = requestAnimationFrame(actions.tick)
-      const next = Math.floor((now - game.start) / 1000) + 1
+      const next = seconds(game.start)
       if (game.time === next) return null
       return { game: { ...game, time: next } }
     },
   ...recordActions,
+  ...saved.actions,
 }
 
 export const view = (state, actions) => (
-  <main oncontextmenu={prevent} ondragstart={prevent} oncreate={actions.init}>
+  <main
+    oncontextmenu={prevent}
+    ondragstart={prevent}
+    oncreate={actions.init}
+    onupdate={() => saved.keep(state.game)}
+  >
     <Game key="a" state={state} actions={actions} />
     {phone ? (
       <PhoneBar

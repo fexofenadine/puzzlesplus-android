@@ -1,9 +1,10 @@
 import { h } from 'hyperapp'
 import s from './Digit.module.css'
 
-const Digit = ({ value, digits = 3 }) => (
+//blank shows dashes, for a clock that is turned off
+const Digit = ({ value, digits = 3, blank }) => (
   <div class={s.root}>
-    {`000${Math.max(-99, Math.min(10 ** digits - 1, value))}`
+    {(blank ? '-'.repeat(digits) : `000${Math.max(-99, Math.min(10 ** digits - 1, value))}`)
       .slice(-digits)
       .split('')
       .sort((a) => (a === '-' ? -1 : 0))

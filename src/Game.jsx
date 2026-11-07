@@ -71,7 +71,11 @@ const Game = ({ key, state, actions }) => (
             </SideButton>
           </div>
         )}
-        <Digit value={state.game.time} digits={clockDigits(state.theme, state.game.time)} />
+        <Digit
+          value={state.game.time}
+          digits={clockDigits(state.theme, state.game.time)}
+          blank={!state.timer}
+        />
       </div>
       <div class={state.game.lose ? s.fieldLost : s.field}>
         {rowsOf(state).map((row) => (

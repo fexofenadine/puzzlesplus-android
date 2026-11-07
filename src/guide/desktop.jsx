@@ -23,7 +23,12 @@ export const desktopSection = {
       </li>
       <li>
         <b>Pause</b> (the title bar button or P) stops the clock and hides the board. The game also
-        pauses when you switch tabs or windows, and waits for you to press play.
+        pauses when you switch tabs or windows, and waits for you to press play. A game in progress
+        is kept when you leave or reload the page, and comes back paused at the same time.
+      </li>
+      <li>
+        <b>Timer</b> in the Game menu turns the clock off. It shows dashes, and a game played with
+        the timer off at any point doesn't count for best times.
       </li>
       <li>
         <b>The boss key</b> (Esc or the tray's Esc button) covers the screen with a spreadsheet of

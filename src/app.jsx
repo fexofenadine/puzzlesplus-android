@@ -17,7 +17,8 @@ import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './shell/storage'
 import { listen, shellActions, shellState, shortcut } from './shell/actions'
-import { pauseAction } from './shell/clock'
+import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from './shell/clock'
+import { check, resumable } from './shell/resume'
 
 const levels = {
   beginner: {
@@ -85,8 +86,48 @@ const createGame = ({ level, width, height, mines }) => {
     paused: false,
     pausedAt: 0,
     openedAt: { x: -1, y: -1, time: 0 },
+    untimed: false,
   }
 }
+
+//a cell as one number: its count, then opened, mined, flag and mark bits
+const packCell = ({ opened, mined, flag, mark, num }) =>
+  num | (opened ? 16 : 0) | (mined ? 32 : 0) | (flag ? 64 : 0) | (mark ? 128 : 0)
+
+const unpackCell = (v) => {
+  check(Number.isInteger(v) && v >= 0 && v < 256 && (v & 15) <= 8)
+  return { opened: !!(v & 16), mined: !!(v & 32), flag: !!(v & 64), mark: !!(v & 128), num: v & 15 }
+}
+
+//the game in progress, kept so a reload comes back to it paused
+export const saved = resumable({
+  key: 'savedGame',
+  running,
+  pack: ({ level, width, height, mines, field, left, flags, hinted, untimed }) => ({
+    level,
+    width,
+    height,
+    mines,
+    field: field.map((row) => row.map(packCell)),
+    left,
+    flags,
+    hinted,
+    untimed,
+  }),
+  unpack: ({ level, width, height, mines, field, left, flags, hinted, untimed }) => {
+    check(typeof level === 'string' && Array.isArray(field) && field.length === height)
+    check(field.every((row) => Array.isArray(row) && row.length === width))
+    check(Number.isInteger(left) && Number.isInteger(flags) && Number.isInteger(mines))
+    return {
+      ...createGame({ level, width, height, mines }),
+      field: field.map((row) => row.map(unpackCell)),
+      left,
+      flags,
+      hinted: Boolean(hinted),
+      untimed: Boolean(untimed),
+    }
+  },
+})
 
 const openable = (game, x, y) => {
   const cell = game.field[y][x]
@@ -181,10 +222,11 @@ const prevent = (event) => {
 export const state = {
   ...shellState('minesweeper'),
   hint: null,
-  game: createGame(loadLevel()),
+  game: saved.restore() || createGame(loadLevel()),
   marks: Boolean(load('marks')),
   safeStart: load('safeStart') !== 'off',
   noGuess: Boolean(load('noGuess')),
+  timer: loadTimer('timer'),
   winner: null,
   bestTime: null,
   about: false,
@@ -453,7 +495,7 @@ export const actions = {
               : game.openedAt,
           pressed: false,
           group: false,
-          start: begin ? performance.now() : game.start,
+          start: begin ? clock() : game.start,
           time: begin ? 1 : game.time,
           lose,
           win,
@@ -462,28 +504,27 @@ export const actions = {
       }
     },
   tick:
-    (now) =>
+    () =>
     ({ game }, actions) => {
       game.raf = requestAnimationFrame(actions.tick)
-      const next = Math.floor((now - game.start) / 1000) + 1
+      const next = seconds(game.start)
       if (game.time === next) return null
       return { game: { ...game, time: next } }
     },
-  win:
-    () =>
-    ({ game }) => {
-      if (game.level === 'custom') return null
-      const time = parseInt(load(timeKey(game.level, game.hinted)), 10)
-      if (time && time <= game.time) return null
-      return {
-        winner: {
-          name: 'Anonymous',
-          time: game.time,
-          level: game.level,
-          hinted: game.hinted,
-        },
-      }
-    },
+  win: () => (state) => {
+    const { game } = state
+    if (game.level === 'custom' || !timed(state)) return null
+    const time = parseInt(load(timeKey(game.level, game.hinted)), 10)
+    if (time && time <= game.time) return null
+    return {
+      winner: {
+        name: 'Anonymous',
+        time: game.time,
+        level: game.level,
+        hinted: game.hinted,
+      },
+    }
+  },
   changeWinner:
     (payload) =>
     ({ winner }) => ({
@@ -552,6 +593,7 @@ export const actions = {
     save('noGuess', noGuess ? 'yes' : '')
     return { menu: null, noGuess }
   },
+  toggleTimer: timerAction('timer'),
   toggleMarks: () => (state) => {
     const marks = !state.marks
     save('marks', marks ? 'yes' : '')
@@ -560,10 +602,16 @@ export const actions = {
       marks,
     }
   },
+  ...saved.actions,
 }
 
 export const view = (state, actions) => (
-  <main oncontextmenu={prevent} ondragstart={prevent} oncreate={actions.init}>
+  <main
+    oncontextmenu={prevent}
+    ondragstart={prevent}
+    oncreate={actions.init}
+    onupdate={() => saved.keep(state.game)}
+  >
     {state.game && <Game key="a" state={state} actions={actions} />}
     {phone ? (
       <PhoneBar

@@ -1,0 +1,120 @@
+/*the player's digits in each theme's first number colour, highlights mixed from its highlight*/
+:global(:root) {
+  --sd-ink: var(--num-1);
+  --sd-peer: color-mix(in srgb, var(--highlight) 12%, var(--cell-open));
+  --sd-same: color-mix(in srgb, var(--highlight) 30%, var(--cell-open));
+  --sd-select: color-mix(in srgb, var(--highlight) 45%, var(--cell-open));
+  --sd-note: color-mix(in srgb, var(--text) 62%, transparent);
+}
+
+.root {
+  position: relative;
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+  font: 20px/var(--size) var(--text-font);
+  text-align: center;
+  background: var(--cell-open);
+  border: 0;
+  outline: 0;
+  cursor: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.given {
+  font-weight: bold;
+}
+
+.entry {
+  color: var(--sd-ink);
+}
+
+/*the selected cell, the cells it shares a row, column or box with, and the same digit elsewhere*/
+.peer {
+  background: var(--sd-peer);
+}
+
+.same {
+  background: var(--sd-same);
+}
+
+.selected {
+  background: var(--sd-select);
+}
+
+.error {
+  color: #ff2020;
+}
+
+.error::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 3px,
+    color-mix(in srgb, #ff2020 35%, transparent) 3px 5px
+  );
+  content: '';
+}
+
+.notes {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  left: 1px;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  align-items: center;
+  font: calc(var(--size) * 0.3) / 1 var(--text-font);
+  color: var(--sd-note);
+}
+
+.note,
+.noteOff,
+.noteFocus {
+  display: block;
+}
+
+.noteOff {
+  visibility: hidden;
+}
+
+.noteFocus {
+  color: var(--sd-ink);
+  font-weight: bold;
+}
+
+.ghost {
+  color: color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+/*hint outlines, the same colours the other games use, amber for candidates taken away*/
+
+.hintSource {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #2e8bff;
+}
+
+.hintPlace {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #12d12a;
+}
+
+.hintRemove {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #ffb000;
+}
+
+.hintWrong {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #ff3b3b;
+}

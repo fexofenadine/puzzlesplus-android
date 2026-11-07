@@ -18,7 +18,8 @@ const HowToPlay = ({ key, name, actions }, children) => (
         </p>
         <p>
           Every game: F2 or N starts a new game, H gives a hint, P pauses, + and - zoom, and Esc
-          hides the game behind a spreadsheet.
+          hides the game behind a spreadsheet. A game in progress comes back paused after a reload,
+          and Game → Timer turns the clock off (no best times then).
         </p>
         <div class={s.footer}>
           <Button type="button" onClick={actions.toggleHowTo} onCreate={(el) => el.focus()}>

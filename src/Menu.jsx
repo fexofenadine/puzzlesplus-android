@@ -84,6 +84,7 @@ const Menu = ({ state, actions }) => (
         onClick={actions.toggleSafeStart}
       />
       <SubMenuItem name="No Guessing" checked={state.noGuess} onClick={actions.toggleNoGuess} />
+      <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />

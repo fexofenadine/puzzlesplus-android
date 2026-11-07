@@ -61,7 +61,11 @@ const Game = ({ key, state, actions }) => {
               <HintIcon />
             </SideButton>
           </div>
-          <Digit value={game.time} digits={clockDigits(state.theme, game.time)} />
+          <Digit
+            value={game.time}
+            digits={clockDigits(state.theme, game.time)}
+            blank={!state.timer}
+          />
         </div>
         <div class={running(game) && !paused ? s.active : s.inactive} style={{ '--n': n }}>
           {[...board].map((value, i) => (

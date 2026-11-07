@@ -49,7 +49,13 @@ export const shellState = (page, root = '../') => ({
 
 export const listen = (actions) => {
   //leaving the page pauses, coming back waits for play
-  document.addEventListener('visibilitychange', () => document.hidden && actions.pause(true))
+  //the game is kept as the page hides or goes, so a reload or a closed app picks it up
+  const away = () => {
+    actions.pause(true)
+    if (actions.keepGame) actions.keepGame()
+  }
+  document.addEventListener('visibilitychange', () => document.hidden && away())
+  window.addEventListener('pagehide', away)
   window.addEventListener('blur', () => actions.pause(true))
   if (window.matchMedia) {
     matchMedia('(orientation: portrait)').addEventListener('change', (event) =>

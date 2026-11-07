@@ -1,0 +1,185 @@
+/*each doubling turns the hue a step and shifts the lightness, past 2048 tiles take the top colour*/
+/*--t-turns caps the hue steps, so a theme's high tiles keep its own colours*/
+/*text follows the tile's lightness: the on-dark colour below --t-mid, the on-light one above*/
+:global(:root) {
+  --t-hue: 200;
+  --t-step: -25;
+  --t-sat: 70%;
+  --t-l0: 90%;
+  --t-ld: -5%;
+  --t-mid: 50%;
+  --t-turns: 99;
+  --t-top: #3c3c3c;
+  --t-top-text: #fff;
+  --t-on-dark: #fff;
+  --t-on-light: #000;
+}
+
+/*a sunset from purple through pink to orange and yellow*/
+:global(:root[data-theme='synthwave']) {
+  --t-hue: 285;
+  --t-step: 18;
+  --t-turns: 7;
+  --t-sat: 85%;
+  --t-l0: 30%;
+  --t-ld: 3.5%;
+  --t-top: #36f9f6;
+  --t-top-text: #241b2f;
+  --t-on-dark: #f4eeff;
+  --t-on-light: #241b2f;
+}
+
+:global(:root[data-theme='matrix']) {
+  --t-hue: 140;
+  --t-step: 0;
+  --t-sat: 70%;
+  --t-l0: 4%;
+  --t-ld: 6%;
+  --t-mid: 40%;
+  --t-top: #b6ffcb;
+  --t-top-text: #020a04;
+  --t-on-dark: #b6ffcb;
+  --t-on-light: #020a04;
+}
+
+:global(:root[data-theme='nord']) {
+  --t-hue: 210;
+  --t-step: -22;
+  --t-sat: 32%;
+  --t-l0: 40%;
+  --t-ld: 3%;
+  --t-top: #ebcb8b;
+  --t-top-text: #2e3440;
+  --t-on-dark: #eceff4;
+  --t-on-light: #2e3440;
+}
+
+:global(:root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])) {
+  --t-hue: 190;
+  --t-step: -22;
+  --t-sat: 60%;
+  --t-l0: 24%;
+  --t-ld: 3.5%;
+  --t-top: #fdf6e3;
+  --t-top-text: #002b36;
+  --t-on-dark: #fdf6e3;
+  --t-on-light: #002b36;
+}
+
+/*sunken cells in a grid, the tiles laid over them on the same steps*/
+.board {
+  --gap: 5px;
+  --step: calc(var(--cell) + var(--gap));
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), var(--cell));
+  gap: var(--gap);
+  width: fit-content;
+  margin: 0 auto;
+  padding: var(--gap);
+  background: var(--panel);
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cell {
+  height: var(--cell);
+  background: var(--cell-open);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+.tiles {
+  position: absolute;
+  top: var(--gap);
+  left: var(--gap);
+}
+
+/*a raised tile like an unopened cell, in its value's colour*/
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: var(--cell);
+  height: var(--cell);
+  font: bold calc(var(--cell) * 0.42) / var(--cell) var(--text-font);
+  text-align: center;
+  --l: calc(var(--t-l0) + var(--k) * var(--t-ld));
+  color: color-mix(
+    in srgb,
+    var(--t-on-dark) clamp(0%, (var(--t-mid) - var(--l)) * 100, 100%),
+    var(--t-on-light)
+  );
+  background: hsl(
+    calc(var(--t-hue) + min(var(--k), var(--t-turns)) * var(--t-step)) var(--t-sat) var(--l)
+  );
+  box-shadow:
+    inset 2px 2px 0 color-mix(in srgb, var(--cell-light) 70%, transparent),
+    inset -2px -2px 0 color-mix(in srgb, var(--cell-shadow) 80%, transparent);
+  transform: translate(calc(var(--x) * var(--step)), calc(var(--y) * var(--step)));
+  transition: transform 0.1s ease-in-out;
+}
+
+.beyond {
+  color: var(--t-top-text);
+  background: var(--t-top);
+}
+
+.tile[data-digits='3'] {
+  font-size: calc(var(--cell) * 0.36);
+}
+
+.tile[data-digits='4'] {
+  font-size: calc(var(--cell) * 0.29);
+}
+
+.tile[data-digits='5'] {
+  font-size: calc(var(--cell) * 0.23);
+}
+
+/*the two halves of a merge slide under the new tile and go with the next move*/
+.gone {
+  z-index: 0;
+}
+
+.fresh {
+  animation: grow 0.15s ease-out 0.1s backwards;
+}
+
+.merged {
+  z-index: 2;
+  animation: pop 0.15s ease-out 0.1s backwards;
+}
+
+@keyframes grow {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+}
+
+@keyframes pop {
+  from {
+    scale: 0.6;
+  }
+  60% {
+    scale: 1.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+  }
+
+  .fresh,
+  .merged {
+    animation: none;
+  }
+}

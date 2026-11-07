@@ -10,7 +10,8 @@ const Winner = ({ key, state, actions }) => (
     <Dialog>
       <form class={s.root} autocomplete="off" onsubmit={actions.submitBestTime}>
         <label for="winner" class={s.text}>
-          You have the fastest time for {state.level} level{state.hinted ? ' with hints' : ''}.
+          {state.text ||
+            `You have the fastest time for ${state.level} level${state.hinted ? ' with hints' : ''}.`}
         </label>
         <label for="winner" class={s.text}>
           Please enter your name.

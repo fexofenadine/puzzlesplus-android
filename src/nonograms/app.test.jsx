@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { app, h } from 'hyperapp'
-import { state, actions, view, createGame } from './app'
+import { state, actions, view, createGame, saved } from './app'
 import { CROSS, EMPTY, FILL } from './rules'
 import { makePuzzle, random } from './generate'
 import { clockDigits } from '../shell/clock'
@@ -223,4 +223,32 @@ it('remembers the rain glyph choice and opens the help boxes', () => {
   expect(now().howTo).toBe(true)
   wired.toggleAbout()
   expect(now().about).toBe(true)
+})
+
+it('keeps no best time with the timer off and shows dashes', () => {
+  wired.toggleTimer()
+  expect(now().timer).toBe(false)
+  const { solution } = now().game
+  solution.forEach((v, i) => v && click(i))
+  expect(now().game.win).toBe(true)
+  expect(now().winner).toBe(null)
+  const blank = Digit({ value: 12, blank: true })
+  expect(blank.children.map((digit) => digit.attributes['data-n'])).toEqual(['-', '-', '-'])
+})
+
+it('comes back to a game in progress paused, leaving out a half done stroke', () => {
+  click(0)
+  const kept = board()
+  wired.down({ event: left, i: 1 })
+  saved.keep(now().game)
+  const back = saved.restore()
+  expect(back.paused).toBe(true)
+  expect([...back.board]).toEqual(kept)
+  expect(back.clues).toEqual(now().game.clues)
+  expect(back.history).toHaveLength(1)
+  expect(back.stroke).toBe(null)
+  start({ game: back, mode: FILL })
+  wired.pause(false)
+  wired.undo()
+  expect(board().every((v) => v === EMPTY)).toBe(true)
 })

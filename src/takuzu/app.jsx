@@ -11,12 +11,14 @@ import OpenGames from '../shell/OpenGames'
 import { load, remove, save } from '../shell/storage'
 import { records } from '../shell/records'
 import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
-import { pauseAction } from '../shell/clock'
+import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from '../shell/clock'
+import { check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
 import BestTimes from '../shell/BestTimes'
 import Prompt from '../shell/Prompt'
 import { allowed, fallback, levelNames } from './Menu'
 import { EMPTY, emptyBoard, full, sizes, solved } from './rules'
+import { levels } from './techniques'
 import { completeWithErrors, findHint } from './hint'
 import { deal } from './deal'
 import { showRain } from '../shell/rain'
@@ -50,6 +52,42 @@ export const createGame = ({ n, level }) => ({
   pausedAt: 0,
   win: false,
   hinted: false,
+  untimed: false,
+})
+
+//a board of -1, 0 and 1 cells for size n
+const boardOf = (cells, n) => {
+  check(Array.isArray(cells) && cells.length === n * n && cells.every((v) => v >= -1 && v <= 1))
+  return Int8Array.from(cells)
+}
+
+//the game in progress, kept so a reload comes back to it paused
+export const saved = resumable({
+  key: 'takuzu.saved',
+  running,
+  pack: ({ n, level, givens, solution, board, history, hinted, untimed }) => ({
+    n,
+    level,
+    givens: Array.from(givens),
+    solution: Array.from(solution),
+    board: Array.from(board),
+    history,
+    hinted,
+    untimed,
+  }),
+  unpack: ({ n, level, givens, solution, board, history, hinted, untimed }) => {
+    check(sizes.includes(n) && level >= 0 && level < levels.length && Array.isArray(history))
+    return {
+      ...createGame({ n, level }),
+      givens: boardOf(givens, n),
+      solution: boardOf(solution, n),
+      board: boardOf(board, n),
+      history,
+      hinted: Boolean(hinted),
+      untimed: Boolean(untimed),
+      dealing: false,
+    }
+  },
 })
 
 const { timeKey, eachSlot, actions: recordActions } = records('takuzu', sizes, levelNames)
@@ -72,18 +110,18 @@ const prevent = (event) => {
 const begin = (game, actions) => {
   if (game.start >= 0) return game
   game.raf = requestAnimationFrame(actions.tick)
-  return { ...game, start: performance.now(), time: 1 }
+  return { ...game, start: clock(), time: 1 }
 }
 
 //after a cell changes: a win, or a full board that isn't one
 //settled means another click the same way would only empty the cell again, so ask now
 //otherwise the cell may be passing through on its way to the value meant, so ask later
-const changed = (game, board, history, actions, settled = false) => {
-  const next = { ...begin(game, actions), board, history, change: ++changes }
+const changed = (state, board, history, actions, settled = false) => {
+  const next = { ...begin(state.game, actions), board, history, change: ++changes }
   next.win = solved(board, next.n)
   if (next.win) {
     cancelAnimationFrame(next.raf)
-    actions.win(next)
+    if (timed({ ...state, game: next })) actions.win(next)
   }
   const stuck = !next.win && full(board)
   if (stuck && !settled) setTimeout(() => actions.ask(next.change), ASK_AFTER)
@@ -112,9 +150,10 @@ export const state = {
   hint: null,
   prompt: false,
   errors: Boolean(load('takuzu.errors')),
+  timer: loadTimer('takuzu.timer'),
   rain: Boolean(load('takuzu.rain')),
   about: false,
-  game: createGame(loadChoice()),
+  game: saved.restore() || createGame(loadChoice()),
   winner: null,
   bestTime: null,
 }
@@ -125,7 +164,8 @@ export const actions = {
     window.addEventListener('keydown', actions.press)
     listen(actions)
     showRain(state.rain)
-    actions.reset()
+    //a resumed game is already dealt
+    if (state.game.dealing) actions.reset()
   },
   press: (event) => (state, actions) => {
     //undo is the one shortcut with a modifier
@@ -174,7 +214,8 @@ export const actions = {
     },
   play:
     ({ event, i }) =>
-    ({ game }, actions) => {
+    (state, actions) => {
+      const { game } = state
       if (event.button !== 0 && event.button !== 2) return null
       if (game.dealing || game.paused || game.win || game.givens[i] !== EMPTY) return null
       const back = event.button === 2
@@ -182,7 +223,7 @@ export const actions = {
       const board = game.board.slice()
       board[i] = cycle[(cycle.indexOf(from) + (back ? 2 : 1)) % 3]
       const settled = board[i] === (back ? 0 : 1)
-      return changed(game, board, [...game.history, [i, from]], actions, settled)
+      return changed(state, board, [...game.history, [i, from]], actions, settled)
     },
   //the delayed question, dropped if the board changed or the game moved on meanwhile
   ask:
@@ -191,15 +232,14 @@ export const actions = {
       if (game.change !== change || game.win || game.paused || !full(game.board)) return null
       return { prompt: true }
     },
-  undo:
-    () =>
-    ({ game }, actions) => {
-      if (!game.history.length || game.win || game.paused || game.dealing) return { menu: null }
-      const [i, from] = game.history[game.history.length - 1]
-      const board = game.board.slice()
-      board[i] = from
-      return { menu: null, ...changed(game, board, game.history.slice(0, -1), actions) }
-    },
+  undo: () => (state, actions) => {
+    const { game } = state
+    if (!game.history.length || game.win || game.paused || game.dealing) return { menu: null }
+    const [i, from] = game.history[game.history.length - 1]
+    const board = game.board.slice()
+    board[i] = from
+    return { menu: null, ...changed(state, board, game.history.slice(0, -1), actions) }
+  },
   hint:
     () =>
     ({ game }, actions) => {
@@ -221,6 +261,7 @@ export const actions = {
     save('takuzu.errors', state.errors ? '' : 'yes')
     return { menu: null, errors: !state.errors }
   },
+  toggleTimer: timerAction('takuzu.timer'),
   toggleRain: () => (state) => {
     save('takuzu.rain', state.rain ? '' : 'yes')
     showRain(!state.rain)
@@ -231,18 +272,24 @@ export const actions = {
     ({ about }) => ({ menu: null, about: !about }),
   pause: pauseAction(running),
   tick:
-    (now) =>
+    () =>
     ({ game }, actions) => {
       game.raf = requestAnimationFrame(actions.tick)
-      const next = Math.floor((now - game.start) / 1000) + 1
+      const next = seconds(game.start)
       if (game.time === next) return null
       return { game: { ...game, time: next } }
     },
   ...recordActions,
+  ...saved.actions,
 }
 
 export const view = (state, actions) => (
-  <main oncontextmenu={prevent} ondragstart={prevent} oncreate={actions.init}>
+  <main
+    oncontextmenu={prevent}
+    ondragstart={prevent}
+    oncreate={actions.init}
+    onupdate={() => saved.keep(state.game)}
+  >
     <Game key="a" state={state} actions={actions} />
     {phone ? (
       <PhoneBar

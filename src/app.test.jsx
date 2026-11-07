@@ -1,7 +1,8 @@
 import { beforeEach, expect, it } from 'vitest'
 import { app, h } from 'hyperapp'
-import { state, actions, view } from './app'
+import { state, actions, view, saved } from './app'
 import { solvable } from './mines'
+import { clock } from './shell/clock'
 
 it('renders without crashing', async () => {
   const container = document.createElement('div')
@@ -443,7 +444,7 @@ it('pauses the clock and picks up from the same time', () => {
   const resumed = game()
   expect(resumed.paused).toBe(false)
   expect(resumed.start).toBeGreaterThan(paused.start)
-  expect(resumed.start - paused.start).toBeCloseTo(performance.now() - paused.pausedAt, -2)
+  expect(resumed.start - paused.start).toBeCloseTo(clock() - paused.pausedAt, -2)
 })
 
 it('ignores clicks, chords and hints while paused', () => {
@@ -538,4 +539,43 @@ it('has a hint button by the face on every theme but classic', async () => {
   for (const theme of ['synthwave', 'matrix', 'nord', 'solarized', 'solarized-phosphor']) {
     expect(await hintButtons(theme)).toBe(1)
   }
+})
+
+it('comes back to a game in progress paused, mines and flags and all', () => {
+  wired.down({ event: { button: 2, buttons: 2 }, x: 8, y: 8 })
+  wired.up()
+  const before = game()
+  saved.keep(before)
+  const back = saved.restore()
+  expect(back.paused).toBe(true)
+  expect(back.field).toEqual(before.field)
+  expect(back.flags).toBe(before.flags)
+  expect(back.left).toBe(before.left)
+  start({ game: back })
+  wired.pause(false)
+  expect(game().paused).toBe(false)
+  wired.chord({ x: 1, y: 1 })
+  expect(game().field[1][0].opened).toBe(true)
+})
+
+it('forgets the saved game once it is lost, and keeps no best time with the timer off', () => {
+  saved.keep(game())
+  expect(localStorage.getItem('savedGame')).not.toBe(null)
+  wired.down({ event: { button: 0, buttons: 1 }, x: 4, y: 4 })
+  wired.up()
+  expect(game().lose).toBe(true)
+  saved.keep(game())
+  expect(localStorage.getItem('savedGame')).toBe(null)
+  start({ game: chordGame(), timer: false })
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      if (x !== 4 && !(x === 0 && y === 0)) {
+        wired.down({ event: { button: 0, buttons: 1 }, x, y })
+        wired.up()
+      }
+    }
+  }
+  wired.peek()
+  expect(current.game.win).toBe(true)
+  expect(current.winner).toBe(null)
 })

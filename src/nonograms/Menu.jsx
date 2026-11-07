@@ -31,6 +31,7 @@ const Menu = ({ state, actions }) => (
       ))}
       <Separator />
       <SubMenuItem name="Show Errors" checked={state.errors} onClick={actions.toggleErrors} />
+      <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />

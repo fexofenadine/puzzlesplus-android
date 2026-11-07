@@ -102,7 +102,11 @@ const Game = ({ key, state, actions }) => {
               </SideButton>
             )}
           </div>
-          <Digit value={game.time} digits={clockDigits(state.theme, game.time)} />
+          <Digit
+            value={game.time}
+            digits={clockDigits(state.theme, game.time)}
+            blank={!state.timer}
+          />
         </div>
         <div class={s.board} style={{ '--tracks': tracks(n) }}>
           <div class={s.columns}>{lines.slice(n).map((_, x) => clue(n + x))}</div>
