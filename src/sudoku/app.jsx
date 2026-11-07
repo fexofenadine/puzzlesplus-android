@@ -4,6 +4,9 @@ import Winner from '../Winner'
 import BackgroundSettings from '../shell/BackgroundSettings'
 import Boss from '../shell/Boss'
 import Taskbar from '../shell/Taskbar'
+import PhoneBar from '../shell/PhoneBar'
+import { phone } from '../shell/phone'
+import PhoneMenu from './PhoneMenu'
 import OpenGames from '../shell/OpenGames'
 import { load, save } from '../shell/storage'
 import { records } from '../shell/records'
@@ -389,7 +392,21 @@ export const view = (state, actions) => (
     onupdate={() => saved.keep(state.game)}
   >
     <Game key="a" state={state} actions={actions} />
-    <Taskbar key="h" name="Sudoku Plus" state={state} actions={actions} />
+    {phone ? (
+      <PhoneBar
+        key="h"
+        title={state.theme === 'classic' ? 'Sudoku' : 'Sudoku Plus'}
+        page="sudoku"
+        paused={state.game.paused}
+        canPause={running(state.game)}
+        state={state}
+        actions={actions}
+      >
+        <PhoneMenu state={state} actions={actions} />
+      </PhoneBar>
+    ) : (
+      <Taskbar key="h" name="Sudoku Plus" state={state} actions={actions} />
+    )}
     {state.winner && <Winner key="b" state={state.winner} actions={actions} />}
     {state.bestTime && (
       <BestTimes

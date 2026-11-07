@@ -171,15 +171,20 @@
   border: 1px solid #000;
 }
 
+/*three a row, a short last row centred*/
 .games {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
+  justify-content: center;
 }
 
 .game {
   composes: chip;
+  flex: 0 0 calc((100% - 12px) / 3);
   flex-direction: column;
+  min-width: 0;
+  padding: 4px 2px;
   gap: 4px;
   min-height: 64px;
   font-size: 12px;
@@ -187,7 +192,10 @@
 
 .gameOn {
   composes: chipOn;
+  flex: 0 0 calc((100% - 12px) / 3);
   flex-direction: column;
+  min-width: 0;
+  padding: 4px 2px;
   gap: 4px;
   min-height: 64px;
   font-size: 12px;

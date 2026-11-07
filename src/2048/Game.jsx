@@ -8,6 +8,7 @@ import SideButton, { HintIcon, UndoIcon } from '../shell/SideButton'
 import WindowControls, { windowProps } from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { watchWindow } from '../shell/zoom'
+import { pageUrl, phone } from '../shell/phone'
 import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 
@@ -61,7 +62,7 @@ const Game = ({ key, state, actions }) => {
     <Dialog
       key={key}
       hidden={state.windowState !== 'open'}
-      title={state.theme === 'classic' ? '2048' : '2048 Plus'}
+      title={!phone && (state.theme === 'classic' ? '2048' : '2048 Plus')}
       titleHint="Double-click for 100% zoom"
       onTitleDoubleClick={() => actions.zoom(0)}
       controls={<WindowControls {...windowProps(state, actions, paused, running(game))} />}
@@ -71,7 +72,7 @@ const Game = ({ key, state, actions }) => {
         actions.fit()
       }}
     >
-      <Menu state={state} actions={actions} />
+      {!phone && <Menu state={state} actions={actions} />}
       <div class={g.root}>
         <div class={g.scoreboard}>
           <Digit value={game.score} digits={scoreDigits(game.score)} />
@@ -103,7 +104,7 @@ const Game = ({ key, state, actions }) => {
           {paused && <PausedCover onResume={() => actions.pause(false)} />}
         </Board>
         {hint && !paused && (
-          <HintPanel text={hint.text} more={hint.kind === 'move' && 'guide/#hints'} />
+          <HintPanel text={hint.text} more={hint.kind === 'move' && pageUrl('guide/#hints')} />
         )}
       </div>
     </Dialog>

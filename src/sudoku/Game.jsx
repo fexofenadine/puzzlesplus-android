@@ -9,13 +9,14 @@ import WindowControls, { windowProps } from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { guideTopic } from './hint'
 import { watchWindow } from '../shell/zoom'
+import { pageUrl, phone } from '../shell/phone'
 import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, digitCounts, geometry, violations } from './rules'
 
 //the guide's section on a hint, none for a solved board
-const more = (hint) => guideTopic(hint) && `guide/#${guideTopic(hint)}`
+const more = (hint) => guideTopic(hint) && pageUrl(`guide/#${guideTopic(hint)}`)
 
 export const running = ({ start, win, dealing }) => start >= 0 && !win && !dealing
 
@@ -104,7 +105,7 @@ const Game = ({ key, state, actions }) => {
     <Dialog
       key={key}
       hidden={state.windowState !== 'open'}
-      title={state.theme === 'classic' ? 'Sudoku' : 'Sudoku Plus'}
+      title={!phone && (state.theme === 'classic' ? 'Sudoku' : 'Sudoku Plus')}
       titleHint="Double-click for 100% zoom"
       onTitleDoubleClick={() => actions.zoom(0)}
       controls={<WindowControls {...windowProps(state, actions, paused, running(game))} />}
@@ -114,7 +115,7 @@ const Game = ({ key, state, actions }) => {
         actions.fit()
       }}
     >
-      <Menu state={state} actions={actions} />
+      {!phone && <Menu state={state} actions={actions} />}
       <div class={g.root}>
         <div class={g.scoreboard}>
           <Digit value={game.dealing ? 0 : left} />

@@ -1,8 +1,8 @@
-<p align="center"><img src="docs/social-preview.png" alt="Puzzles Plus: Minesweeper, Takuzu and Nonograms" width="640"></p>
+<p align="center"><img src="docs/social-preview.png" alt="Puzzles Plus: Minesweeper, Takuzu, Nonograms, Sudoku and 2048" width="640"></p>
 
 # Puzzles Plus for Android
 
-Minesweeper, Takuzu and Nonograms in a Windows 95 style, with hints that explain their reasoning and boards you can solve by logic alone, as an Android app. It is the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) made for phones: the same games, six themes and animated backgrounds, guides and best times, all inside the app so it plays offline.
+Minesweeper, Takuzu, Nonograms, Sudoku and 2048 in a Windows 95 style, with hints that explain their reasoning and boards you can solve by logic alone, as an Android app. It is the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) made for phones: the same games, six themes and animated backgrounds, guides and best times, all inside the app so it plays offline.
 
 **[Download the latest release](https://github.com/fexofenadine/puzzlesplus-android/releases/latest)**
 
@@ -21,12 +21,13 @@ Android 6 or later. Each release lists its APK's SHA-256, so you can check the d
 ## On a phone
 
 - **The game fills the screen** under a top bar in the theme's colours, with the menu, new game, hint and pause. Wide boards turn on their side in portrait.
-- **The menu** has the three games, new game, hint and undo, difficulty and size as buttons, each game's options, the six themes, background settings, the guides and About.
+- **The menu** has the five games, new game, hint and undo, difficulty and size as buttons, each game's options, the six themes, background settings, the guides and About.
 - **The back button** closes the menu or a dialog first, then leaves the app; a guide's back goes to its game.
 - The phone's status and navigation bars take the theme's colour, and the system font size leaves the games' pixel layout alone; the games have their own zoom.
+- **Resume**: a game in progress comes back paused after the app is closed, and a **Timer** option turns the clock off (and best times with it).
 - No taskbar, Start menu, boss key or window buttons: those belong to the website's desktop.
 
-Everything else, from the rules to every solving technique, is in each game's guide, in the app's menu or on the website: [Minesweeper](https://fexofenadine.github.io/puzzlesplus/minesweeper/guide/), [Takuzu](https://fexofenadine.github.io/puzzlesplus/takuzu/guide/) and [Nonograms](https://fexofenadine.github.io/puzzlesplus/nonograms/guide/).
+Everything else, from the rules to every solving technique, is in each game's guide, in the app's menu or on the website: [Minesweeper](https://fexofenadine.github.io/puzzlesplus/minesweeper/guide/), [Takuzu](https://fexofenadine.github.io/puzzlesplus/takuzu/guide/), [Nonograms](https://fexofenadine.github.io/puzzlesplus/nonograms/guide/), [Sudoku](https://fexofenadine.github.io/puzzlesplus/sudoku/guide/) and [2048](https://fexofenadine.github.io/puzzlesplus/2048/guide/).
 
 ## Building
 

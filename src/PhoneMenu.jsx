@@ -32,6 +32,7 @@ const PhoneMenu = ({ state, actions }) => [
       onToggle={actions.toggleSafeStart}
     />
     <Check name="Marks (?)" checked={state.marks} onToggle={actions.toggleMarks} />
+    <Check name="Timer" checked={state.timer} onToggle={actions.toggleTimer} />
     <Item glyph="🏆" name="Best times" onClick={actions.toggleBestTime} actions={actions} />
   </Section>,
 ]
