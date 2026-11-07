@@ -19,8 +19,28 @@ export const cellSizes = { 3: 72, 4: 60, 5: 52, 6: 46 }
 
 //a tile's look: its power of two picks the colour and the css the text that reads on it
 //its digit count picks the font size
-export const Tile = ({ tile, n }) => {
+//slides a tile from the cell it was drawn on to its new one in the original's 100 ms
+//animated from script because a keyed update can put a tile back into the page, which cancels a
+//css transition
+const glide = (element, from, to) => {
+  if (from[0] === to[0] && from[1] === to[1]) return
+  if (!element.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const board = element.parentNode.parentNode
+  const step = element.offsetWidth + parseFloat(getComputedStyle(board).columnGap || 0)
+  const dx = (from[0] - to[0]) * step
+  const dy = (from[1] - to[1]) * step
+  element.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0 0' }], {
+    duration: 100,
+    easing: 'ease-in-out',
+  })
+}
+
+//offset is where a drag holds it, in cells; still means the finger moves it, so no glide
+export const Tile = ({ tile, n, offset, still }) => {
   const k = Math.log2(tile.value)
+  const [ox, oy] = offset || [0, 0]
+  const x = (tile.cell % n) + ox
+  const y = Math.floor(tile.cell / n) + oy
   return (
     <div
       key={tile.id}
@@ -34,20 +54,33 @@ export const Tile = ({ tile, n }) => {
         .filter(Boolean)
         .join(' ')}
       data-digits={Math.min(5, String(tile.value).length)}
-      style={{ '--x': tile.cell % n, '--y': Math.floor(tile.cell / n), '--k': k }}
+      style={{ '--x': x, '--y': y, '--k': k }}
+      onupdate={(element, old) =>
+        !still && glide(element, [old.style['--x'], old.style['--y']], [x, y])
+      }
     >
       {tile.value}
     </div>
   )
 }
 
+//the tiles in the order they were made, so few elements move in the page
+const byId = (a, b) => a.id - b.id
+
 //the sunken cells and the tiles over them, drawn for the game and the guide alike
-export const Board = ({ n, tiles, hidden, onDown }, children) => (
+//drag holds tiles off their cells while a finger moves them
+export const Board = ({ n, tiles, hidden, drag, onDown }, children) => (
   <div class={s.board} style={{ '--n': n, '--cell': `${cellSizes[n]}px` }} onpointerdown={onDown}>
     {Array.from({ length: n * n }, () => (
       <div class={s.cell} />
     ))}
-    {!hidden && <div class={s.tiles}>{tiles.map((tile) => Tile({ tile, n }))}</div>}
+    {!hidden && (
+      <div class={s.tiles}>
+        {[...tiles]
+          .sort(byId)
+          .map((tile) => Tile({ tile, n, offset: drag && drag[tile.id], still: Boolean(drag) }))}
+      </div>
+    )}
     {children}
   </div>
 )
@@ -100,7 +133,13 @@ const Game = ({ key, state, actions }) => {
             blank={!state.timer}
           />
         </div>
-        <Board n={n} tiles={game.tiles} hidden={paused} onDown={actions.swipeStart}>
+        <Board
+          n={n}
+          tiles={game.tiles}
+          hidden={paused}
+          drag={state.drag}
+          onDown={actions.swipeStart}
+        >
           {paused && <PausedCover onResume={() => actions.pause(false)} />}
         </Board>
         {hint && !paused && (

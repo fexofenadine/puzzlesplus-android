@@ -18,6 +18,7 @@ import BestScores from './BestScores'
 import { offer, recordActions } from './records'
 import { canMove, highest, move, sizes, spawn, targets, tilesOf, valuesOf } from './rules'
 import { suggest } from './search'
+import { along, finishes, lockOf, offsetsOf, planOf } from './drag'
 import About from './About'
 import HowToPlay from './HowToPlay'
 
@@ -131,15 +132,19 @@ const keyDirs = {
   83: 'down',
 }
 
-//a swipe needs this many pixels along its main direction
-const SWIPE = 24
-
+//the pointer since it went down on the board: start, a cell's size on screen, the plan once locked
+//and recent { t, x, y } samples, for the release speed
 let swipe = null
+
+//the samples the release speed is measured over, in milliseconds
+const RECENT = 100
 
 export const state = {
   ...shellState('2048'),
   hint: null,
   prompt: false,
+  //each tile's offset in cells while a finger drags the board, else null
+  drag: null,
   //off unless switched on: a score game needs no clock
   timer: load('2048.timer') === 'on',
   about: false,
@@ -152,8 +157,9 @@ export const actions = {
   ...shellActions,
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
+    window.addEventListener('pointermove', actions.swipeMove)
     window.addEventListener('pointerup', actions.swipeEnd)
-    window.addEventListener('pointercancel', () => (swipe = null))
+    window.addEventListener('pointercancel', actions.swipeCancel)
     listen(actions)
   },
   press: (event) => (state, actions) => {
@@ -184,10 +190,12 @@ export const actions = {
       cancelAnimationFrame(game.raf)
       const n = (payload && payload.n) || game.n
       save('2048.size', n)
+      swipe = null
       const winner = !game.offered && game.history.length ? offer(game) : null
       return {
         menu: null,
         hint: null,
+        drag: null,
         prompt: false,
         ...(winner && { winner }),
         game: createGame(n),
@@ -195,9 +203,11 @@ export const actions = {
     },
   slide: (dir) => (state, actions) => {
     const { game } = state
-    if (game.paused || game.over || state.prompt) return null
+    //a key during a drag ends the drag
+    swipe = null
+    if (game.paused || game.over || state.prompt) return state.drag && { drag: null }
     const done = move(game.tiles, game.n, dir, game.nextId)
-    if (!done.moved) return null
+    if (!done.moved) return state.drag && { drag: null }
     const { tiles, nextId } = spawn(done.tiles, game.n, rng, done.nextId)
     const values = valuesOf(tiles, game.n)
     const next = {
@@ -218,26 +228,66 @@ export const actions = {
       winner = offer(next)
       next.offered = true
     }
-    return { hint: null, prompt: reached && !next.over, ...(winner && { winner }), game: next }
+    //the drag's offsets go in the same update, so the tiles slide on from where the finger left them
+    return {
+      hint: null,
+      drag: null,
+      prompt: reached && !next.over,
+      ...(winner && { winner }),
+      game: next,
+    }
   },
-  //swipes on the board, by touch or with the mouse held down
-  swipeStart: (event) => () => {
-    swipe = { x: event.clientX, y: event.clientY }
+  //drags on the board, by touch or with the mouse held down: the tiles follow along the direction
+  //the drag settles on, and the release finishes the move or lets them spring back
+  swipeStart: (event) => (state) => {
+    const { game } = state
+    if (game.paused || game.over || state.prompt || event.button > 0) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const { clientX: x, clientY: y, timeStamp: t } = event
+    swipe = { x, y, size: rect.width / game.n || 1, plan: null, samples: [{ t, x, y }] }
+  },
+  swipeMove: (event) => (state) => {
+    if (!swipe) return null
+    const { clientX: x, clientY: y, timeStamp: t } = event
+    swipe.samples = [...swipe.samples.filter((s) => t - s.t <= RECENT), { t, x, y }]
+    const dx = x - swipe.x
+    const dy = y - swipe.y
+    if (!swipe.plan) {
+      const dir = lockOf(dx, dy)
+      if (!dir) return null
+      const { game } = state
+      swipe.plan = planOf(game.tiles, game.n, dir, game.nextId)
+    }
+    return { drag: offsetsOf(swipe.plan, along(swipe.plan.dir, dx, dy) / swipe.size) }
   },
   swipeEnd: (event) => (state, actions) => {
-    if (!swipe) return
-    const dx = event.clientX - swipe.x
-    const dy = event.clientY - swipe.y
+    if (!swipe) return null
+    const { plan, size, samples } = swipe
+    const { clientX: x, clientY: y, timeStamp: t } = event
+    const start = swipe
     swipe = null
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE) return
-    if (Math.abs(dx) > Math.abs(dy)) actions.slide(dx > 0 ? 'right' : 'left')
-    else actions.slide(dy > 0 ? 'down' : 'up')
+    if (!plan) return null
+    const a = along(plan.dir, x - start.x, y - start.y)
+    //from the oldest sample still recent, so a finger that stopped before lifting isn't a flick
+    const first = samples.find((s) => t - s.t <= RECENT)
+    const speed =
+      first && t > first.t ? along(plan.dir, x - first.x, y - first.y) / (t - first.t) : 0
+    if (finishes(plan, a / size, speed)) {
+      actions.slide(plan.dir)
+      return null
+    }
+    return { drag: null }
+  },
+  swipeCancel: () => () => {
+    swipe = null
+    return { drag: null }
   },
   //back one move, even out of a lost game; the game then keeps its scores with the helped ones
   undo:
     () =>
     ({ game }, actions) => {
       if (!game.history.length || game.paused) return { menu: null }
+      swipe = null
       const { values, score } = game.history.at(-1)
       const { tiles, nextId } = tilesOf(values, game.nextId)
       const next = {
@@ -252,7 +302,7 @@ export const actions = {
       }
       //a lost game's clock had stopped
       if (game.over && game.start >= 0) next.raf = requestAnimationFrame(actions.tick)
-      return { menu: null, hint: null, game: next }
+      return { menu: null, hint: null, drag: null, game: next }
     },
   hint:
     () =>
@@ -283,7 +333,7 @@ export const actions = {
     ({ about }) => ({ menu: null, about: !about }),
   pause: pauseAction(running, () => {
     swipe = null
-    return {}
+    return { drag: null }
   }),
   tick:
     () =>

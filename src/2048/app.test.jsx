@@ -66,14 +66,68 @@ it('ignores a move that changes nothing', () => {
   expect(now().game.start).toBe(-1)
 })
 
-it('swipes by the longer way the pointer travelled, past a few pixels', () => {
+//a board 240 px wide, so a cell is 60 px on screen
+const board = { getBoundingClientRect: () => ({ width: 240 }) }
+
+//a drag through points [x, y, ms] from the first
+const drag = (points) => {
+  const [[x0, y0, t0], ...rest] = points
+  wired.swipeStart({ clientX: x0, clientY: y0, timeStamp: t0, button: 0, currentTarget: board })
+  for (const [x, y, t] of rest) wired.swipeMove({ clientX: x, clientY: y, timeStamp: t })
+  const [x, y, t] = points.at(-1)
+  wired.swipeEnd({ clientX: x, clientY: y, timeStamp: t })
+}
+
+it('moves the tiles with a drag and finishes past halfway', () => {
+  //the 2 travels three cells left, 180 px
   start({ game: gameOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) })
-  wired.swipeStart({ clientX: 100, clientY: 100 })
-  wired.swipeEnd({ clientX: 110, clientY: 105 })
+  const id = now().game.tiles[0].id
+  wired.swipeStart({ clientX: 300, clientY: 100, timeStamp: 0, button: 0, currentTarget: board })
+  wired.swipeMove({ clientX: 240, clientY: 102, timeStamp: 500 })
+  //a third of the way, following the finger
+  expect(now().drag[id][0]).toBeCloseTo(-1)
+  expect(now().drag[id][1]).toBe(0)
+  //a slow release short of halfway springs back
+  wired.swipeEnd({ clientX: 240, clientY: 102, timeStamp: 1000 })
+  expect(now().drag).toBe(null)
   expect(now().game.history).toHaveLength(0)
-  wired.swipeStart({ clientX: 100, clientY: 100 })
-  wired.swipeEnd({ clientX: 60, clientY: 110 })
+  //slowly past halfway finishes
+  drag([
+    [300, 100, 2000],
+    [260, 100, 2500],
+    [200, 100, 3000],
+    [200, 100, 3500],
+  ])
   expect(values()[0]).toBe(2)
+  expect(now().drag).toBe(null)
+})
+
+it('finishes a short quick flick and ignores a tap', () => {
+  start({ game: gameOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) })
+  drag([
+    [300, 100, 0],
+    [303, 101, 10],
+  ])
+  expect(now().game.history).toHaveLength(0)
+  drag([
+    [300, 100, 0],
+    [285, 100, 20],
+    [270, 100, 40],
+  ])
+  expect(values()[0]).toBe(2)
+})
+
+it('keeps the direction a drag settled on', () => {
+  start({ game: gameOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) })
+  //left first, then a long way down: the tiles only ever went left, and down never happens
+  drag([
+    [300, 100, 0],
+    [285, 100, 500],
+    [285, 300, 1000],
+    [285, 300, 1500],
+  ])
+  expect(now().game.history).toHaveLength(0)
+  expect(values()[3]).toBe(2)
 })
 
 it('undoes moves one at a time and keeps the game with the helped ones', () => {

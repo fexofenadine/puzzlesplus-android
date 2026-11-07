@@ -123,7 +123,6 @@
     inset 2px 2px 0 color-mix(in srgb, var(--cell-light) 70%, transparent),
     inset -2px -2px 0 color-mix(in srgb, var(--cell-shadow) 80%, transparent);
   transform: translate(calc(var(--x) * var(--step)), calc(var(--y) * var(--step)));
-  transition: transform 0.1s ease-in-out;
 }
 
 .beyond {
@@ -143,43 +142,52 @@
   font-size: calc(var(--cell) * 0.23);
 }
 
-/*the two halves of a merge slide under the new tile and go with the next move*/
+/*the two halves of a merge slide under the new tile, then hide once it has popped*/
+/*so a drag that moves the new tile never shows them*/
 .gone {
   z-index: 0;
+  animation: hide 0s 0.3s forwards;
 }
 
+/*timings follow the original: a 100 ms slide, then 200 ms to appear or pop*/
 .fresh {
-  animation: grow 0.15s ease-out 0.1s backwards;
+  animation: grow 0.2s ease 0.1s backwards;
 }
 
 .merged {
   z-index: 2;
-  animation: pop 0.15s ease-out 0.1s backwards;
+  animation: pop 0.2s ease 0.1s backwards;
 }
 
 @keyframes grow {
   from {
     opacity: 0;
-    scale: 0.2;
+    scale: 0;
   }
 }
 
 @keyframes pop {
   from {
-    scale: 0.6;
+    scale: 0;
   }
-  60% {
-    scale: 1.15;
+  50% {
+    scale: 1.2;
+  }
+}
+
+@keyframes hide {
+  to {
+    visibility: hidden;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tile {
-    transition: none;
-  }
-
   .fresh,
   .merged {
     animation: none;
+  }
+
+  .gone {
+    animation-delay: 0s;
   }
 }
