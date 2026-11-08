@@ -136,11 +136,7 @@ const keyDirs = {
 }
 
 //the pointer since it went down on the board: start, a cell's size on screen, the plan once locked
-//and recent { t, x, y } samples, for the release speed
 let swipe = null
-
-//the samples the release speed is measured over, in milliseconds
-const RECENT = 100
 
 export const state = {
   ...shellState('2048'),
@@ -250,13 +246,12 @@ export const actions = {
     if (game.paused || game.over || state.prompt || event.button > 0) return
     const board = event.currentTarget
     const rect = board.getBoundingClientRect()
-    const { clientX: x, clientY: y, timeStamp: t } = event
-    swipe = { x, y, board, size: rect.width / game.n || 1, plan: null, samples: [{ t, x, y }] }
+    const { clientX: x, clientY: y } = event
+    swipe = { x, y, board, size: rect.width / game.n || 1, plan: null }
   },
   swipeMove: (event) => (state) => {
     if (!swipe) return
-    const { clientX: x, clientY: y, timeStamp: t } = event
-    swipe.samples = [...swipe.samples.filter((s) => t - s.t <= RECENT), { t, x, y }]
+    const { clientX: x, clientY: y } = event
     const dx = x - swipe.x
     const dy = y - swipe.y
     if (!swipe.plan) {
@@ -269,17 +264,11 @@ export const actions = {
   },
   swipeEnd: (event) => (state, actions) => {
     if (!swipe) return null
-    const { plan, size, samples, board } = swipe
-    const { clientX: x, clientY: y, timeStamp: t } = event
+    const { plan, board } = swipe
     const start = swipe
     swipe = null
     if (!plan) return null
-    const a = along(plan.dir, x - start.x, y - start.y)
-    //from the oldest sample still recent, so a finger that stopped before lifting isn't a flick
-    const first = samples.find((s) => t - s.t <= RECENT)
-    const speed =
-      first && t > first.t ? along(plan.dir, x - first.x, y - first.y) / (t - first.t) : 0
-    if (finishes(plan, a / size, speed)) {
+    if (finishes(plan, along(plan.dir, event.clientX - start.x, event.clientY - start.y))) {
       actions.slide(plan.dir)
       return null
     }

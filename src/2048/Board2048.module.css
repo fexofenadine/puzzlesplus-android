@@ -169,8 +169,9 @@ one, else a ramp: each doubling turns the hue a step and shifts the lightness*/
 
 .tile {
   position: absolute;
-  top: 0;
-  left: 0;
+  /*placed by offset, not transform, so the pop's scale is about the tile's own centre*/
+  top: calc(var(--y) * var(--step));
+  left: calc(var(--x) * var(--step));
   z-index: 1;
   width: var(--cell);
   height: var(--cell);
@@ -192,9 +193,8 @@ one, else a ramp: each doubling turns the hue a step and shifts the lightness*/
   color: var(--t-fg);
   background: var(--t-bg);
   border-radius: 3px;
-  transform: translate(calc(var(--x) * var(--step)), calc(var(--y) * var(--step)));
   /*its own layer, so slides stay smooth while a background animates*/
-  will-change: transform, translate;
+  will-change: translate, scale;
 }
 
 .tile[data-k='1'] {

@@ -33,7 +33,7 @@
 }
 
 .pressed::before {
-  border: 1px solid var(--cell-shadow);
+  border: 1px solid var(--grid-line, var(--cell-shadow));
   border-width: 1px 0 0 1px;
 }
 

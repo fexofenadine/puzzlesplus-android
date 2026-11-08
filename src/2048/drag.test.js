@@ -43,17 +43,16 @@ describe('drag', () => {
     const far = offsetsOf(plan, 5)[tiles[0].id][0]
     expect(far).toBeLessThan(0)
     expect(far).toBeGreaterThan(-0.15)
-    expect(finishes(plan, 5, 3)).toBe(false)
+    expect(finishes(plan, 300)).toBe(false)
   })
 
-  it('finishes past halfway or on a flick onwards', () => {
+  it('finishes once the finger went more than 10px onwards, like the original', () => {
     const { tiles, nextId } = tilesOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1)
     const plan = planOf(tiles, 4, 'left', nextId)
     expect(progressOf(plan, 1.5)).toBe(0.5)
-    expect(finishes(plan, 1.4, 0.1)).toBe(false)
-    expect(finishes(plan, 1.5, 0)).toBe(true)
-    expect(finishes(plan, 0.3, 0.8)).toBe(true)
-    //a flick back the other way doesn't count
-    expect(finishes(plan, -0.3, 0.8)).toBe(false)
+    expect(finishes(plan, 10)).toBe(false)
+    expect(finishes(plan, 11)).toBe(true)
+    //brought back towards the start, the tiles spring back
+    expect(finishes(plan, -20)).toBe(false)
   })
 })

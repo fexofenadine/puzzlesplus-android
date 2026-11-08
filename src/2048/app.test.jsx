@@ -78,7 +78,7 @@ const drag = (points) => {
   wired.swipeEnd({ clientX: x, clientY: y, timeStamp: t })
 }
 
-it('moves the tiles with a drag and finishes past halfway', () => {
+it('moves the tiles with a drag and finishes past 10px', () => {
   //the 2 travels three cells left, 180 px
   start({ game: gameOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) })
   //a stand-in for the tile on the page, 60 px wide with no gap
@@ -88,46 +88,42 @@ it('moves the tiles with a drag and finishes past halfway', () => {
   wired.swipeMove({ clientX: 240, clientY: 102, timeStamp: 500 })
   //a third of the way, following the finger: one cell of the three
   expect(tile.style.translate).toBe('-60px 0px')
-  //a slow release short of halfway springs back
-  wired.swipeEnd({ clientX: 240, clientY: 102, timeStamp: 1000 })
+  //brought back near the start, the release springs back
+  wired.swipeMove({ clientX: 295, clientY: 102, timeStamp: 800 })
+  wired.swipeEnd({ clientX: 295, clientY: 102, timeStamp: 1000 })
   expect(tile.style.translate).toBe('')
   expect(now().game.history).toHaveLength(0)
-  //slowly past halfway finishes
+  //a short slow drag finishes, as in the original
   drag([
     [300, 100, 2000],
-    [260, 100, 2500],
-    [200, 100, 3000],
-    [200, 100, 3500],
+    [292, 100, 2500],
+    [285, 100, 3000],
+    [285, 100, 3500],
   ])
   expect(values()[0]).toBe(2)
 })
 
-it('finishes a short quick flick and ignores a tap', () => {
+it('ignores a tap', () => {
   start({ game: gameOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) })
   drag([
     [300, 100, 0],
     [303, 101, 10],
   ])
   expect(now().game.history).toHaveLength(0)
-  drag([
-    [300, 100, 0],
-    [285, 100, 20],
-    [270, 100, 40],
-  ])
-  expect(values()[0]).toBe(2)
+  expect(values()[3]).toBe(2)
 })
 
 it('keeps the direction a drag settled on', () => {
   start({ game: gameOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) })
-  //left first, then a long way down: the tiles only ever went left, and down never happens
+  //left first, then a long way down: the tiles went left, and down never happens
   drag([
     [300, 100, 0],
     [285, 100, 500],
     [285, 300, 1000],
     [285, 300, 1500],
   ])
-  expect(now().game.history).toHaveLength(0)
-  expect(values()[3]).toBe(2)
+  expect(values()[0]).toBe(2)
+  expect(values()[12]).toBe(0)
 })
 
 it('undoes moves one at a time and keeps the game with the helped ones', () => {

@@ -3,9 +3,6 @@ import { move } from './rules'
 //a drag settles on a direction after this many pixels and keeps it until the finger lifts
 export const LOCK = 10
 
-//a release this fast (pixels a millisecond along the direction) finishes the move however short
-export const FLICK = 0.5
-
 //how far the tiles nudge, in cells, when the direction can't move anything
 const NUDGE = 0.12
 
@@ -66,6 +63,6 @@ export const offsetsOf = (plan, cells) => {
 export const progressOf = (plan, cells) =>
   plan.moved ? Math.min(1, Math.max(0, cells / plan.far)) : 0
 
-//a release finishes the move when the tiles got halfway or the finger flicked on
-export const finishes = (plan, cells, speed) =>
-  plan.moved && (progressOf(plan, cells) >= 0.5 || (cells > 0 && speed >= FLICK))
+//a release more than LOCK pixels onwards finishes the move, like the original's touchend
+//only a finger brought back near its start lets the tiles spring back
+export const finishes = (plan, pixels) => plan.moved && pixels > LOCK

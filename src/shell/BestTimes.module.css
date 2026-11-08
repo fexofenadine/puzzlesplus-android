@@ -1,12 +1,32 @@
+/*every other row banded, a rule under the levels and faint column lines, each a shade of the window*/
 .table {
+  --rule: color-mix(in srgb, var(--text) 22%, var(--face));
+  --band: color-mix(in srgb, var(--text) 7%, var(--face));
   margin: 0 8px;
   border-collapse: collapse;
+}
+
+.table tbody tr:nth-child(odd) {
+  background: var(--band);
+}
+
+.table thead th {
+  border-bottom: 1px solid var(--rule);
+}
+
+.table td {
+  border-left: 1px solid color-mix(in srgb, var(--rule) 50%, transparent);
 }
 
 .level,
 .size {
   padding: 2px 8px;
   font-weight: normal;
+}
+
+/*levels centred over their centred scores*/
+.level {
+  text-align: center;
 }
 
 .size {

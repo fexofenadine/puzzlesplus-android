@@ -51,7 +51,8 @@
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: 1;
+  /*above the board's own layers: merged tiles, the paused cover, the lost field's glitch*/
+  z-index: 3;
   display: none;
   background: var(--face);
   border: 1px solid;
