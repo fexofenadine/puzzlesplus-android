@@ -5,6 +5,7 @@ import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
 import BackgroundSettings from './shell/BackgroundSettings'
+import Switching from './shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 import Boss from './shell/Boss'
@@ -103,6 +104,10 @@ const unpackCell = (v) => {
 export const saved = resumable({
   key: 'savedGame',
   running,
+  label: ({ level, width, height, mines }) =>
+    level === 'custom'
+      ? `${width} × ${height}, ${mines} mines`
+      : level[0].toUpperCase() + level.slice(1),
   pack: ({ level, width, height, mines, field, left, flags, hinted, untimed }) => ({
     level,
     width,
@@ -222,6 +227,7 @@ const prevent = (event) => {
 export const state = {
   ...shellState('minesweeper'),
   hint: null,
+  shelf: saved.list(),
   game: saved.restore() || createGame(loadLevel()),
   marks: Boolean(load('marks')),
   safeStart: load('safeStart') !== 'off',
@@ -242,7 +248,7 @@ export const actions = {
   press: (event) => (state, actions) => {
     const key = shortcut(event, state, actions)
     if (key === 113 || key === 78) {
-      actions.reset()
+      actions.newGame()
     } else if (key === 72) {
       actions.hint()
     } else if (key === 80) {
@@ -580,7 +586,7 @@ export const actions = {
     (event) =>
     ({ game, customField }, actions) => {
       event.preventDefault()
-      actions.reset(customLevel(customField, game))
+      actions.newGame(customLevel(customField, game))
       return { customField: null }
     },
   toggleSafeStart: () => (state) => {
@@ -634,6 +640,7 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.switching && <Switching key="k" title="Minesweeper Plus" actions={actions} />}
     {state.about && <About key="f" actions={actions} />}
     {state.howTo && <HowToPlay key="i" actions={actions} />}
     {state.openGames && <OpenGames key="j" state={state} actions={actions} />}

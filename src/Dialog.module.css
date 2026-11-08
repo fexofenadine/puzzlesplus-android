@@ -88,3 +88,30 @@
   display: block;
   fill: currentColor;
 }
+
+/*a game window faded so the background shows: frame, title bar and face mix toward clear*/
+/*its cells, outlines, buttons and counters keep their own colours*/
+.clear {
+  --clear-face: color-mix(in srgb, var(--face) var(--window), transparent);
+  --clear-panel: color-mix(in srgb, var(--panel) var(--window), transparent);
+  --clear-light: color-mix(in srgb, var(--light) var(--window), transparent);
+  --clear-shadow: color-mix(in srgb, var(--shadow) var(--window), transparent);
+  --clear-frame: color-mix(in srgb, var(--window-frame) var(--window), transparent);
+  background: var(--clear-face);
+  border-color: var(--clear-face) var(--clear-frame) var(--clear-frame) var(--clear-face);
+  box-shadow: none;
+  animation: none;
+}
+
+.clear > .container {
+  border-color: var(--clear-light) var(--clear-shadow) var(--clear-shadow) var(--clear-light);
+}
+
+.clear .header {
+  background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--title-start) var(--window), transparent),
+      color-mix(in srgb, var(--title-end) var(--window), transparent)
+    )
+    100% 0 no-repeat;
+}

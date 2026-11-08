@@ -12,6 +12,7 @@ import { guideTopic } from './hint'
 import { watchWindow } from './shell/zoom'
 import { pageUrl, phone } from './shell/phone'
 import { clockDigits } from './shell/clock'
+import { windowClear } from './shell/actions'
 
 //the guide's section on a hint, none for a solved board
 const more = (hint) => guideTopic(hint) && pageUrl(`guide/#${guideTopic(hint)}`)
@@ -38,6 +39,7 @@ const Face = ({ state, actions }) => (
 
 const Game = ({ key, state, actions }) => (
   <Dialog
+    clear={windowClear(state)}
     key={key}
     hidden={state.windowState !== 'open'}
     title={!phone && (state.theme === 'classic' ? 'Minesweeper' : 'Minesweeper Plus')}

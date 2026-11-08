@@ -20,6 +20,7 @@ import { canMove, highest, move, sizes, spawn, targets, tilesOf, valuesOf } from
 import { suggest } from './search'
 import { along, finishes, lockOf, offsetsOf, planOf } from './drag'
 import { hold, letGo } from './motion'
+import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 
@@ -77,6 +78,7 @@ const valuesCheck = (values, n) => {
 export const saved = resumable({
   key: '2048.saved',
   running,
+  label: ({ n, score }) => `${n} × ${n}, ${score} points`,
   pack: ({ n, tiles, score, tile, history, reached, hinted, undone, untimed }) => ({
     n,
     values: valuesOf(tiles, n),
@@ -147,6 +149,7 @@ export const state = {
   //off unless switched on: a score game needs no clock
   timer: load('2048.timer') === 'on',
   about: false,
+  shelf: saved.list(),
   game: saved.restore() || createGame(loadSize()),
   winner: null,
   bestTime: null,
@@ -172,7 +175,7 @@ export const actions = {
     const key = shortcut(event, state, actions)
     if (key === null) return
     if (key === 113 || key === 78) {
-      actions.reset()
+      actions.newGame()
     } else if (key === 72) {
       actions.hint()
     } else if (key === 80) {
@@ -185,12 +188,14 @@ export const actions = {
   //a new board, keeping the size unless given; a game left with a best score asks for a name
   reset:
     (payload) =>
-    ({ game }) => {
+    ({ game, switching }) => {
       cancelAnimationFrame(game.raf)
       const n = (payload && payload.n) || game.n
       save('2048.size', n)
       swipe = null
-      const winner = !game.offered && game.history.length ? offer(game) : null
+      //a game put aside for later is not over, so it offers no best score
+      const parked = switching && switching.parked
+      const winner = !parked && !game.offered && game.history.length ? offer(game) : null
       return {
         menu: null,
         hint: null,
@@ -386,6 +391,7 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.switching && <Switching key="k" title="2048" actions={actions} />}
     {state.about && <About key="f" actions={actions} />}
     {state.howTo && <HowToPlay key="i" actions={actions} />}
     {state.openGames && <OpenGames key="j" state={state} actions={actions} />}

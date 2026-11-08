@@ -2,6 +2,7 @@ import { h } from 'hyperapp'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
 import { backgroundFor } from './backgrounds'
 import { themes } from './themes'
+import { isGame } from './actions'
 
 //the theme menu every game shares, a game's own theme options go after it
 const ThemeMenu = ({ state, actions }, children) => (
@@ -13,9 +14,20 @@ const ThemeMenu = ({ state, actions }, children) => (
         onClick={() => actions.setTheme(theme)}
       />
     ))}
-    {backgroundFor(state.theme) && <Separator />}
-    {backgroundFor(state.theme) && (
+    {(backgroundFor(state.theme) || isGame(state.page)) && <Separator />}
+    {backgroundFor(state.theme) ? (
       <SubMenuItem name="Background Settings..." onClick={actions.toggleBackgroundSettings} />
+    ) : (
+      isGame(state.page) && (
+        <SubMenuItem name="Window Settings..." onClick={actions.toggleBackgroundSettings} />
+      )
+    )}
+    {isGame(state.page) && (
+      <SubMenuItem
+        name="Hide Window"
+        checked={state.glass.hidden}
+        onClick={actions.toggleHideWindow}
+      />
     )}
     {children}
   </MenuItem>

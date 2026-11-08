@@ -77,6 +77,7 @@ export const startGuide = ({ page, root = '../../', home = '../', title, icon, p
     },
     pause: () => null,
     reset: () => null,
+    closeGame: () => (state, actions) => actions.finishClose(),
   }
   const view = (state, actions) => (
     <main oncreate={actions.init}>

@@ -20,6 +20,27 @@ import {
 //state and actions every game window shares, spread into each game's own
 //games provide pause(paused), press(event) and reset(), the shell calls them
 
+//the game window's frame: opacity in percent, hidden fades it out entirely
+const loadGlass = () => {
+  const opacity = Number(load('windowOpacity'))
+  return {
+    opacity: load('windowOpacity') && opacity >= 0 && opacity <= 100 ? opacity : 100,
+    hidden: Boolean(load('windowHidden')),
+  }
+}
+
+//how solid a game window's frame is now, null while fully solid
+export const windowClear = ({ glass, backgroundSettings }) => {
+  const opacity = glass.hidden
+    ? 0
+    : backgroundSettings && backgroundSettings.opacity !== undefined
+      ? backgroundSettings.opacity
+      : glass.opacity
+  return opacity < 100 ? opacity : null
+}
+
+export const isGame = (page) => games.some(([id]) => id === page)
+
 const loadTheme = () => {
   const theme = load('theme')
   return themes.some(([id]) => id === theme) ? theme : 'classic'
@@ -27,7 +48,7 @@ const loadTheme = () => {
 
 //the site's top page opens the game played last
 const remember = (page) => {
-  if (games.some(([id]) => id === page)) save('lastGame', page)
+  if (isGame(page)) save('lastGame', page)
   return page
 }
 
@@ -44,10 +65,13 @@ export const shellState = (page, root = '../') => ({
   drawer: false,
   //where back leaves to on a phone, a guide's game, otherwise the home screen
   home: null,
+  //set while a game in play waits to hear what becomes of it
+  switching: null,
   theme: loadTheme(),
   boss: null,
   backgrounds: loadSettings(),
   backgroundSettings: null,
+  glass: loadGlass(),
   howTo: false,
   //a phone always fills the screen
   zoom: { chosen: loadZoom(), scale: loadZoom(), seen: null, maximised: phone || loadMaximised() },
@@ -117,6 +141,9 @@ export const shellActions = {
   },
   //closing ends the game and offers every game instead
   close: () => (state, actions) => {
+    actions.closeGame()
+  },
+  finishClose: () => (state, actions) => {
     actions.reset()
     return { menu: null, windowState: 'closed', openGames: state.page }
   },
@@ -147,32 +174,56 @@ export const shellActions = {
       return { menu: null, boss: makeSheet() }
     },
   //a live draft, cancel restores the saved settings
+  //a theme without a background still has the window's opacity, game pages only
   toggleBackgroundSettings:
     () =>
-    ({ theme, backgrounds, backgroundSettings }) => {
+    ({ page, theme, backgrounds, backgroundSettings, glass }) => {
       if (backgroundSettings) {
-        configure(backgroundSettings.id, backgrounds[backgroundSettings.id])
+        if (backgroundSettings.id)
+          configure(backgroundSettings.id, backgrounds[backgroundSettings.id])
         return { backgroundSettings: null }
       }
       const id = backgroundFor(theme)
-      return { menu: null, backgroundSettings: id && { id, draft: { ...backgrounds[id] } } }
+      const opacity = isGame(page) ? glass.opacity : undefined
+      if (!id && opacity === undefined) return { menu: null }
+      return {
+        menu: null,
+        backgroundSettings: { id, draft: id ? { ...backgrounds[id] } : {}, opacity },
+      }
     },
   changeBackgroundSettings:
     (values) =>
-    ({ backgroundSettings: { id, draft } }) => {
-      const next = { ...draft, ...values }
-      configure(id, next)
-      return { backgroundSettings: { id, draft: next } }
+    ({ backgroundSettings }) => {
+      const draft = { ...backgroundSettings.draft, ...values }
+      if (backgroundSettings.id) configure(backgroundSettings.id, draft)
+      return { backgroundSettings: { ...backgroundSettings, draft } }
     },
-  resetBackgroundSettings: () => (state, actions) =>
-    actions.changeBackgroundSettings(defaults(state.backgroundSettings.id)),
+  changeOpacity:
+    (opacity) =>
+    ({ backgroundSettings }) => ({ backgroundSettings: { ...backgroundSettings, opacity } }),
+  resetBackgroundSettings: () => (state, actions) => {
+    const { id, opacity } = state.backgroundSettings
+    if (opacity !== undefined) actions.changeOpacity(100)
+    if (id) actions.changeBackgroundSettings(defaults(id))
+  },
   submitBackgroundSettings:
     (event) =>
-    ({ backgrounds, backgroundSettings: { id, draft } }) => {
+    ({ backgrounds, backgroundSettings: { id, draft, opacity }, glass }) => {
       event.preventDefault()
-      const next = { ...backgrounds, [id]: draft }
-      saveSettings(next)
-      return { backgrounds: next, backgroundSettings: null }
+      const next = id ? { ...backgrounds, [id]: draft } : backgrounds
+      if (id) saveSettings(next)
+      if (opacity !== undefined) save('windowOpacity', opacity === 100 ? '' : opacity)
+      return {
+        backgrounds: next,
+        backgroundSettings: null,
+        glass: opacity === undefined ? glass : { ...glass, opacity },
+      }
+    },
+  toggleHideWindow:
+    () =>
+    ({ glass }) => {
+      save('windowHidden', glass.hidden ? '' : 'yes')
+      return { menu: null, glass: { ...glass, hidden: !glass.hidden } }
     },
   //shrink the chosen zoom to fit, only for a new level, theme or browser size
   fit:

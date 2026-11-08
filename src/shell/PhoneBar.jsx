@@ -5,6 +5,7 @@ import { book, help, icons } from './Taskbar'
 import { backgroundFor } from './backgrounds'
 import avatar from './avatar.png'
 import { pageUrl } from './phone'
+import { clockText } from './ResumeItems'
 
 const MENU = 'M3 5h18v2.5H3zM3 10.75h18v2.5H3zM3 16.5h18V19H3z'
 const BACK = 'M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z'
@@ -109,7 +110,7 @@ const PhoneBar = (
           <BarButton title="Menu" d={MENU} onClick={() => actions.toggleDrawer()} />
         )}
         <span class={s.title}>{title}</span>
-        {!back && <BarButton title="New game" d={NEW} onClick={() => actions.reset()} />}
+        {!back && <BarButton title="New game" d={NEW} onClick={() => actions.newGame()} />}
         {!back && <BarButton title="Hint" d={HINT} onClick={() => actions.hint()} />}
         {!back && (
           <BarButton
@@ -142,6 +143,18 @@ const PhoneBar = (
             </div>
           </Section>
           {children}
+          {state.shelf && state.shelf.length > 0 && (
+            <Section label="Resume">
+              {state.shelf.map(({ id, label, elapsed }) => (
+                <Item
+                  glyph="▶"
+                  name={`${label} ${clockText(elapsed)}`}
+                  onClick={() => actions.resumeGame(id)}
+                  actions={actions}
+                />
+              ))}
+            </Section>
+          )}
           <Section>
             <Chips
               label="Theme"
@@ -151,14 +164,17 @@ const PhoneBar = (
               actions={actions}
             />
             {look}
-            {backgroundFor(state.theme) && (
-              <Item
-                glyph="⚙"
-                name="Background settings"
-                onClick={actions.toggleBackgroundSettings}
-                actions={actions}
-              />
-            )}
+            <Item
+              glyph="⚙"
+              name={backgroundFor(state.theme) ? 'Background settings' : 'Window settings'}
+              onClick={actions.toggleBackgroundSettings}
+              actions={actions}
+            />
+            <Check
+              name="Hide window"
+              checked={state.glass.hidden}
+              onToggle={actions.toggleHideWindow}
+            />
           </Section>
           <Section>
             <Item icon={book} name={`${name} guide`} onClick={go('guide/')} actions={actions} />

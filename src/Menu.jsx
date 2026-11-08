@@ -2,6 +2,7 @@ import { h } from 'hyperapp'
 import s from './Menu.module.css'
 import ThemeMenu from './shell/ThemeMenu'
 import ViewMenu from './shell/ViewMenu'
+import { resumeItems } from './shell/ResumeItems'
 import { gameLinks } from './shell/GameLinks'
 
 export const SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, children) => (
@@ -48,28 +49,28 @@ export const Separator = () => <li class={s.separator} />
 const Menu = ({ state, actions }) => (
   <ul class={s.root} tabindex={-1} onfocusout={actions.toggleMenu}>
     <MenuItem name="Game" type="game" active={state.menu} onChange={actions.toggleMenu}>
-      <SubMenuItem name="New" hotKey="F2" onClick={() => actions.reset()} />
+      <SubMenuItem name="New" hotKey="F2" onClick={() => actions.newGame()} />
       <SubMenuItem name="Hint" hotKey="H" onClick={() => actions.hint()} />
       <Separator />
       <SubMenuItem
         name="Beginner"
         checked={state.game.level === 'beginner'}
-        onClick={() => actions.reset({ level: 'beginner' })}
+        onClick={() => actions.newGame({ level: 'beginner' })}
       />
       <SubMenuItem
         name="Intermediate"
         checked={state.game.level === 'intermediate'}
-        onClick={() => actions.reset({ level: 'intermediate' })}
+        onClick={() => actions.newGame({ level: 'intermediate' })}
       />
       <SubMenuItem
         name="Expert"
         checked={state.game.level === 'expert'}
-        onClick={() => actions.reset({ level: 'expert' })}
+        onClick={() => actions.newGame({ level: 'expert' })}
       />
       <SubMenuItem
         name="Extreme"
         checked={state.game.level === 'extreme'}
-        onClick={() => actions.reset({ level: 'extreme' })}
+        onClick={() => actions.newGame({ level: 'extreme' })}
       />
       <SubMenuItem
         name="Custom..."
@@ -88,6 +89,7 @@ const Menu = ({ state, actions }) => (
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />
+      {resumeItems(state, actions)}
       {gameLinks('minesweeper')}
     </MenuItem>
     <ViewMenu state={state} actions={actions} />

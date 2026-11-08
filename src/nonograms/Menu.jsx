@@ -3,6 +3,7 @@ import m from '../Menu.module.css'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
 import ThemeMenu from '../shell/ThemeMenu'
 import ViewMenu from '../shell/ViewMenu'
+import { resumeItems } from '../shell/ResumeItems'
 import { gameLinks } from '../shell/GameLinks'
 import { sizes } from './rules'
 
@@ -17,7 +18,7 @@ export const fallback = (n, level) => (allowed(n, level) ? level : fallback(n, l
 const Menu = ({ state, actions }) => (
   <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>
     <MenuItem name="Game" type="game" active={state.menu} onChange={actions.toggleMenu}>
-      <SubMenuItem name="New" hotKey="F2" onClick={() => actions.reset()} />
+      <SubMenuItem name="New" hotKey="F2" onClick={() => actions.newGame()} />
       <SubMenuItem name="Undo" hotKey="Ctrl+Z" onClick={() => actions.undo()} />
       <SubMenuItem name="Hint" hotKey="H" onClick={() => actions.hint()} />
       <Separator />
@@ -26,7 +27,7 @@ const Menu = ({ state, actions }) => (
           name={name}
           checked={state.game.level === level}
           disabled={!allowed(state.game.n, level)}
-          onClick={() => actions.reset({ level })}
+          onClick={() => actions.newGame({ level })}
         />
       ))}
       <Separator />
@@ -35,6 +36,7 @@ const Menu = ({ state, actions }) => (
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />
+      {resumeItems(state, actions)}
       {gameLinks('nonograms')}
     </MenuItem>
     <MenuItem name="Size" type="size" active={state.menu} onChange={actions.toggleMenu}>
@@ -42,7 +44,7 @@ const Menu = ({ state, actions }) => (
         <SubMenuItem
           name={`${n} × ${n}`}
           checked={state.game.n === n}
-          onClick={() => actions.reset({ n })}
+          onClick={() => actions.newGame({ n })}
         />
       ))}
     </MenuItem>

@@ -46,16 +46,38 @@ const Control = ({ option, value, onChange }) => {
   )
 }
 
+//the game window's opacity, saved apart from the background's own settings
+const opacityOption = {
+  type: 'range',
+  min: 0,
+  max: 100,
+  step: 5,
+  format: (value) => `${value}%`,
+}
+
 const BackgroundSettings = ({ key, state, actions }) => {
-  const background = backgrounds[state.id]
+  const background = state.id && backgrounds[state.id]
   return (
     <Overlay
       key={key}
       onKeyDown={(event) => event.keyCode === 27 && actions.toggleBackgroundSettings()}
     >
-      <Dialog title={`${background.name} Settings`} onClose={actions.toggleBackgroundSettings}>
+      <Dialog
+        title={background ? `${background.name} Settings` : 'Window Settings'}
+        onClose={actions.toggleBackgroundSettings}
+      >
         <form class={s.root} autocomplete="off" onsubmit={actions.submitBackgroundSettings}>
-          {optionsOf(state.id).map((option) => (
+          {state.opacity !== undefined && (
+            <label class={s.row}>
+              <span class={s.name}>Window:</span>
+              <Control
+                option={opacityOption}
+                value={state.opacity}
+                onChange={actions.changeOpacity}
+              />
+            </label>
+          )}
+          {(state.id ? optionsOf(state.id) : []).map((option) => (
             <label class={s.row}>
               <span class={s.name}>{option.label}:</span>
               <Control
@@ -65,7 +87,7 @@ const BackgroundSettings = ({ key, state, actions }) => {
               />
             </label>
           ))}
-          <p class={s.credit}>{background.credit}</p>
+          {background && <p class={s.credit}>{background.credit}</p>}
           <div class={s.footer}>
             <Button onCreate={(el) => el.focus()}>
               <span class={s.button}>OK</span>

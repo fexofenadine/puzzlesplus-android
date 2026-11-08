@@ -22,6 +22,7 @@ import { levels } from './techniques'
 import { completeWithErrors, findHint } from './hint'
 import { deal } from './deal'
 import { showRain } from '../shell/rain'
+import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 
@@ -65,6 +66,7 @@ const boardOf = (cells, n) => {
 export const saved = resumable({
   key: 'takuzu.saved',
   running,
+  label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
   pack: ({ n, level, givens, solution, board, history, hinted, untimed }) => ({
     n,
     level,
@@ -153,6 +155,7 @@ export const state = {
   timer: loadTimer('takuzu.timer'),
   rain: Boolean(load('takuzu.rain')),
   about: false,
+  shelf: saved.list(),
   game: saved.restore() || createGame(loadChoice()),
   winner: null,
   bestTime: null,
@@ -177,7 +180,7 @@ export const actions = {
     }
     const key = shortcut(event, state, actions)
     if (key === 113 || key === 78) {
-      actions.reset()
+      actions.newGame()
     } else if (key === 72) {
       actions.hint()
     } else if (key === 80) {
@@ -323,6 +326,7 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.switching && <Switching key="k" title="Takuzu" actions={actions} />}
     {state.about && <About key="f" actions={actions} />}
     {state.howTo && <HowToPlay key="i" actions={actions} />}
     {state.openGames && <OpenGames key="j" state={state} actions={actions} />}

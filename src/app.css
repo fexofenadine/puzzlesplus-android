@@ -379,7 +379,7 @@ main::before {
   left: -12px;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E"),
-    url(./synthwave.jpg) 50% 60% / cover;
+    url(./synthwave.webp) 50% 60% / cover;
   filter: blur(0.4px) saturate(1.15);
   animation:
     vhs-grain 0.5s steps(1, end) infinite,
@@ -479,7 +479,7 @@ main::before {
 
 /*markus spiske's cc0 photo, shown when the rain is off*/
 :root[data-theme='matrix'] main::before {
-  background: url(./matrix.jpg) 50% 50% / cover #000;
+  background: url(./matrix.webp) 50% 50% / cover #000;
 }
 
 :root[data-theme='matrix'][data-background='animated'] main::before {
@@ -506,7 +506,7 @@ main::before {
 :root:is([data-theme='solarized'], [data-theme='solarized-phosphor']) main::before {
   background:
     linear-gradient(rgba(0, 43, 54, 0.72), rgba(0, 43, 54, 0.72)),
-    url(./solarized.jpg) 50% 50% / cover var(--desktop);
+    url(./solarized.webp) 50% 50% / cover var(--desktop);
 }
 
 :root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])[data-background='animated']

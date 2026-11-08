@@ -5,7 +5,7 @@ import { sizes } from './rules'
 //2048's part of the phone drawer: playing, size and its options
 const PhoneMenu = ({ state, actions }) => [
   <Section>
-    <Item glyph="↻" name="New game" onClick={() => actions.reset()} actions={actions} />
+    <Item glyph="↻" name="New game" onClick={() => actions.newGame()} actions={actions} />
     <Item glyph="?" name="Hint" onClick={() => actions.hint()} actions={actions} />
     <Item glyph="↶" name="Undo" onClick={() => actions.undo()} actions={actions} />
   </Section>,
@@ -14,7 +14,7 @@ const PhoneMenu = ({ state, actions }) => [
       label="Size"
       options={sizes.map((n) => [n, `${n} × ${n}`])}
       value={state.game.n}
-      onPick={(n) => actions.reset({ n })}
+      onPick={(n) => actions.newGame({ n })}
       actions={actions}
     />
     <div style={{ height: '6px' }} />

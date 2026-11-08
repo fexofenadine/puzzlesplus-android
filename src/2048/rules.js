@@ -2,10 +2,10 @@
 //tiles carry ids so the view can slide them: { id, value, cell, fresh, merged, gone }
 //fresh tiles just appeared, merged ones were just made, gone ones slid into a merge and go next move
 
-export const sizes = [3, 4, 5, 6]
+export const sizes = [3, 4, 5]
 
 //the tile that wins: 2048 can't be reached on 3x3, so it aims lower
-export const targets = { 3: 512, 4: 2048, 5: 2048, 6: 2048 }
+export const targets = { 3: 512, 4: 2048, 5: 2048 }
 
 export const directions = ['left', 'right', 'up', 'down']
 

@@ -21,6 +21,7 @@ import { CROSS, EMPTY, FILL, emptyBoard, fillsLeft, sizes, solved } from './rule
 import { deal } from './deal'
 import { completeWithErrors, findHint } from './hint'
 import { allowed, fallback, levelNames } from './Menu'
+import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 
@@ -66,6 +67,7 @@ const boardOf = (cells, n) => {
 export const saved = resumable({
   key: 'nonograms.saved',
   running,
+  label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
   pack: ({ n, level, clues, solution, board, stroke, history, hinted, untimed }) => ({
     n,
     level,
@@ -181,6 +183,7 @@ export const state = {
   touch: Boolean(window.matchMedia && matchMedia('(pointer: coarse)').matches),
   mode: FILL,
   about: false,
+  shelf: saved.list(),
   game: saved.restore() || createGame(loadChoice()),
   winner: null,
   bestTime: null,
@@ -211,7 +214,7 @@ export const actions = {
     }
     const key = shortcut(event, state, actions)
     if (key === 113 || key === 78) {
-      actions.reset()
+      actions.newGame()
     } else if (key === 72) {
       actions.hint()
     } else if (key === 80) {
@@ -389,6 +392,7 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.switching && <Switching key="k" title="Nonograms" actions={actions} />}
     {state.about && <About key="f" actions={actions} />}
     {state.howTo && <HowToPlay key="i" actions={actions} />}
     {state.openGames && <OpenGames key="j" state={state} actions={actions} />}

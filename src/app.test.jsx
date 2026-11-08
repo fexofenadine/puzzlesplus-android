@@ -3,6 +3,7 @@ import { app, h } from 'hyperapp'
 import { state, actions, view, saved } from './app'
 import { solvable } from './mines'
 import { clock } from './shell/clock'
+import { windowClear } from './shell/actions'
 
 it('renders without crashing', async () => {
   const container = document.createElement('div')
@@ -211,8 +212,13 @@ it('ignores shortcut keys while typing or with a modifier held', () => {
   expect(current.hint).toBe(null)
   key(72)
   expect(game().hinted).toBe(true)
+  //a game in play asks before it is replaced
   key(78)
+  expect(game().start).toBe(0)
+  expect(current.switching).toEqual({ payload: undefined })
+  wired.answerSwitch('discard')
   expect(game().start).toBe(-1)
+  expect(current.switching).toBe(null)
 })
 
 it('explains a chord on a number without enough flags', () => {
@@ -287,11 +293,35 @@ it('previews background settings live and only saves them on OK', () => {
   localStorage.clear()
 })
 
-it('has no background settings for themes without one', () => {
+it('has only the window opacity for themes without a background', () => {
   start({ theme: 'synthwave' })
   wired.toggleBackgroundSettings()
   wired.peek()
-  expect(current.backgroundSettings).toBe(null)
+  expect(current.backgroundSettings).toEqual({ id: null, draft: {}, opacity: 100 })
+})
+
+it('fades the game window as a preview, keeps it on ok and hides it whole', () => {
+  start({ theme: 'synthwave' })
+  expect(windowClear(current)).toBe(null)
+  wired.toggleBackgroundSettings()
+  wired.changeOpacity(40)
+  wired.peek()
+  expect(windowClear(current)).toBe(40)
+  //cancel puts it back
+  wired.toggleBackgroundSettings()
+  wired.peek()
+  expect(windowClear(current)).toBe(null)
+  wired.toggleBackgroundSettings()
+  wired.changeOpacity(40)
+  wired.submitBackgroundSettings({ preventDefault: () => {} })
+  wired.peek()
+  expect(current.glass.opacity).toBe(40)
+  wired.toggleHideWindow()
+  wired.peek()
+  expect(windowClear(current)).toBe(0)
+  wired.toggleHideWindow()
+  wired.peek()
+  expect(windowClear(current)).toBe(40)
 })
 
 it('has an extreme level at expert density, 30% wider and taller', () => {
@@ -359,6 +389,16 @@ it('minimises to the taskbar paused, and its taskbar button brings it back still
 it('closing ends the game and offers every game, picking this one opens a fresh game', () => {
   wired.close()
   wired.peek()
+  //a game in play asks first, keeping playing leaves the window open
+  if (current.switching) {
+    expect(current.windowState).toBe('open')
+    wired.answerSwitch(null)
+    wired.peek()
+    expect(current.windowState).toBe('open')
+    wired.close()
+    wired.answerSwitch('discard')
+    wired.peek()
+  }
   expect(current.windowState).toBe('closed')
   expect(current.openGames).toBe('minesweeper')
   expect(current.game.start).toBe(-1)

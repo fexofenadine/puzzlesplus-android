@@ -7,7 +7,7 @@ import { levels } from './techniques'
 //takuzu's part of the phone drawer: playing, difficulty, size and its options
 const PhoneMenu = ({ state, actions }) => [
   <Section>
-    <Item glyph="↻" name="New game" onClick={() => actions.reset()} actions={actions} />
+    <Item glyph="↻" name="New game" onClick={() => actions.newGame()} actions={actions} />
     <Item glyph="?" name="Hint" onClick={() => actions.hint()} actions={actions} />
     <Item glyph="↶" name="Undo" onClick={() => actions.undo()} actions={actions} />
   </Section>,
@@ -16,14 +16,14 @@ const PhoneMenu = ({ state, actions }) => [
       label="Difficulty"
       options={levels.map((_, level) => [level, levelNames[level], !allowed(state.game.n, level)])}
       value={state.game.level}
-      onPick={(level) => actions.reset({ level })}
+      onPick={(level) => actions.newGame({ level })}
       actions={actions}
     />
     <Chips
       label="Size"
       options={sizes.map((n) => [n, String(n)])}
       value={state.game.n}
-      onPick={(n) => actions.reset({ n })}
+      onPick={(n) => actions.newGame({ n })}
       actions={actions}
     />
     <div style={{ height: '6px' }} />

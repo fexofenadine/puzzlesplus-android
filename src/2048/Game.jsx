@@ -12,11 +12,12 @@ import { pageUrl, phone } from '../shell/phone'
 import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import { glide } from './motion'
+import { windowClear } from '../shell/actions'
 
 export const running = ({ start, over }) => start >= 0 && !over
 
 //cells shrink a little as boards grow, so every size makes a similar window
-export const cellSizes = { 3: 72, 4: 60, 5: 52, 6: 46 }
+export const cellSizes = { 3: 72, 4: 60, 5: 52 }
 
 //a tile's look: its power of two picks the colour and the css the text that reads on it
 //its digit count picks the font size
@@ -71,6 +72,7 @@ const Game = ({ key, state, actions }) => {
   const { n, paused } = game
   return (
     <Dialog
+      clear={windowClear(state)}
       key={key}
       hidden={state.windowState !== 'open'}
       title={!phone && (state.theme === 'classic' ? '2048' : '2048 Plus')}

@@ -31,6 +31,7 @@ import { levels } from './techniques'
 import { deal } from './deal'
 import { completeWithErrors, findHint } from './hint'
 import { allowed, fallback, levelNames } from './Menu'
+import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 
@@ -75,6 +76,8 @@ const boardOf = (cells, n) => {
 export const saved = resumable({
   key: 'sudoku.saved',
   running,
+  label: ({ level }) => levelNames[level],
+  fresh: { selected: -1, picked: 0 },
   pack: ({ n, level, givens, solution, board, notes, history, hinted, untimed }) => ({
     n,
     level,
@@ -199,6 +202,7 @@ export const state = {
   //pad digits and typed ones are notes while this is on
   noting: false,
   about: false,
+  shelf: saved.list(),
   game: saved.restore() || createGame(loadChoice()),
   winner: null,
   bestTime: null,
@@ -224,7 +228,7 @@ export const actions = {
     if (key === null) return
     const digit = digitOf(event)
     if (key === 113 || key === 78) {
-      actions.reset()
+      actions.newGame()
     } else if (key === 72) {
       actions.hint()
     } else if (key === 80) {
@@ -423,6 +427,7 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.switching && <Switching key="k" title="Sudoku" actions={actions} />}
     {state.about && <About key="f" actions={actions} />}
     {state.howTo && <HowToPlay key="i" actions={actions} />}
     {state.openGames && <OpenGames key="j" state={state} actions={actions} />}

@@ -14,6 +14,7 @@ import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, violations } from './rules'
+import { windowClear } from '../shell/actions'
 
 //the guide's section on a hint, none for a solved board
 const more = (hint) => guideTopic(hint) && pageUrl(`guide/#${guideTopic(hint)}`)
@@ -28,6 +29,7 @@ const Game = ({ key, state, actions }) => {
   const left = board.filter((v) => v === EMPTY).length
   return (
     <Dialog
+      clear={windowClear(state)}
       key={key}
       hidden={state.windowState !== 'open'}
       title={!phone && (state.theme === 'classic' ? 'Takuzu' : 'Takuzu Plus')}

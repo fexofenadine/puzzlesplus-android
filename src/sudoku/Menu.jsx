@@ -3,6 +3,7 @@ import m from '../Menu.module.css'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
 import ThemeMenu from '../shell/ThemeMenu'
 import ViewMenu from '../shell/ViewMenu'
+import { resumeItems } from '../shell/ResumeItems'
 import { gameLinks } from '../shell/GameLinks'
 import { sizes } from './rules'
 import { levels } from './techniques'
@@ -18,7 +19,7 @@ export const fallback = (n, level) => (allowed(n, level) ? level : fallback(n, l
 const Menu = ({ state, actions }) => (
   <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>
     <MenuItem name="Game" type="game" active={state.menu} onChange={actions.toggleMenu}>
-      <SubMenuItem name="New" hotKey="F2" onClick={() => actions.reset()} />
+      <SubMenuItem name="New" hotKey="F2" onClick={() => actions.newGame()} />
       <SubMenuItem name="Undo" hotKey="Ctrl+Z" onClick={() => actions.undo()} />
       <SubMenuItem name="Hint" hotKey="H" onClick={() => actions.hint()} />
       <SubMenuItem name="Auto Notes" onClick={() => actions.autoNotes()} />
@@ -28,7 +29,7 @@ const Menu = ({ state, actions }) => (
           name={levelNames[level]}
           checked={state.game.level === level}
           disabled={!allowed(state.game.n, level)}
-          onClick={() => actions.reset({ level })}
+          onClick={() => actions.newGame({ level })}
         />
       ))}
       <Separator />
@@ -38,6 +39,7 @@ const Menu = ({ state, actions }) => (
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />
+      {resumeItems(state, actions)}
       {gameLinks('sudoku')}
     </MenuItem>
     {sizes.length > 1 && (
@@ -46,7 +48,7 @@ const Menu = ({ state, actions }) => (
           <SubMenuItem
             name={`${n} × ${n}`}
             checked={state.game.n === n}
-            onClick={() => actions.reset({ n })}
+            onClick={() => actions.newGame({ n })}
           />
         ))}
       </MenuItem>

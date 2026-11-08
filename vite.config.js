@@ -34,7 +34,8 @@ const prepaint = () => ({
   },
 })
 
-export default defineConfig({
+//the website stays readable, the android app is minified since nobody reads its files
+export default defineConfig(({ mode }) => ({
   base: './',
   oxc: {
     jsx: { runtime: 'classic', pragma: 'h' },
@@ -47,8 +48,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'build',
-    minify: false,
-    cssMinify: false,
+    minify: mode === 'android',
+    cssMinify: mode === 'android',
     modulePreload: { polyfill: false },
     rolldownOptions: {
       //the root page only redirects, each game and guide is its own page
@@ -76,4 +77,4 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
   },
-})
+}))

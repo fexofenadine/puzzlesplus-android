@@ -14,6 +14,7 @@ import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, digitCounts, geometry, violations } from './rules'
+import { windowClear } from '../shell/actions'
 
 //the guide's section on a hint, none for a solved board
 const more = (hint) => guideTopic(hint) && pageUrl(`guide/#${guideTopic(hint)}`)
@@ -103,6 +104,7 @@ const Game = ({ key, state, actions }) => {
   }
   return (
     <Dialog
+      clear={windowClear(state)}
       key={key}
       hidden={state.windowState !== 'open'}
       title={!phone && (state.theme === 'classic' ? 'Sudoku' : 'Sudoku Plus')}

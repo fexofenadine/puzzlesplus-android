@@ -1,7 +1,8 @@
 .root {
   padding: 6px 5px 5px 6px;
-  background: var(--panel);
-  border: solid var(--light);
+  /*a faded window (Dialog's clear) fades this too*/
+  background: var(--clear-panel, var(--panel));
+  border: solid var(--clear-light, var(--light));
   border-width: 3px 0 0 3px;
 }
 

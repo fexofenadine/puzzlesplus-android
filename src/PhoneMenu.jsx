@@ -11,7 +11,7 @@ const levels = [
 //minesweeper's part of the phone drawer: playing, difficulty and its options
 const PhoneMenu = ({ state, actions }) => [
   <Section>
-    <Item glyph="↻" name="New game" onClick={() => actions.reset()} actions={actions} />
+    <Item glyph="↻" name="New game" onClick={() => actions.newGame()} actions={actions} />
     <Item glyph="?" name="Hint" onClick={() => actions.hint()} actions={actions} />
   </Section>,
   <Section>
@@ -20,7 +20,7 @@ const PhoneMenu = ({ state, actions }) => [
       options={[...levels, ['custom', 'Custom…']]}
       value={state.game.level}
       onPick={(level) =>
-        level === 'custom' ? actions.toggleCustomField() : actions.reset({ level })
+        level === 'custom' ? actions.toggleCustomField() : actions.newGame({ level })
       }
       actions={actions}
     />

@@ -48,7 +48,7 @@ export const parts = [
         title: 'Sizes and best scores',
         body: () => [
           <p>
-            The Size menu has 3 × 3 to 6 × 6. Smaller boards fill up fast and need care from the
+            The Size menu has 3 × 3 to 5 × 5. Smaller boards fill up fast and need care from the
             first move, bigger ones forgive more and run longer. On 3 × 3 the winning tile is 512,
             since 2048 can't fit.
           </p>,
