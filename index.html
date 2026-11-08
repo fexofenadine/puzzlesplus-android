@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Minesweeper Plus</title>
-    <!--the games live in their own folders, old links land on minesweeper-->
+    <!--the games live in their own folders, old links land on the last game or minesweeper-->
     <meta http-equiv="refresh" content="0; url=minesweeper/index.html" />
     <meta property="og:title" content="Minesweeper" />
     <meta
@@ -22,7 +22,13 @@
     <link rel="apple-touch-icon" href="/icon.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <script>
-      location.replace('minesweeper/index.html' + location.search + location.hash)
+      //the game played last, else minesweeper
+      var game = 'minesweeper'
+      try {
+        var last = localStorage.getItem('lastGame')
+        if (/^(minesweeper|takuzu|nonograms|sudoku|2048)$/.test(last)) game = last
+      } catch (error) {}
+      location.replace(game + '/index.html' + location.search + location.hash)
     </script>
   </head>
   <body>
