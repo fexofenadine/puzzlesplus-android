@@ -521,7 +521,7 @@ main::before {
 }
 
 :root[data-phone] main {
-  justify-content: flex-start;
+  /*centred in the room below the bar*/
   padding-top: var(--phone-bar);
 }
 
