@@ -59,7 +59,7 @@
   margin: 0;
   padding: 0;
   color: var(--glyph);
-  font: bold 16px var(--text-font);
+  font: bold 16px var(--digit-font, var(--text-font));
   background: var(--cell);
   border: 1px solid var(--cell-shadow);
   outline: 0;

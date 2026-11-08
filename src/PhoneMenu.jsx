@@ -1,5 +1,5 @@
 import { h } from 'hyperapp'
-import { Check, Chips, Item, Section } from './shell/PhoneBar'
+import { Check, Chips, Item, Section, TROPHY } from './shell/PhoneBar'
 
 const levels = [
   ['beginner', 'Beginner'],
@@ -8,12 +8,8 @@ const levels = [
   ['extreme', 'Extreme'],
 ]
 
-//minesweeper's part of the phone drawer: playing, difficulty and its options
+//minesweeper's part of the options sheet: difficulty and its options
 const PhoneMenu = ({ state, actions }) => [
-  <Section>
-    <Item glyph="↻" name="New game" onClick={() => actions.newGame()} actions={actions} />
-    <Item glyph="?" name="Hint" onClick={() => actions.hint()} actions={actions} />
-  </Section>,
   <Section>
     <Chips
       label="Difficulty"
@@ -33,7 +29,7 @@ const PhoneMenu = ({ state, actions }) => [
     />
     <Check name="Marks (?)" checked={state.marks} onToggle={actions.toggleMarks} />
     <Check name="Timer" checked={state.timer} onToggle={actions.toggleTimer} />
-    <Item glyph="🏆" name="Best times" onClick={actions.toggleBestTime} actions={actions} />
+    <Item d={TROPHY} name="Best times" onClick={actions.toggleBestTime} actions={actions} />
   </Section>,
 ]
 

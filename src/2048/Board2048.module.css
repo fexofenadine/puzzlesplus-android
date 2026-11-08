@@ -74,7 +74,7 @@ one, else a ramp: each doubling turns the hue a step and shifts the lightness*/
   --t-f11: #241b2f;
   --t-top: #36f9f6;
   --t-top-text: #241b2f;
-  --t-font: var(--text-font);
+  --t-font: var(--digit-font, var(--text-font));
   --t-s2: 0.42;
   --t-s3: 0.36;
   --t-s4: 0.29;
@@ -93,7 +93,7 @@ one, else a ramp: each doubling turns the hue a step and shifts the lightness*/
   --t-top-text: #020a04;
   --t-on-dark: #b6ffcb;
   --t-on-light: #020a04;
-  --t-font: var(--text-font);
+  --t-font: var(--digit-font, var(--text-font));
   /*courier prime's digits are narrow, so they can be larger and still fit five to a tile*/
   --t-s2: 0.5;
   --t-s3: 0.4;

@@ -1,3 +1,6 @@
+/*the phone's chrome: windows 95 on classic (these first rules), material on every other theme*/
+/*(the rules under :root:not([data-theme='classic']) further down, coloured by app.css's --md tokens)*/
+
 /*the top bar in the title bar's colours, under the status bar*/
 .bar {
   position: fixed;
@@ -6,12 +9,12 @@
   left: 0;
   z-index: 4;
   display: flex;
-  gap: 8px;
+  gap: 2px;
   align-items: center;
   box-sizing: border-box;
   height: var(--phone-bar);
-  padding: env(safe-area-inset-top) calc(6px + env(safe-area-inset-right)) 0
-    calc(6px + env(safe-area-inset-left));
+  padding: env(safe-area-inset-top) calc(4px + env(safe-area-inset-right)) 0
+    calc(4px + env(safe-area-inset-left));
   color: var(--title-text);
   font: var(--title-weight) 17px var(--title-font);
   -webkit-font-smoothing: var(--font-smoothing);
@@ -22,6 +25,7 @@
 
 .title {
   flex: 1;
+  margin-left: 4px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -29,6 +33,7 @@
 
 .button {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   width: 44px;
@@ -68,6 +73,7 @@
   bottom: 0;
   left: 0;
   z-index: 6;
+  box-sizing: border-box;
   width: min(80%, 320px);
   overflow-y: auto;
   padding-bottom: env(safe-area-inset-bottom);
@@ -81,7 +87,34 @@
   user-select: none;
 }
 
-.head {
+/*the options sheet: a windows 95 panel from the bottom on classic*/
+.sheet {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+  max-height: calc(100% - var(--phone-bar) - 24px);
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom);
+  color: var(--text);
+  font: 15px var(--ui-font);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-shadow: var(--text-glow);
+  background: var(--face);
+  border-top: 1px solid var(--light);
+  box-shadow:
+    inset 0 1px var(--face),
+    0 -4px 12px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+.handle {
+  display: none;
+}
+
+.head,
+.sheetTitle {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -91,6 +124,12 @@
   font: var(--title-weight) 18px var(--title-font);
   text-shadow: var(--title-glow);
   background: linear-gradient(to right, var(--title-start), var(--title-end));
+}
+
+.sheetTitle {
+  height: 36px;
+  padding-top: 0;
+  font-size: 16px;
 }
 
 .head img {
@@ -159,10 +198,22 @@
   text-shadow: 1px 1px var(--light);
 }
 
-.chips {
+.chips,
+.segments,
+.swatches {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+/*material's ticks, not drawn on classic*/
+.tick,
+.swatchTick {
+  display: none;
+}
+
+.chipName {
+  min-width: 0;
 }
 
 .swatch {
@@ -171,40 +222,13 @@
   border: 1px solid #000;
 }
 
-/*three a row, a short last row centred*/
-.games {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-}
-
-.game {
-  composes: chip;
-  flex: 0 0 calc((100% - 12px) / 3);
-  flex-direction: column;
-  min-width: 0;
-  padding: 4px 2px;
-  gap: 4px;
-  min-height: 64px;
-  font-size: 12px;
-}
-
-.gameOn {
-  composes: chipOn;
-  flex: 0 0 calc((100% - 12px) / 3);
-  flex-direction: column;
-  min-width: 0;
-  padding: 4px 2px;
-  gap: 4px;
-  min-height: 64px;
-  font-size: 12px;
-}
-
-.row {
+.row,
+.item,
+.itemOn {
   display: flex;
   gap: 12px;
   align-items: center;
+  box-sizing: border-box;
   width: 100%;
   min-height: 40px;
   margin: 0;
@@ -218,10 +242,22 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.row:active {
+.row:active,
+.item:active,
+.itemOn {
   color: var(--highlight-text);
   text-shadow: none;
   background: var(--highlight);
+}
+
+.rowName {
+  flex: 1;
+  min-width: 0;
+}
+
+.end {
+  flex: none;
+  opacity: 0.8;
 }
 
 .glyph {
@@ -229,9 +265,12 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  font-size: 17px;
+  width: 24px;
+  height: 24px;
+}
+
+.glyph svg {
+  fill: currentColor;
 }
 
 /*a windows 95 checkbox: a sunken box with a tick*/
@@ -241,7 +280,7 @@
   box-sizing: border-box;
   width: 15px;
   height: 15px;
-  margin: 0 3px 0 4px;
+  margin: 0 5px 0 4px;
   background: var(--input);
   border: 1px solid;
   border-color: var(--shadow) var(--light) var(--light) var(--shadow);
@@ -262,4 +301,391 @@
   border-width: 0 2px 2px 0;
   transform: rotate(40deg);
   content: '';
+}
+
+.range {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 2px;
+}
+
+.range input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--highlight);
+}
+
+.value {
+  flex: none;
+  width: 40px;
+  text-align: right;
+}
+
+/*material: the bar, panel, sheet and controls in the theme's material colours and fonts*/
+:root:not([data-theme='classic']) .bar {
+  color: var(--md-on);
+  font: 400 var(--md-title-size, 22px) var(--title-font);
+  -webkit-font-smoothing: antialiased;
+  text-shadow: var(--md-title-glow, none);
+  background: var(--md-bar);
+  box-shadow: none;
+}
+
+:root:not([data-theme='classic']) .button {
+  width: 40px;
+  color: var(--md-on-variant);
+}
+
+:root:not([data-theme='classic']) .button svg {
+  filter: none;
+}
+
+:root:not([data-theme='classic']) .button:active {
+  background: color-mix(in srgb, var(--md-on) 12%, transparent);
+}
+
+:root:not([data-theme='classic']) .shade {
+  background: rgba(0, 0, 0, 0.4);
+  animation: fade 0.2s ease-out;
+}
+
+:root:not([data-theme='classic']) .drawer {
+  width: min(85%, 320px);
+  padding: 0 12px env(safe-area-inset-bottom);
+  color: var(--md-on-variant);
+  font: 500 14px var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+  text-shadow: none;
+  background: var(--md-panel);
+  border: 0;
+  border-radius: 0 16px 16px 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  animation: slide-in 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root:not([data-theme='classic']) .sheet {
+  padding: 0 0 calc(12px + env(safe-area-inset-bottom));
+  color: var(--md-on);
+  font: 16px var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+  text-shadow: none;
+  background: var(--md-high);
+  border: 0;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.45);
+  animation: slide-up 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root:not([data-theme='classic']) .handle {
+  display: block;
+  width: 32px;
+  height: 4px;
+  margin: 16px auto 12px;
+  background: var(--md-on-variant);
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+:root:not([data-theme='classic']) .head,
+:root:not([data-theme='classic']) .sheetTitle {
+  color: var(--md-on);
+  font: 400 22px var(--title-font);
+  text-shadow: var(--md-title-glow, none);
+  background: none;
+}
+
+:root:not([data-theme='classic']) .head {
+  height: 76px;
+  padding: env(safe-area-inset-top) 16px 0;
+}
+
+:root:not([data-theme='classic']) .head img {
+  border-radius: 50%;
+}
+
+:root:not([data-theme='classic']) .sheetTitle {
+  height: auto;
+  padding: 0 24px 4px;
+}
+
+:root:not([data-theme='classic']) .section {
+  padding: 4px 0;
+  border: 0;
+  box-shadow: none;
+}
+
+:root:not([data-theme='classic']) .section + .section {
+  border-top: 1px solid var(--md-outline-variant);
+}
+
+:root:not([data-theme='classic']) .sheet .section {
+  padding: 4px 24px 8px;
+}
+
+:root:not([data-theme='classic']) .label {
+  margin: 12px 16px 8px;
+  color: var(--md-on-variant);
+  font: 500 14px var(--ui-font);
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 1;
+}
+
+:root:not([data-theme='classic']) .sheet .label {
+  margin: 12px 0 8px;
+}
+
+/*navigation items with a pill for the open game*/
+:root:not([data-theme='classic']) .item,
+:root:not([data-theme='classic']) .itemOn {
+  min-height: 56px;
+  padding: 0 24px 0 16px;
+  color: var(--md-on-variant);
+  font: 500 14px var(--ui-font);
+  text-shadow: none;
+  border-radius: 28px;
+}
+
+:root:not([data-theme='classic']) .itemOn {
+  color: var(--md-on-sec-cont);
+  background: var(--md-sec-cont);
+}
+
+:root:not([data-theme='classic']) .item:active {
+  color: var(--md-on);
+  background: color-mix(in srgb, var(--md-on) 12%, transparent);
+}
+
+:root:not([data-theme='classic']) .end {
+  font-weight: 400;
+}
+
+:root:not([data-theme='classic']) .sheet .item {
+  min-height: 52px;
+  margin: 0 -24px;
+  width: calc(100% + 48px);
+  padding: 0 24px;
+  color: var(--md-on);
+  font: 16px var(--ui-font);
+  border-radius: 0;
+}
+
+:root:not([data-theme='classic']) .sheet .item .glyph {
+  color: var(--md-on-variant);
+}
+
+/*filter chips*/
+:root:not([data-theme='classic']) .chip,
+:root:not([data-theme='classic']) .chipOn {
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 16px;
+  color: var(--md-on-variant);
+  font: 500 14px var(--ui-font);
+  text-shadow: none;
+  background: none;
+  border: 1px solid var(--md-outline);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+:root:not([data-theme='classic']) .chipOn {
+  padding-left: 8px;
+  color: var(--md-on-sec-cont);
+  background: var(--md-sec-cont);
+  border-color: transparent;
+}
+
+:root:not([data-theme='classic']) .chip:disabled {
+  color: var(--md-on-variant);
+  text-shadow: none;
+  opacity: 0.38;
+}
+
+:root:not([data-theme='classic']) .chips {
+  gap: 8px;
+}
+
+:root:not([data-theme='classic']) .tick {
+  display: block;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/*segmented buttons for sizes*/
+:root:not([data-theme='classic']) .segments {
+  flex-wrap: nowrap;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--md-outline);
+  border-radius: 20px;
+}
+
+:root:not([data-theme='classic']) .segments .chip,
+:root:not([data-theme='classic']) .segments .chipOn {
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 4px;
+  color: var(--md-on);
+  border: 0;
+  border-left: 1px solid var(--md-outline);
+  border-radius: 0;
+}
+
+:root:not([data-theme='classic']) .segments .chipOn {
+  color: var(--md-on-sec-cont);
+}
+
+:root:not([data-theme='classic']) .segments > :first-child {
+  border-left: 0;
+}
+
+/*round theme swatches with their names under them*/
+:root:not([data-theme='classic']) .swatches {
+  flex-wrap: nowrap;
+  gap: 0;
+  justify-content: space-between;
+}
+
+:root:not([data-theme='classic']) .swatches .chip,
+:root:not([data-theme='classic']) .swatches .chipOn {
+  flex: 0 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 0;
+  color: var(--md-on-variant);
+  font-size: 12px;
+  font-weight: 400;
+  background: none;
+  border: 0;
+}
+
+:root:not([data-theme='classic']) .swatches .chipOn {
+  color: var(--md-on);
+  font-weight: 500;
+}
+
+:root:not([data-theme='classic']) .swatch {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+}
+
+:root:not([data-theme='classic']) .chipOn .swatch {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 3px;
+}
+
+:root:not([data-theme='classic']) .swatchTick {
+  display: block;
+  fill: #fff;
+}
+
+/*switches at the end of their rows*/
+:root:not([data-theme='classic']) .row {
+  min-height: 52px;
+  padding: 0;
+  color: var(--md-on);
+  font: 16px var(--ui-font);
+  text-shadow: none;
+}
+
+:root:not([data-theme='classic']) .row:active {
+  color: var(--md-on);
+  background: none;
+}
+
+:root:not([data-theme='classic']) .check,
+:root:not([data-theme='classic']) .checkOn {
+  order: 2;
+  width: 52px;
+  height: 32px;
+  margin: 0;
+  background: var(--md-switch-off);
+  border: 2px solid var(--md-outline);
+  border-radius: 16px;
+  box-shadow: none;
+  transition: background 0.2s;
+}
+
+:root:not([data-theme='classic']) .check::after,
+:root:not([data-theme='classic']) .checkOn::after {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 16px;
+  height: 16px;
+  background: var(--md-outline);
+  border: 0;
+  border-radius: 50%;
+  transform: none;
+  transition:
+    left 0.2s,
+    width 0.2s;
+  content: '';
+}
+
+:root:not([data-theme='classic']) .checkOn {
+  background: var(--md-primary);
+  border-color: var(--md-primary);
+}
+
+:root:not([data-theme='classic']) .checkOn::after {
+  top: 2px;
+  left: 22px;
+  width: 24px;
+  height: 24px;
+  background: var(--md-on-primary);
+}
+
+:root:not([data-theme='classic']) .range {
+  min-height: 52px;
+  padding: 0;
+  color: var(--md-on);
+}
+
+:root:not([data-theme='classic']) .range input {
+  accent-color: var(--md-primary);
+}
+
+:root:not([data-theme='classic']) .value {
+  color: var(--md-on-variant);
+  font-size: 14px;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shade,
+  .drawer,
+  .sheet {
+    animation: none !important;
+  }
 }

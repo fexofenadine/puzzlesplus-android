@@ -13,6 +13,27 @@
 
 /*theme fonts, all under the sil open font license, see src/fonts*/
 @font-face {
+  font-family: 'Nunito';
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(./fonts/nunito.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Chakra Petch';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/chakra-petch.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Chakra Petch';
+  font-weight: 600 700;
+  font-display: swap;
+  src: url(./fonts/chakra-petch-semibold.woff2) format('woff2');
+}
+
+@font-face {
   font-family: 'Orbitron';
   font-weight: 400 900;
   font-display: swap;
@@ -105,11 +126,12 @@
 }
 
 :root[data-theme='synthwave'] {
-  /*synthwave '84 palette with eighties sci-fi lettering*/
-  --ui-font: 'Orbitron', var(--pixel-font);
+  /*synthwave '84 palette with eighties sci-fi lettering: orbitron titles and digits, chakra petch to read*/
+  --ui-font: 'Chakra Petch', var(--pixel-font);
   --title-font: 'Orbitron', var(--pixel-font);
   --title-weight: normal;
-  --text-font: 'Orbitron', Tahoma, sans-serif;
+  --text-font: 'Chakra Petch', Tahoma, sans-serif;
+  --digit-font: 'Orbitron', Tahoma, sans-serif;
   --font-smoothing: auto;
   --text-glow: 0 0 3px #ff7edb, 0 0 8px rgba(54, 249, 246, 0.7);
   --title-glow: 0 0 4px #ff7edb, 0 0 10px #f92aad;
@@ -270,7 +292,7 @@
 :root[data-theme='nord'] {
   /*nord dark palette*/
   color-scheme: dark;
-  --ui-font: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --ui-font: 'Nunito', system-ui, 'Segoe UI', Roboto, sans-serif;
   --title-font: var(--ui-font);
   --text-font: var(--ui-font);
   --font-size: 12px;
@@ -530,8 +552,308 @@ main::before {
   margin: 16px;
 }
 
+/*dialogs never wider than the phone, best times' columns close up to fit*/
+:root[data-phone] [class*='Overlay_root'] [class*='Dialog_dialog'] {
+  max-width: calc(100vw - 16px);
+}
+
+:root[data-phone] [class*='Overlay_root'] [class*='Dialog_container'] {
+  overflow-x: auto;
+}
+
+:root[data-phone] [class*='Overlay_root'] [class*='Dialog_a'] {
+  margin: 8px;
+}
+
+:root[data-phone] [class*='BestTimes_slot'] {
+  min-width: 0;
+  padding: 2px 3px;
+}
+
+:root[data-phone] [class*='BestTimes_level'],
+:root[data-phone] [class*='BestTimes_size'] {
+  padding: 2px 3px;
+}
+
 /*dialogs open below the top bar*/
 :root[data-phone] [class*='Overlay_root'] {
   top: var(--phone-bar);
   height: calc(100% - var(--phone-bar));
+}
+
+/*material colours for the phone's chrome, from each theme's own published palette; classic stays windows 95*/
+/*nordtheme.com: polar night nord0-3, snow storm nord4-6, frost nord7-10*/
+:root[data-phone][data-theme='nord'] {
+  --md-bar: #3b4252;
+  --md-panel: #3b4252;
+  --md-high: #434c5e;
+  --md-card: rgba(46, 52, 64, 0.86);
+  --md-outline: #616e88;
+  --md-outline-variant: #4c566a;
+  --md-on: #eceff4;
+  --md-on-variant: #d8dee9;
+  --md-primary: #88c0d0;
+  --md-on-primary: #2e3440;
+  --md-sec-cont: #5e81ac;
+  --md-on-sec-cont: #eceff4;
+  --md-switch-off: #434c5e;
+}
+
+/*robb owen's synthwave '84: #262335 editor, #241b2f panels, #ff7edb pink, #36f9f6 cyan*/
+:root[data-phone][data-theme='synthwave'] {
+  --md-title-size: 18px;
+  --md-bar: #241b2f;
+  --md-panel: #241b2f;
+  --md-high: #2a2139;
+  --md-card: rgba(38, 35, 53, 0.84);
+  --md-outline: #6d77b3;
+  --md-outline-variant: #34294f;
+  --md-on: #fff;
+  --md-on-variant: #b6b1d8;
+  --md-primary: #ff7edb;
+  --md-on-primary: #262335;
+  --md-sec-cont: #463465;
+  --md-on-sec-cont: #fff;
+  --md-switch-off: #34294f;
+  --md-title-glow: 0 0 2px #fff, 0 0 10px #ff7edb;
+}
+
+/*ethan schoonover's solarized dark: base03, base02, base01, base0/1, blue #268bd2*/
+:root[data-phone]:is([data-theme='solarized'], [data-theme='solarized-phosphor']) {
+  --md-bar: #073642;
+  --md-panel: #073642;
+  --md-high: #0a3f4c;
+  --md-card: rgba(0, 43, 54, 0.86);
+  --md-outline: #586e75;
+  --md-outline-variant: #0e4a58;
+  --md-on: #eee8d5;
+  --md-on-variant: #93a1a1;
+  --md-primary: #268bd2;
+  --md-on-primary: #fdf6e3;
+  --md-sec-cont: #0f4f6a;
+  --md-on-sec-cont: #eee8d5;
+  --md-switch-off: #073642;
+}
+
+/*the usual matrix code palette: #0d0208 black, #003b00, #008f11 and #00ff41 greens*/
+:root[data-phone][data-theme='matrix'] {
+  --md-bar: #04120a;
+  --md-panel: #04120a;
+  --md-high: #061c0e;
+  --md-card: rgba(13, 2, 8, 0.86);
+  --md-outline: #008f11;
+  --md-outline-variant: #003b00;
+  --md-on: #00ff41;
+  --md-on-variant: #45c964;
+  --md-primary: #00ff41;
+  --md-on-primary: #0d0208;
+  --md-sec-cont: #003b00;
+  --md-on-sec-cont: #00ff41;
+  --md-switch-off: #0d0208;
+}
+
+/*material dialogs on the phone: everything that opens over the game, every theme but classic*/
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Dialog_dialog'] {
+  overflow: hidden;
+  color: var(--md-on);
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+  text-shadow: none;
+  background: var(--md-high);
+  border: 0;
+  border-radius: 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: dialog-in 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Dialog_container'] {
+  padding: 4px 8px 12px;
+  border: 0;
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Dialog_header'] {
+  padding: 16px 4px 4px 16px;
+  background: none;
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Dialog_title'] {
+  color: var(--md-on);
+  font: 400 22px/1.3 var(--title-font);
+  text-shadow: var(--md-title-glow, none);
+  white-space: normal;
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] p {
+  color: var(--md-on-variant);
+}
+
+/*text buttons, the first of a footer filled*/
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Button_root'] {
+  min-height: 40px;
+  padding: 0 12px;
+  color: var(--md-primary);
+  font: 500 14px var(--ui-font);
+  background: none;
+  border: 0;
+  border-radius: 20px;
+}
+
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='Button_root']::before,
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='Button_root']::after {
+  display: none;
+}
+
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='Button_root']:active {
+  padding: 0 12px;
+  background: color-mix(in srgb, var(--md-primary) 12%, transparent);
+}
+
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='_footer']
+  > [class*='Button_root']:first-child {
+  padding: 0 24px;
+  color: var(--md-on-primary);
+  background: var(--md-primary);
+}
+
+/*best times' reset is the quiet one, ok the filled one*/
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='BestTime_footer']
+  > [class*='Button_root']:first-child {
+  padding: 0 12px;
+  color: var(--md-primary);
+  background: none;
+}
+
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='BestTime_footer']
+  > [class*='Button_root']:last-child {
+  padding: 0 24px;
+  color: var(--md-on-primary);
+  background: var(--md-primary);
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='_footer'] {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/*the close button an icon button*/
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='Dialog_button']
+  [class*='Button_root'] {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+  color: var(--md-on-variant);
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Dialog_button'] svg {
+  width: 18px;
+  height: 18px;
+}
+
+/*outlined fields*/
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Input_root'],
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Winner_input'],
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='_frame'] {
+  color: var(--md-on);
+  font-family: var(--ui-font);
+  background: none;
+  border: 1px solid var(--md-outline);
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] select,
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] input {
+  color: var(--md-on);
+  font-family: var(--ui-font);
+  background: none;
+  border: 0;
+  accent-color: var(--md-primary);
+}
+
+/*best times' tabs with an indicator under the open one*/
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='BestTime_tab'] {
+  color: var(--md-on-variant);
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+}
+
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='BestTime_tabActive'] {
+  color: var(--md-primary);
+  border-bottom-color: var(--md-primary);
+}
+
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='BestTime_table'] {
+  color: var(--md-on-variant);
+  background: none;
+  border-color: var(--md-outline-variant);
+  box-shadow: none;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-phone] [class*='Overlay_root'] [class*='Dialog_dialog'] {
+    animation: none;
+  }
+}
+
+/*the board without its windows 95 frame, on a card that the window slider still fades*/
+:root[data-phone][data-card]:not([data-theme='classic'])
+  [class*='Dialog_dialog']:not([class*='Overlay_root'] *) {
+  padding: 8px;
+  background: color-mix(in srgb, var(--md-card) var(--window, 100%), transparent);
+  border: 0;
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--md-outline-variant) var(--window, 100%), transparent),
+    0 10px 28px color-mix(in srgb, rgba(0, 0, 0, 0.5) var(--window, 100%), transparent);
+  animation: none;
+  backdrop-filter: blur(6px);
+}
+
+:root[data-phone][data-card]:not([data-theme='classic'])
+  [class*='Dialog_dialog']:not([class*='Overlay_root'] *)
+  [class*='Dialog_container'] {
+  border-color: transparent;
+}
+
+:root[data-phone][data-card]:not([data-theme='classic'])
+  [class*='Dialog_dialog']:not([class*='Overlay_root'] *)
+  [class*='Game_root'] {
+  background: none;
+  border-color: transparent;
+}
+
+:root[data-phone][data-card]:not([data-theme='classic'])
+  [class*='Dialog_dialog']:not([class*='Overlay_root'] *)
+  [class*='Game_scoreboard'] {
+  border-color: transparent;
 }

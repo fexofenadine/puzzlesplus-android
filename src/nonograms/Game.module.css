@@ -8,7 +8,7 @@
     'rows field';
   justify-content: center;
   color: var(--text);
-  font: bold 12px/1 var(--text-font);
+  font: bold 12px/1 var(--digit-font, var(--text-font));
 }
 
 /*the 2px pads match the field's top and left border*/

@@ -7,6 +7,14 @@ export const phone = import.meta.env.MODE === 'android'
 //the stylesheet keys the phone layout off the root, set before the first paint
 if (phone) document.documentElement.dataset.phone = ''
 
+//the board without its frame, set before the first paint too
+try {
+  if (phone && localStorage.getItem('windowCard') === 'yes')
+    document.documentElement.dataset.card = ''
+} catch {
+  //blocked storage keeps the frame
+}
+
 //capacitor serves its root index.html for any path without a dot, so a folder link would land
 //on the root page, which redirects to the first game and so loops; phones name the page
 export const pageUrl = (url) => {
@@ -40,9 +48,10 @@ const hex = (colour) => {
   return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
 }
 
-//the system bars take the theme's title bar colour, through MainActivity's PuzzlesBars
+//the system bars take the theme's bar colour (classic's title bar), through MainActivity's PuzzlesBars
 const matchBars = () => {
-  const colour = getComputedStyle(document.documentElement).getPropertyValue('--title-start')
+  const style = getComputedStyle(document.documentElement)
+  const colour = style.getPropertyValue('--md-bar') || style.getPropertyValue('--title-start')
   if (window.PuzzlesBars && colour.trim()) window.PuzzlesBars.set(hex(colour.trim()))
 }
 

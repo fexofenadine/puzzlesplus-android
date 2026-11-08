@@ -61,8 +61,11 @@ export const shellState = (page, root = '../') => ({
   windowState: 'open',
   //the game picked in the open games dialog, null while it is shut
   openGames: null,
-  //the phone's side drawer
+  //the phone's side panel of places, and its sheet of options from the bottom
   drawer: false,
+  sheet: false,
+  //a phone can show the board without its windows 95 frame, on a card
+  card: load('windowCard') === 'yes',
   //where back leaves to on a phone, a guide's game, otherwise the home screen
   home: null,
   //set while a game in play waits to hear what becomes of it
@@ -123,11 +126,22 @@ export const shellActions = {
   closeMenu: () => ({ menu: null }),
   toggleDrawer:
     () =>
-    ({ drawer }) => ({ menu: null, drawer: !drawer }),
-  closeDrawer: () => ({ menu: null, drawer: false }),
-  //android's back button: the drawer, then a dialog, then leave
+    ({ drawer }) => ({ menu: null, drawer: !drawer, sheet: false }),
+  toggleSheet:
+    () =>
+    ({ sheet }) => ({ menu: null, sheet: !sheet, drawer: false }),
+  closeDrawer: () => ({ menu: null, drawer: false, sheet: false }),
+  toggleCard:
+    () =>
+    ({ card }) => {
+      save('windowCard', card ? '' : 'yes')
+      if (card) delete document.documentElement.dataset.card
+      else document.documentElement.dataset.card = ''
+      return { card: !card }
+    },
+  //android's back button: the side panel or sheet, then a dialog, then leave
   back: () => (state) => {
-    if (state.drawer) return { menu: null, drawer: false }
+    if (state.drawer || state.sheet) return { menu: null, drawer: false, sheet: false }
     if (!closeDialog()) leave(state.home)
     return null
   },
@@ -224,6 +238,13 @@ export const shellActions = {
     ({ glass }) => {
       save('windowHidden', glass.hidden ? '' : 'yes')
       return { menu: null, glass: { ...glass, hidden: !glass.hidden } }
+    },
+  //a phone's options sheet sets the opacity straight away, saved as it goes
+  setOpacity:
+    (opacity) =>
+    ({ glass }) => {
+      save('windowOpacity', opacity === 100 ? '' : opacity)
+      return { glass: { ...glass, opacity } }
     },
   //shrink the chosen zoom to fit, only for a new level, theme or browser size
   fit:

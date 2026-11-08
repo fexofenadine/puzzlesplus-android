@@ -42,7 +42,7 @@
   height: 24px;
   margin: 0;
   padding: 0;
-  font: bold 15px/24px var(--text-font);
+  font: bold 15px/24px var(--digit-font, var(--text-font));
   text-align: center;
   border: 0;
   outline: 0;

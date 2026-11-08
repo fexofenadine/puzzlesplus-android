@@ -1,15 +1,10 @@
 import { h } from 'hyperapp'
-import { Check, Chips, Item, Section } from '../shell/PhoneBar'
+import { Check, Chips, Item, Section, TROPHY } from '../shell/PhoneBar'
 import { allowed, levelNames } from './Menu'
 import { sizes } from './rules'
 
-//nonograms' part of the phone drawer: playing, difficulty, size and its options
+//nonograms' part of the options sheet: difficulty, size and its options
 const PhoneMenu = ({ state, actions }) => [
-  <Section>
-    <Item glyph="↻" name="New game" onClick={() => actions.newGame()} actions={actions} />
-    <Item glyph="?" name="Hint" onClick={() => actions.hint()} actions={actions} />
-    <Item glyph="↶" name="Undo" onClick={() => actions.undo()} actions={actions} />
-  </Section>,
   <Section>
     <Chips
       label="Difficulty"
@@ -20,6 +15,7 @@ const PhoneMenu = ({ state, actions }) => [
     />
     <Chips
       label="Size"
+      kind="segments"
       options={sizes.map((n) => [n, String(n)])}
       value={state.game.n}
       onPick={(n) => actions.newGame({ n })}
@@ -28,7 +24,7 @@ const PhoneMenu = ({ state, actions }) => [
     <div style={{ height: '6px' }} />
     <Check name="Show Errors" checked={state.errors} onToggle={actions.toggleErrors} />
     <Check name="Timer" checked={state.timer} onToggle={actions.toggleTimer} />
-    <Item glyph="🏆" name="Best times" onClick={actions.toggleBestTime} actions={actions} />
+    <Item d={TROPHY} name="Best times" onClick={actions.toggleBestTime} actions={actions} />
   </Section>,
 ]
 
