@@ -89,7 +89,10 @@ const Boss = ({ key, state, actions }) => {
   return (
     <section key={key} class={s.root} tabindex={-1} oncreate={cover} ondestroy={uncover}>
       <header class={s.header}>
-        <div class={s.title}>Q3 budget</div>
+        {/*a tap on the title goes back too, for screens without esc*/}
+        <button type="button" class={s.title} onclick={() => actions.boss()}>
+          Q3 budget
+        </button>
         <nav class={s.menus}>
           {['File', 'Edit', 'View', 'Insert', 'Format', 'Data', 'Tools', 'Help'].map((name) => (
             <span>{name}</span>
