@@ -11,39 +11,26 @@ import { watchWindow } from '../shell/zoom'
 import { pageUrl, phone } from '../shell/phone'
 import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
+import { glide } from './motion'
 
 export const running = ({ start, over }) => start >= 0 && !over
 
 //cells shrink a little as boards grow, so every size makes a similar window
 export const cellSizes = { 3: 72, 4: 60, 5: 52, 6: 46 }
 
-//slides a tile from the cell it was drawn on to its new one in the original's 100 ms
-//animated from script because a keyed update can put a tile back into the page, which cancels a
-//css transition
-const glide = (element, from, to) => {
-  if (from[0] === to[0] && from[1] === to[1]) return
-  if (!element.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const board = element.parentNode.parentNode
-  const step = element.offsetWidth + parseFloat(getComputedStyle(board).columnGap || 0)
-  const dx = (from[0] - to[0]) * step
-  const dy = (from[1] - to[1]) * step
-  element.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0 0' }], {
-    duration: 100,
-    easing: 'ease-in-out',
-  })
-}
-
 //a tile's look: its power of two picks the colour and the css the text that reads on it
 //its digit count picks the font size
-//offset is where a drag holds it, in cells; still means the finger moves it, so no glide
-export const Tile = ({ tile, n, offset, still }) => {
+//it slides from script (glide) because a keyed update can put a tile back into the page, which
+//cancels a css transition
+export const Tile = ({ tile, n }) => {
   const k = Math.log2(tile.value)
-  const [ox, oy] = offset || [0, 0]
-  const x = (tile.cell % n) + ox
-  const y = Math.floor(tile.cell / n) + oy
+  const x = tile.cell % n
+  const y = Math.floor(tile.cell / n)
   return (
     <div
       key={tile.id}
+      data-id={tile.id}
+      data-k={k}
       class={[
         s.tile,
         k > 11 && s.beyond,
@@ -55,9 +42,7 @@ export const Tile = ({ tile, n, offset, still }) => {
         .join(' ')}
       data-digits={Math.min(5, String(tile.value).length)}
       style={{ '--x': x, '--y': y, '--k': k }}
-      onupdate={(element, old) =>
-        !still && glide(element, [old.style['--x'], old.style['--y']], [x, y])
-      }
+      onupdate={(element, old) => glide(element, [old.style['--x'], old.style['--y']], [x, y])}
     >
       {tile.value}
     </div>
@@ -68,19 +53,12 @@ export const Tile = ({ tile, n, offset, still }) => {
 const byId = (a, b) => a.id - b.id
 
 //the sunken cells and the tiles over them, drawn for the game and the guide alike
-//drag holds tiles off their cells while a finger moves them
-export const Board = ({ n, tiles, hidden, drag, onDown }, children) => (
+export const Board = ({ n, tiles, hidden, onDown }, children) => (
   <div class={s.board} style={{ '--n': n, '--cell': `${cellSizes[n]}px` }} onpointerdown={onDown}>
     {Array.from({ length: n * n }, () => (
       <div class={s.cell} />
     ))}
-    {!hidden && (
-      <div class={s.tiles}>
-        {[...tiles]
-          .sort(byId)
-          .map((tile) => Tile({ tile, n, offset: drag && drag[tile.id], still: Boolean(drag) }))}
-      </div>
-    )}
+    {!hidden && <div class={s.tiles}>{[...tiles].sort(byId).map((tile) => Tile({ tile, n }))}</div>}
     {children}
   </div>
 )
@@ -133,13 +111,7 @@ const Game = ({ key, state, actions }) => {
             blank={!state.timer}
           />
         </div>
-        <Board
-          n={n}
-          tiles={game.tiles}
-          hidden={paused}
-          drag={state.drag}
-          onDown={actions.swipeStart}
-        >
+        <Board n={n} tiles={game.tiles} hidden={paused} onDown={actions.swipeStart}>
           {paused && <PausedCover onResume={() => actions.pause(false)} />}
         </Board>
         {hint && !paused && (

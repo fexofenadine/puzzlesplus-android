@@ -81,15 +81,16 @@ const drag = (points) => {
 it('moves the tiles with a drag and finishes past halfway', () => {
   //the 2 travels three cells left, 180 px
   start({ game: gameOf([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) })
-  const id = now().game.tiles[0].id
-  wired.swipeStart({ clientX: 300, clientY: 100, timeStamp: 0, button: 0, currentTarget: board })
+  //a stand-in for the tile on the page, 60 px wide with no gap
+  const tile = { dataset: { id: String(now().game.tiles[0].id) }, style: {}, offsetWidth: 60 }
+  const page = { ...board, querySelectorAll: () => [tile] }
+  wired.swipeStart({ clientX: 300, clientY: 100, timeStamp: 0, button: 0, currentTarget: page })
   wired.swipeMove({ clientX: 240, clientY: 102, timeStamp: 500 })
-  //a third of the way, following the finger
-  expect(now().drag[id][0]).toBeCloseTo(-1)
-  expect(now().drag[id][1]).toBe(0)
+  //a third of the way, following the finger: one cell of the three
+  expect(tile.style.translate).toBe('-60px 0px')
   //a slow release short of halfway springs back
   wired.swipeEnd({ clientX: 240, clientY: 102, timeStamp: 1000 })
-  expect(now().drag).toBe(null)
+  expect(tile.style.translate).toBe('')
   expect(now().game.history).toHaveLength(0)
   //slowly past halfway finishes
   drag([
@@ -99,7 +100,6 @@ it('moves the tiles with a drag and finishes past halfway', () => {
     [200, 100, 3500],
   ])
   expect(values()[0]).toBe(2)
-  expect(now().drag).toBe(null)
 })
 
 it('finishes a short quick flick and ignores a tap', () => {

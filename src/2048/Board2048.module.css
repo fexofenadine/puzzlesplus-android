@@ -1,6 +1,14 @@
-/*each doubling turns the hue a step and shifts the lightness, past 2048 tiles take the top colour*/
-/*--t-turns caps the hue steps, so a theme's high tiles keep its own colours*/
-/*text follows the tile's lightness: the on-dark colour below --t-mid, the on-light one above*/
+/*the original's tile font, used on every theme without a font of its own for tiles*/
+@font-face {
+  font-family: 'Clear Sans';
+  font-weight: 700;
+  src: url(../fonts/clear-sans-bold.woff) format('woff');
+}
+
+/*tiles take a theme's palette (--t-c1 to --t-c11, text --t-text or --t-f1 to --t-f11) where it has
+one, else a ramp: each doubling turns the hue a step and shifts the lightness*/
+/*--t-turns caps the ramp's hue steps; ramp text is the on-dark colour below --t-mid, else on-light*/
+/*past 2048 tiles take the top colour*/
 :global(:root) {
   --t-hue: 200;
   --t-step: -25;
@@ -13,20 +21,65 @@
   --t-top-text: #fff;
   --t-on-dark: #fff;
   --t-on-light: #000;
+  /*the original's font and text sizes for 1-2, 3, 4 and 5 digits, as parts of a cell*/
+  --t-font: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+  --t-s2: 0.52;
+  --t-s3: 0.42;
+  --t-s4: 0.33;
+  --t-s5: 0.28;
+  /*how far each font's digits must drop, in em, to sit in the middle of the tile, measured from
+  their ink against the line box (clear sans sits low, so it rises)*/
+  --t-drop: -0.04em;
 }
 
-/*a sunset from purple through pink to orange and yellow*/
+/*the original game's colours*/
+:global(:root[data-theme='classic']) {
+  --t-c1: #eee4da;
+  --t-c2: #ede0c8;
+  --t-c3: #f2b179;
+  --t-c4: #f59563;
+  --t-c5: #f67c5f;
+  --t-c6: #f65e3b;
+  --t-c7: #edcf72;
+  --t-c8: #edcc61;
+  --t-c9: #edc850;
+  --t-c10: #edc53f;
+  --t-c11: #edc22e;
+  --t-text: #f9f6f2;
+  --t-f1: #776e65;
+  --t-f2: #776e65;
+  --t-glow: rgb(243 215 116);
+  --t-top: #3c3a32;
+  --t-top-text: #f9f6f2;
+  --t-grid: #bbada0;
+  --t-slot: rgb(238 228 218 / 0.35);
+}
+
+/*a dusk from indigo through violet and pink to a neon yellow 2048, synthwave's own font*/
 :global(:root[data-theme='synthwave']) {
-  --t-hue: 285;
-  --t-step: 18;
-  --t-turns: 7;
-  --t-sat: 85%;
-  --t-l0: 30%;
-  --t-ld: 3.5%;
+  --t-c1: #3b2d5c;
+  --t-c2: #4d3474;
+  --t-c3: #6a3d94;
+  --t-c4: #8c3fa3;
+  --t-c5: #b0429f;
+  --t-c6: #d64a96;
+  --t-c7: #f2568b;
+  --t-c8: #ff6f7a;
+  --t-c9: #ff8b5c;
+  --t-c10: #ffb257;
+  --t-c11: #fede5d;
+  --t-text: #f4eeff;
+  --t-f9: #241b2f;
+  --t-f10: #241b2f;
+  --t-f11: #241b2f;
   --t-top: #36f9f6;
   --t-top-text: #241b2f;
-  --t-on-dark: #f4eeff;
-  --t-on-light: #241b2f;
+  --t-font: var(--text-font);
+  --t-s2: 0.42;
+  --t-s3: 0.36;
+  --t-s4: 0.29;
+  --t-s5: 0.23;
+  --t-drop: -0.025em;
 }
 
 :global(:root[data-theme='matrix']) {
@@ -40,6 +93,14 @@
   --t-top-text: #020a04;
   --t-on-dark: #b6ffcb;
   --t-on-light: #020a04;
+  --t-font: var(--text-font);
+  /*courier prime's digits are narrow, so they can be larger and still fit five to a tile*/
+  --t-s2: 0.5;
+  --t-s3: 0.4;
+  --t-s4: 0.32;
+  --t-s5: 0.26;
+  /*its digits sit high in their line box*/
+  --t-drop: 0.07em;
 }
 
 :global(:root[data-theme='nord']) {
@@ -54,21 +115,30 @@
   --t-on-light: #2e3440;
 }
 
+/*solarized's accents in turn, cool to warm, settling on its yellow for 2048*/
 :global(:root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])) {
-  --t-hue: 190;
-  --t-step: -22;
-  --t-sat: 60%;
-  --t-l0: 24%;
-  --t-ld: 3.5%;
+  --t-c1: #2b5b66;
+  --t-c2: #35717a;
+  --t-c3: #2aa198;
+  --t-c4: #268bd2;
+  --t-c5: #6c71c4;
+  --t-c6: #d33682;
+  --t-c7: #dc322f;
+  --t-c8: #cb4b16;
+  --t-c9: #b58900;
+  --t-c10: #c49a17;
+  --t-c11: #d3ab31;
+  --t-text: #fdf6e3;
+  --t-f9: #002b36;
+  --t-f10: #002b36;
+  --t-f11: #002b36;
   --t-top: #fdf6e3;
   --t-top-text: #002b36;
-  --t-on-dark: #fdf6e3;
-  --t-on-light: #002b36;
 }
 
-/*sunken cells in a grid, the tiles laid over them on the same steps*/
+/*the original's grid: rounded tiles over rounded slots in a rounded tray*/
 .board {
-  --gap: 5px;
+  --gap: calc(var(--cell) * 0.14);
   --step: calc(var(--cell) + var(--gap));
   position: relative;
   display: grid;
@@ -77,11 +147,8 @@
   width: fit-content;
   margin: 0 auto;
   padding: var(--gap);
-  background: var(--panel);
-  border-width: 2px 3px 3px 2px;
-  border-style: solid;
-  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
-  border-radius: 0 2px;
+  background: var(--t-grid, color-mix(in srgb, var(--shadow) 55%, var(--panel)));
+  border-radius: 6px;
   touch-action: none;
   user-select: none;
   cursor: pointer;
@@ -90,8 +157,8 @@
 
 .cell {
   height: var(--cell);
-  background: var(--cell-open);
-  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+  background: var(--t-slot, color-mix(in srgb, var(--light) 30%, transparent));
+  border-radius: 3px;
 }
 
 .tiles {
@@ -100,7 +167,6 @@
   left: var(--gap);
 }
 
-/*a raised tile like an unopened cell, in its value's colour*/
 .tile {
   position: absolute;
   top: 0;
@@ -108,38 +174,108 @@
   z-index: 1;
   width: var(--cell);
   height: var(--cell);
-  font: bold calc(var(--cell) * 0.42) / var(--cell) var(--text-font);
+  font: bold calc(var(--cell) * var(--t-s2)) / var(--cell) var(--t-font);
+  /*a taller line drops the digits by half the extra, a shorter one lifts them*/
+  line-height: calc(var(--cell) + 2 * var(--t-drop));
   text-align: center;
   --l: calc(var(--t-l0) + var(--k) * var(--t-ld));
-  color: color-mix(
+  --t-ramp: hsl(
+    calc(var(--t-hue) + min(var(--k), var(--t-turns)) * var(--t-step)) var(--t-sat) var(--l)
+  );
+  --t-auto: color-mix(
     in srgb,
     var(--t-on-dark) clamp(0%, (var(--t-mid) - var(--l)) * 100, 100%),
     var(--t-on-light)
   );
-  background: hsl(
-    calc(var(--t-hue) + min(var(--k), var(--t-turns)) * var(--t-step)) var(--t-sat) var(--l)
-  );
-  box-shadow:
-    inset 2px 2px 0 color-mix(in srgb, var(--cell-light) 70%, transparent),
-    inset -2px -2px 0 color-mix(in srgb, var(--cell-shadow) 80%, transparent);
+  --t-bg: var(--t-ramp);
+  --t-fg: var(--t-text, var(--t-auto));
+  color: var(--t-fg);
+  background: var(--t-bg);
+  border-radius: 3px;
   transform: translate(calc(var(--x) * var(--step)), calc(var(--y) * var(--step)));
+  /*its own layer, so slides stay smooth while a background animates*/
+  will-change: transform, translate;
+}
+
+.tile[data-k='1'] {
+  --t-bg: var(--t-c1, var(--t-ramp));
+  --t-fg: var(--t-f1, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='2'] {
+  --t-bg: var(--t-c2, var(--t-ramp));
+  --t-fg: var(--t-f2, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='3'] {
+  --t-bg: var(--t-c3, var(--t-ramp));
+  --t-fg: var(--t-f3, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='4'] {
+  --t-bg: var(--t-c4, var(--t-ramp));
+  --t-fg: var(--t-f4, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='5'] {
+  --t-bg: var(--t-c5, var(--t-ramp));
+  --t-fg: var(--t-f5, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='6'] {
+  --t-bg: var(--t-c6, var(--t-ramp));
+  --t-fg: var(--t-f6, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='7'] {
+  --t-bg: var(--t-c7, var(--t-ramp));
+  --t-fg: var(--t-f7, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='8'] {
+  --t-bg: var(--t-c8, var(--t-ramp));
+  --t-fg: var(--t-f8, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='9'] {
+  --t-bg: var(--t-c9, var(--t-ramp));
+  --t-fg: var(--t-f9, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='10'] {
+  --t-bg: var(--t-c10, var(--t-ramp));
+  --t-fg: var(--t-f10, var(--t-text, var(--t-auto)));
+}
+
+.tile[data-k='11'] {
+  --t-bg: var(--t-c11, var(--t-ramp));
+  --t-fg: var(--t-f11, var(--t-text, var(--t-auto)));
 }
 
 .beyond {
-  color: var(--t-top-text);
-  background: var(--t-top);
+  --t-bg: var(--t-top);
+  --t-fg: var(--t-top-text);
+}
+
+/*the original's glow from 128 to 2048, brighter each doubling, in the tile's own colour or the
+theme's --t-glow*/
+.tile:is([data-k='7'], [data-k='8'], [data-k='9'], [data-k='10'], [data-k='11']) {
+  box-shadow:
+    0 0 calc(var(--cell) * 0.28) calc(var(--cell) * 0.094)
+      color-mix(in srgb, var(--t-glow, var(--t-bg)) calc((var(--k) - 4) * 7.94%), transparent),
+    inset 0 0 0 1px rgb(255 255 255 / calc((var(--k) - 4) * 4.76%));
 }
 
 .tile[data-digits='3'] {
-  font-size: calc(var(--cell) * 0.36);
+  font-size: calc(var(--cell) * var(--t-s3));
 }
 
 .tile[data-digits='4'] {
-  font-size: calc(var(--cell) * 0.29);
+  font-size: calc(var(--cell) * var(--t-s4));
 }
 
 .tile[data-digits='5'] {
-  font-size: calc(var(--cell) * 0.23);
+  font-size: calc(var(--cell) * var(--t-s5));
 }
 
 /*the two halves of a merge slide under the new tile, then hide once it has popped*/

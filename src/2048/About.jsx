@@ -10,7 +10,9 @@ const TwentyAbout = ({ key, actions }) => (
     <p>
       Based on <Link href="https://github.com/gabrielecirulli/2048">2048</Link> by Gabriele Cirulli
       (MIT licence), itself inspired by 1024 and Threes, with the rules kept and the code written
-      anew. The hint is a short look ahead over the tiles that may appear.
+      anew. The hint is a short look ahead over the tiles that may appear. Its tiles keep the
+      original&apos;s shapes and, on Classic, its colours, with the Clear Sans font by Intel (Apache
+      2.0 licence).
     </p>
     <p>
       Part of Puzzles Plus by fexofenadine, sharing its window, themes and backgrounds with
