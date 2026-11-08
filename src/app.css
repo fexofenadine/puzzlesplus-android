@@ -567,9 +567,19 @@ main::before {
   margin: 8px;
 }
 
+:root[data-phone] [class*='BestTimes_table'] {
+  margin: 0;
+}
+
+/*material dialogs band the rows from their own surface*/
+:root[data-phone]:not([data-theme='classic']) [class*='BestTimes_table'] {
+  --rule: color-mix(in srgb, var(--md-on) 22%, var(--md-high));
+  --band: color-mix(in srgb, var(--md-on) 7%, var(--md-high));
+}
+
 :root[data-phone] [class*='BestTimes_slot'] {
   min-width: 0;
-  padding: 2px 3px;
+  padding: 2px 1px;
 }
 
 :root[data-phone] [class*='BestTimes_level'],
