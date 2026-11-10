@@ -56,18 +56,17 @@ looks['solarized-phosphor'] = looks.solarized
 
 export const lookOf = (theme) => looks[theme] || looks.classic
 
-const BURSTS = 7
-const SPAN = 2.6
 const SPARKS = 70
 const TRAIL = 5
+//rockets go up until a press or key, or this many seconds, whichever is first
+const LIMIT = 120
 
-//the bursts of one show: when each goes off in seconds, and where, as fractions of the screen
-export const plan = (rng) =>
-  Array.from({ length: BURSTS }, (_, k) => ({
-    at: (k / BURSTS) * SPAN + rng() * 0.25,
-    x: 0.15 + rng() * 0.7,
-    y: 0.15 + rng() * 0.4,
-  })).sort((a, b) => a.at - b.at)
+//the next rocket: where it bursts as fractions of the screen, and the wait after it in seconds
+export const launch = (rng) => ({
+  x: 0.15 + rng() * 0.7,
+  y: 0.15 + rng() * 0.4,
+  wait: 0.3 + rng() * 0.4,
+})
 
 //the sparks of a burst: a ring of varied speeds all one colour family, with a second colour in some
 export const sparks = (look, x, y, rng) => {
@@ -127,6 +126,8 @@ const place = () => {
 }
 
 //a show for a win, unless they are off, the tab is hidden, the boss key is up or motion is reduced
+//it keeps launching until the next press or key (not one that came before it, nor a held key
+//repeating) or two minutes, then the rockets and bursts in the air finish
 export const celebrate = (theme = document.documentElement.dataset.theme) => {
   if (running || load('fireworks') === 'off' || document.hidden || calm()) return
   const root = document.documentElement
@@ -142,14 +143,24 @@ export const celebrate = (theme = document.documentElement.dataset.theme) => {
   target.height = Math.round(height * scale)
   target.style.display = 'block'
   context.setTransform(scale, 0, 0, scale, 0, 0)
-  const waiting = plan(Math.random)
+  const started = performance.now()
+  let open = true
+  let wait = 0
   let alive = []
   let rockets = []
   let clock = 0
   let last = null
   running = true
 
+  //only a press or key after the show began ends the launching
+  const interrupt = (event) => {
+    if (event.timeStamp > started && !event.repeat) open = false
+  }
+  const listening = ['pointerdown', 'keydown']
+  for (const name of listening) window.addEventListener(name, interrupt, true)
+
   const stop = () => {
+    for (const name of listening) window.removeEventListener(name, interrupt, true)
     running = false
     context.setTransform(1, 0, 0, 1, 0, 0)
     context.clearRect(0, 0, target.width, target.height)
@@ -162,12 +173,15 @@ export const celebrate = (theme = document.documentElement.dataset.theme) => {
     last = now
     clock += dt
     if (root.dataset.boss || document.hidden) return stop()
-    while (waiting.length && waiting[0].at <= clock) {
-      const { x, y } = waiting.shift()
+    if (clock > LIMIT) open = false
+    wait -= dt
+    while (open && wait <= 0) {
+      const next = launch(Math.random)
+      wait += next.wait
       rockets.push({
-        x: x * width,
+        x: next.x * width,
         y: height,
-        top: y * height,
+        top: next.y * height,
         speed: 520 + Math.random() * 120,
         trail: [],
       })
@@ -187,7 +201,7 @@ export const celebrate = (theme = document.documentElement.dataset.theme) => {
     for (const r of rockets)
       draw(context, look, { ...r, color: look.colors[0], char: look.glyphs?.[0] || '' }, 1)
     for (const p of alive) draw(context, look, p, 1 - p.age / p.life)
-    if (waiting.length || rockets.length || alive.length) requestAnimationFrame(frame)
+    if (open || rockets.length || alive.length) requestAnimationFrame(frame)
     else stop()
   }
   requestAnimationFrame(frame)

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { advance, celebrate, lookOf, plan, sparks } from './fireworks'
+import { advance, celebrate, launch, lookOf, sparks } from './fireworks'
 import { themes } from './themes'
 import { random } from './random'
 
@@ -20,6 +20,7 @@ beforeEach(() => {
   document.documentElement.dataset.theme = 'synthwave'
   delete document.documentElement.dataset.boss
   frames = []
+  time = 0
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
   vi.stubGlobal('requestAnimationFrame', (fn) => frames.push(fn))
   HTMLCanvasElement.prototype.getContext = fakeContext
@@ -29,11 +30,14 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-//plays frames at 16ms steps until none are left or the limit passes
-const play = (limit = 600) => {
-  let time = 0
-  while (frames.length && limit-- > 0) frames.shift()((time += 16))
-  return limit
+//plays up to n frames at 16ms steps and says how many were not needed
+let time
+const step = (n) => {
+  while (frames.length && n > 0) {
+    frames.shift()((time += 16))
+    n--
+  }
+  return n
 }
 
 it('has a look for every theme', () => {
@@ -41,14 +45,15 @@ it('has a look for every theme', () => {
   expect(lookOf('unknown')).toBe(lookOf('classic'))
 })
 
-it('plans its bursts in order across the screen', () => {
-  const bursts = plan(random(1))
-  expect(bursts.length).toBeGreaterThan(4)
-  expect(bursts.map((b) => b.at)).toEqual([...bursts.map((b) => b.at)].sort((a, b) => a - b))
-  for (const { x, y } of bursts) {
+it('launches rockets across the screen, a moment apart', () => {
+  const rng = random(1)
+  for (let k = 0; k < 50; k++) {
+    const { x, y, wait } = launch(rng)
     expect(x).toBeGreaterThan(0.1)
     expect(x).toBeLessThan(0.9)
     expect(y).toBeLessThan(0.6)
+    expect(wait).toBeGreaterThan(0.25)
+    expect(wait).toBeLessThan(0.8)
   }
 })
 
@@ -64,17 +69,61 @@ it('flings sparks out and lets them fall and fade away', () => {
   expect(sparks(lookOf('matrix'), 0, 0, random(3))[0].char).not.toBe('')
 })
 
-it('plays a show behind the windows, then hides its canvas', () => {
+//a press or key that happens after the show began
+const press = (type, props = {}) => {
+  const event = new Event(type)
+  Object.defineProperty(event, 'timeStamp', { value: performance.now() + 50 })
+  for (const [name, value] of Object.entries(props)) Object.defineProperty(event, name, { value })
+  window.dispatchEvent(event)
+}
+
+it('keeps launching until a press, then lets what is in the air finish', () => {
   celebrate()
   const canvas = document.body.querySelectorAll('canvas')[1]
   expect(canvas.style.display).toBe('block')
-  expect(play()).toBeGreaterThan(0)
+  //well past the old few seconds, still going
+  step(1250)
+  expect(frames.length).toBe(1)
+  press('pointerdown')
+  //the rockets and sparks in flight take a few seconds to finish, nothing new goes up
+  expect(step(400)).toBeGreaterThan(0)
+  expect(frames.length).toBe(0)
   expect(canvas.style.display).toBe('none')
-  //a show is not stacked on one in progress
+})
+
+it('ends on a key too, but not on one held down or one from before the show', () => {
+  celebrate()
+  step(100)
+  press('keydown', { repeat: true })
+  const early = new Event('pointerdown')
+  Object.defineProperty(early, 'timeStamp', { value: 0 })
+  window.dispatchEvent(early)
+  window.dispatchEvent(new Event('mousemove'))
+  step(300)
+  expect(frames.length).toBe(1)
+  press('keydown')
+  step(400)
+  expect(frames.length).toBe(0)
+})
+
+it('stops launching after two minutes by itself', () => {
+  celebrate()
+  //50ms steps are the longest the show takes, so two minutes need fewer frames
+  for (let k = 0; k < 3000 && frames.length; k++) frames.shift()((time += 50))
+  expect(frames.length).toBe(0)
+  expect(time).toBeGreaterThan(120000)
+})
+
+it('does not stack shows, and a new one can start after one ends', () => {
   celebrate()
   celebrate()
   expect(frames.length).toBe(1)
-  play()
+  press('pointerdown')
+  step(400)
+  celebrate()
+  expect(frames.length).toBe(1)
+  press('pointerdown')
+  step(400)
 })
 
 it('stays quiet when off, hidden, reduced or under the boss key', () => {
