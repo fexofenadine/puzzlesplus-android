@@ -5,6 +5,7 @@ import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
 import Tabs from './Tabs'
+import StatsList from './StatsList'
 
 const tabs = [
   { id: 'clean', name: 'No hints' },
@@ -13,7 +14,7 @@ const tabs = [
 
 const artTab = { id: 'art', name: 'Art' }
 
-//a size a row, a level a column, empty slots stay blank and levels a size can't deal show a dash
+//a size a row, a level a column, a dash for a slot with no time yet (faint when it can't be dealt)
 const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art = false }) => (
   <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBestTime()}>
     <Dialog title={title} onClose={actions.toggleBestTime}>
@@ -39,12 +40,14 @@ const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art
                   {n} × {n}
                 </th>
                 {levelNames.map((_, level) => {
-                  const best = allowed(n, level) && state[state.tab][`${n}.${level}`]
+                  const ok = allowed(n, level)
+                  const best = ok && state[state.tab][`${n}.${level}`]
                   return (
                     <td class={s.slot}>
-                      {!allowed(n, level) && '–'}
-                      {best && <span class={s.time}>{best.time} s</span>}
-                      {best && <span class={s.name}>{best.name}</span>}
+                      {!ok && <span class={s.never}>–</span>}
+                      {ok && !best.set && <span class={s.empty}>–</span>}
+                      {best && best.set && <span class={s.time}>{best.time} s</span>}
+                      {best && best.set && <span class={s.name}>{best.name}</span>}
                     </td>
                   )
                 })}
@@ -52,9 +55,13 @@ const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art
             ))}
           </tbody>
         </table>
+        {state.stats && <StatsList stats={state.stats} />}
         <div class={b.footer}>
           <Button type="button" onClick={actions.resetBestTime}>
             <span class={b.button}>Reset Scores</span>
+          </Button>
+          <Button type="button" onClick={actions.resetStats}>
+            <span class={b.button}>Reset Stats</span>
           </Button>
           <Button type="button" onClick={actions.toggleBestTime} onCreate={(el) => el.focus()}>
             <span class={b.button}>OK</span>

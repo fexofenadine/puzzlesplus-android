@@ -1,4 +1,5 @@
 import { load, remove, save } from './storage'
+import { clearStats, readStats } from './stats'
 
 //best times by size and level under prefix, apart for games with and without hints
 //withArt adds the art board, which counts only games played without hints
@@ -16,8 +17,11 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
     Object.fromEntries(
       eachSlot((n, level, slot) => {
         const key = keyOf(board, n, level)
-        const time = parseInt(load(key), 10) || 999
-        return [slot, { time, name: load(`${key}.name`) || 'Anonymous' }]
+        const saved = parseInt(load(key), 10)
+        return [
+          slot,
+          { set: Boolean(saved), time: saved || 999, name: load(`${key}.name`) || 'Anonymous' },
+        ]
       }),
     )
 
@@ -80,6 +84,7 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
               clean: bestTimes('clean'),
               hinted: bestTimes('hinted'),
               ...(withArt && { art: bestTimes('art') }),
+              stats: readStats(prefix),
             },
       }),
     setBestTimeTab: (tab) => (state) =>
@@ -89,6 +94,9 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
       ({ bestTime }) => ({
         bestTime: { ...bestTime, [bestTime.tab]: clearBestTimes(bestTime.tab) },
       }),
+    resetStats:
+      () =>
+      ({ bestTime }) => ({ bestTime: { ...bestTime, stats: clearStats(prefix) } }),
   }
 
   return { timeKey, eachSlot, actions }

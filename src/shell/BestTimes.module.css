@@ -54,3 +54,12 @@
   text-overflow: ellipsis;
   opacity: 0.75;
 }
+
+/*a dash where there is no time yet, fainter where the level can't be dealt*/
+.empty {
+  opacity: 0.6;
+}
+
+.never {
+  opacity: 0.25;
+}

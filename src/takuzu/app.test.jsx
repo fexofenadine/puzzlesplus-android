@@ -214,8 +214,8 @@ it('wins on the solution and offers a best time', () => {
   wired.changeWinner({ name: ' Ada ' })
   wired.submitBestTime({ preventDefault() {} })
   expect(localStorage.getItem('takuzu.6.1')).toBe(String(game.time))
-  expect(now().bestTime.clean['6.1']).toEqual({ time: game.time, name: 'Ada' })
-  expect(now().bestTime.clean['8.1']).toEqual({ time: 999, name: 'Anonymous' })
+  expect(now().bestTime.clean['6.1']).toEqual({ set: true, time: game.time, name: 'Ada' })
+  expect(now().bestTime.clean['8.1']).toEqual({ set: false, time: 999, name: 'Anonymous' })
 })
 
 it('counts a hint before the first move, and starts the clock', () => {

@@ -4,6 +4,7 @@ import Overlay from './Overlay'
 import Dialog from './Dialog'
 import Button from './Button'
 import Tabs from './shell/Tabs'
+import StatsList from './shell/StatsList'
 
 const tabs = [
   { id: 'clean', name: 'No hints' },
@@ -26,10 +27,16 @@ const BestTime = ({ key, state, actions }) => (
             ))}
           </tbody>
         </table>
+        {state.stats && <StatsList stats={state.stats} losses />}
         <div class={s.footer}>
           <Button type="button" onClick={actions.resetBestTime}>
             <span class={s.button}>Reset Scores</span>
           </Button>
+          {state.stats && (
+            <Button type="button" onClick={actions.resetStats}>
+              <span class={s.button}>Reset Stats</span>
+            </Button>
+          )}
           <Button type="button" onClick={actions.toggleBestTime} onCreate={(el) => el.focus()}>
             <span class={s.button}>OK</span>
           </Button>

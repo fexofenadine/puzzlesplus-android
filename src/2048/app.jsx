@@ -15,7 +15,8 @@ import { clock, pauseAction, seconds } from '../shell/clock'
 import { check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
 import BestScores from './BestScores'
-import { offer, recordActions } from './records'
+import { assistedOf, offer, recordActions } from './records'
+import { tally } from '../shell/stats'
 import { canMove, highest, move, sizes, spawn, targets, tilesOf, valuesOf } from './rules'
 import { suggest } from './search'
 import { along, finishes, lockOf, offsetsOf, planOf } from './drag'
@@ -229,10 +230,12 @@ export const actions = {
     if (reached) {
       next.reached = true
       celebrate()
+      tally('2048', { won: true, clean: !assistedOf(next) })
     }
     let winner = null
     if (next.over) {
       cancelAnimationFrame(next.raf)
+      if (!next.reached) tally('2048', { won: false })
       winner = offer(next)
       next.offered = true
     }

@@ -10,6 +10,7 @@ import PhoneMenu, { look } from './PhoneMenu'
 import OpenGames from '../shell/OpenGames'
 import { load, remove, save } from '../shell/storage'
 import { records } from '../shell/records'
+import { tally } from '../shell/stats'
 import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
 import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from '../shell/clock'
 import { check, resumable } from '../shell/resume'
@@ -125,6 +126,7 @@ const changed = (state, board, history, actions, settled = false) => {
   if (next.win) {
     cancelAnimationFrame(next.raf)
     celebrate()
+    if (!state.game.win) tally('takuzu', { won: true, clean: !next.hinted })
     if (timed({ ...state, game: next })) actions.win(next)
   }
   const stuck = !next.win && full(board)

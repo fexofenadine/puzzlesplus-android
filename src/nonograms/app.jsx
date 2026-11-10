@@ -10,6 +10,7 @@ import PhoneMenu, { look } from './PhoneMenu'
 import OpenGames from '../shell/OpenGames'
 import { load, save } from '../shell/storage'
 import { records } from '../shell/records'
+import { tally } from '../shell/stats'
 import BestTimes from '../shell/BestTimes'
 import Prompt from '../shell/Prompt'
 import { showRain } from '../shell/rain'
@@ -136,6 +137,7 @@ const changed = (state, game, board, history, actions, settled = false) => {
   if (next.win) {
     cancelAnimationFrame(next.raf)
     celebrate()
+    if (!state.game.win) tally('nonograms', { won: true, clean: !next.hinted })
     if (timed({ ...state, game: next })) record(next, actions)
   }
   const stuck = !next.win && fillsLeft(board, next.n, next.clues) === 0
