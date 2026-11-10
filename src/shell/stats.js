@@ -18,8 +18,23 @@ export const readStats = (prefix) => {
   )
 }
 
-//one finished game
+//losses are only counted, and shown, once switched on (Minesweeper and 2048 can be lost)
+export const lossesOn = () => load('losses') === 'on'
+
+export const lossState = () => ({ trackLosses: lossesOn() })
+
+export const lossActions = {
+  toggleTrackLosses:
+    () =>
+    ({ trackLosses }) => {
+      save('losses', trackLosses ? 'off' : 'on')
+      return { menu: null, trackLosses: !trackLosses }
+    },
+}
+
+//one finished game, a loss is skipped while they are not tracked
 export const tally = (prefix, { won, clean = true }) => {
+  if (!won && !lossesOn()) return
   const stats = readStats(prefix)
   if (won) stats.won++
   else stats.lost++

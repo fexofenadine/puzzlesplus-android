@@ -18,7 +18,7 @@ import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './shell/storage'
 import { listen, shellActions, shellState, shortcut } from './shell/actions'
-import { clearStats, readStats, tally } from './shell/stats'
+import { clearStats, lossActions, lossesOn, lossState, readStats, tally } from './shell/stats'
 import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from './shell/clock'
 import { check, resumable } from './shell/resume'
 import { celebrate } from './shell/fireworks'
@@ -229,6 +229,7 @@ const prevent = (event) => {
 
 export const state = {
   ...shellState('minesweeper'),
+  ...lossState(),
   hint: null,
   shelf: saved.list(),
   game: saved.restore() || createGame(loadLevel()),
@@ -244,6 +245,7 @@ export const state = {
 
 export const actions = {
   ...shellActions,
+  ...lossActions,
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
     listen(actions)
@@ -569,6 +571,7 @@ export const actions = {
             hinted: bestTimes(true),
             //classic keeps the original dialog, the stats wait for another theme
             stats: theme === 'classic' ? null : readStats('minesweeper'),
+            losses: lossesOn(),
           },
     }),
   resetStats:

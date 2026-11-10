@@ -10,6 +10,7 @@ it('starts at zero and survives a damaged save', () => {
 })
 
 it('counts wins, losses and unaided streaks', () => {
+  localStorage.setItem('losses', 'on')
   tally('g', { won: true })
   tally('g', { won: true })
   tally('g', { won: true, clean: false })
@@ -17,6 +18,12 @@ it('counts wins, losses and unaided streaks', () => {
   tally('g', { won: true })
   tally('g', { won: false })
   expect(readStats('g')).toMatchObject({ won: 4, lost: 1, streak: 0, best: 2 })
+})
+
+it('skips losses, and leaves the streak alone, until they are switched on', () => {
+  tally('g', { won: true })
+  tally('g', { won: false })
+  expect(readStats('g')).toMatchObject({ won: 1, lost: 0, streak: 1 })
 })
 
 it('clears one game and leaves another', () => {

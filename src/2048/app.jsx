@@ -16,7 +16,7 @@ import { check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
 import BestScores from './BestScores'
 import { assistedOf, offer, recordActions } from './records'
-import { tally } from '../shell/stats'
+import { lossActions, lossState, tally } from '../shell/stats'
 import { canMove, highest, move, sizes, spawn, targets, tilesOf, valuesOf } from './rules'
 import { suggest } from './search'
 import { along, finishes, lockOf, offsetsOf, planOf } from './drag'
@@ -143,6 +143,7 @@ let swipe = null
 
 export const state = {
   ...shellState('2048'),
+  ...lossState(),
   hint: null,
   prompt: false,
   //off unless switched on: a score game needs no clock
@@ -156,6 +157,7 @@ export const state = {
 
 export const actions = {
   ...shellActions,
+  ...lossActions,
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
     window.addEventListener('pointermove', actions.swipeMove)

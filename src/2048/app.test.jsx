@@ -141,6 +141,7 @@ it('undoes moves one at a time and keeps the game with the helped ones', () => {
 it('ends the game with no move left and offers a best score, then lets undo bring it back', () => {
   //one move left: the 64s merge, the new 2 lands in the last cell and nothing matches
   const almost = [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 8, 2, 64, 64]
+  localStorage.setItem('losses', 'on')
   start({ game: gameOf(almost, { score: 500 }) })
   setRandom(() => 0.5)
   wired.slide('left')

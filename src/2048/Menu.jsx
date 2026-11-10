@@ -15,6 +15,11 @@ const Menu = ({ state, actions }) => (
       <SubMenuItem name="Hint" hotKey="H" onClick={() => actions.hint()} />
       <Separator />
       <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />
+      <SubMenuItem
+        name="Track Losses"
+        checked={state.trackLosses}
+        onClick={actions.toggleTrackLosses}
+      />
       <Separator />
       <SubMenuItem name="Best Scores..." onClick={actions.toggleBestTime} />
       <Separator />

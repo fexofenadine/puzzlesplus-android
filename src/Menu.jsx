@@ -86,6 +86,13 @@ const Menu = ({ state, actions }) => (
       />
       <SubMenuItem name="No Guessing" checked={state.noGuess} onClick={actions.toggleNoGuess} />
       <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />
+      {state.theme !== 'classic' && (
+        <SubMenuItem
+          name="Track Losses"
+          checked={state.trackLosses}
+          onClick={actions.toggleTrackLosses}
+        />
+      )}
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />

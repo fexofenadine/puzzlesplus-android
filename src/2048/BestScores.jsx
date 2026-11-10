@@ -55,7 +55,9 @@ const BestScores = ({ key, state, actions }) => (
             ))}
           </tbody>
         </table>
-        {state.stats && <StatsList stats={state.stats} wonLabel="Made the target" losses />}
+        {state.stats && (
+          <StatsList stats={state.stats} wonLabel="Made the target" losses={state.losses} />
+        )}
         <div class={b.footer}>
           <Button type="button" onClick={actions.resetBestTime}>
             <span class={b.button}>Reset Scores</span>

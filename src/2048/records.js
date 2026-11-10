@@ -1,5 +1,5 @@
 import { load, remove, save } from '../shell/storage'
-import { clearStats, readStats } from '../shell/stats'
+import { clearStats, lossesOn, readStats } from '../shell/stats'
 import { sizes } from './rules'
 
 //the best five games per size, kept apart for games that used a hint or undo
@@ -94,6 +94,7 @@ export const recordActions = {
             clean: bestScores(false),
             hinted: bestScores(true),
             stats: readStats('2048'),
+            losses: lossesOn(),
           },
     }),
   setBestTimeTab: (tab) => (state) =>
