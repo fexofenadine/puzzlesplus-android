@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from '../shell/classes'
 import s from './SudokuCell.module.css'
 import { bit } from './rules'
 
@@ -41,15 +42,13 @@ const Cell = ({
     tabindex={-1}
     data-cell={i}
     style={style}
-    class={[
+    class={cx(
       s.root,
       given ? s.given : s.entry,
       look && s[look],
       error && s.error,
       mark && hintClass[mark],
-    ]
-      .filter(Boolean)
-      .join(' ')}
+    )}
     onpointerdown={(event) => onPress({ event, i })}
   >
     {digit ? (

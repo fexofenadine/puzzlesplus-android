@@ -15,6 +15,7 @@
 //canvas port of phosphor.c, typing this game's own source
 
 import { FONT_HEIGHT, FONT_WIDTH, pixel } from './font6x10'
+import { phosphor as meta } from './meta'
 
 const BLANK = 0
 const FLARE = 1
@@ -79,60 +80,7 @@ const runsOf = (c, inverted) => {
 }
 
 export default {
-  name: 'Phosphor',
-  credit: 'Ported from Phosphor by Jamie Zawinski, part of xscreensaver',
-  wallpaper: true,
-  ratio: (pixels) => pixels,
-  options: [
-    { key: 'scale', label: 'Scale', type: 'range', min: 2, max: 12, step: 1, value: 6 },
-    { key: 'ticks', label: 'Fade', type: 'range', min: 4, max: 40, step: 1, value: 20 },
-    {
-      key: 'delay',
-      label: 'Typing delay',
-      type: 'range',
-      min: 10,
-      max: 200,
-      step: 5,
-      value: 50,
-      format: (v) => `${v} ms`,
-    },
-    {
-      key: 'cursor',
-      label: 'Cursor blink',
-      type: 'range',
-      min: 100,
-      max: 1000,
-      step: 1,
-      value: 333,
-      format: (v) => `${v} ms`,
-    },
-    {
-      key: 'colour',
-      label: 'Colour',
-      type: 'select',
-      choices: [
-        ['cyan', 'Cyan'],
-        ['base1', 'Grey'],
-        ['green', 'Green'],
-        ['yellow', 'Yellow'],
-        ['blue', 'Blue'],
-        ['violet', 'Violet'],
-      ],
-      value: 'cyan',
-    },
-    //not in the original, keeps the text behind the game
-    {
-      key: 'brightness',
-      label: 'Brightness',
-      type: 'range',
-      min: 10,
-      max: 100,
-      step: 5,
-      value: 20,
-      format: (v) => `${v}%`,
-    },
-  ],
-
+  ...meta,
   create: (context, settings) => {
     let f = settings
     let width = 0

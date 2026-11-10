@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from './shell/classes'
 import s from './Cell.module.css'
 
 const inRange = (x, y, u, v) =>
@@ -128,14 +129,12 @@ const Cell = ({
 }) => (
   <button
     type="button"
-    class={[
+    class={cx(
       isPressed({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, lose })
         ? s.pressed
         : s.root,
       hint && hintClass[hint],
-    ]
-      .filter(Boolean)
-      .join(' ')}
+    )}
     tabindex={-1}
     onmousedown={(event) => {
       onDown({ event, x, y })

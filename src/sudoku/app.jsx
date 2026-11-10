@@ -13,16 +13,36 @@ import { records } from '../shell/records'
 import { tally } from '../shell/stats'
 import BestTimes from '../shell/BestTimes'
 import Prompt from '../shell/Prompt'
-import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
-import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from '../shell/clock'
-import { check, resumable } from '../shell/resume'
+import {
+  gameKey,
+  historyKey,
+  listen,
+  prevent,
+  shareAction,
+  shellActions,
+  shellState,
+  shortcut,
+  toggleAction,
+} from '../shell/actions'
+import {
+  loadTimer,
+  pauseAction,
+  startClock,
+  stopTick,
+  tickAction,
+  timerAction,
+} from '../shell/clock'
+import { boardOf, check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
 import { celebrate } from '../shell/fireworks'
+import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
+import { codeOf, partsOf, sharedCode } from '../shell/share'
 import FireworksCanvas from '../shell/FireworksCanvas'
 import {
   EMPTY,
   bit,
   boxShapes,
+  breaks,
   candidatesOf,
   emptyBoard,
   full,
@@ -30,6 +50,7 @@ import {
   sizes,
   solved,
 } from './rules'
+import { countSolutions, solve } from './solver'
 import { levels } from './techniques'
 import { deal } from './deal'
 import { completeWithErrors, findHint } from './hint'
@@ -57,6 +78,8 @@ export const createGame = ({ n, level }) => ({
   board: emptyBoard(n),
   notes: new Int32Array(n * n),
   history: [],
+  //the steps undo took back, until the next change
+  future: [],
   dealing: true,
   deal: 0,
   start: -1,
@@ -67,21 +90,31 @@ export const createGame = ({ n, level }) => ({
   win: false,
   hinted: false,
   untimed: false,
+  //the day of a daily puzzle, and whether the board came from a link
+  daily: null,
+  shared: false,
 })
-
-//a board of digits from 0 to n for size n
-const boardOf = (cells, n) => {
-  check(Array.isArray(cells) && cells.length === n * n && cells.every((v) => v >= 0 && v <= n))
-  return Int8Array.from(cells)
-}
 
 //the game in progress, kept so a reload comes back to it paused
 export const saved = resumable({
   key: 'sudoku.saved',
   running,
-  label: ({ level }) => levelNames[level],
+  label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
   fresh: { selected: -1, picked: 0 },
-  pack: ({ n, level, givens, solution, board, notes, history, hinted, untimed }) => ({
+  pack: ({
+    n,
+    level,
+    givens,
+    solution,
+    board,
+    notes,
+    history,
+    future,
+    hinted,
+    untimed,
+    daily,
+    shared,
+  }) => ({
     n,
     level,
     givens: Array.from(givens),
@@ -89,21 +122,40 @@ export const saved = resumable({
     board: Array.from(board),
     notes: Array.from(notes),
     history,
+    future,
     hinted,
     untimed,
+    daily,
+    shared,
   }),
-  unpack: ({ n, level, givens, solution, board, notes, history, hinted, untimed }) => {
+  unpack: ({
+    n,
+    level,
+    givens,
+    solution,
+    board,
+    notes,
+    history,
+    future,
+    hinted,
+    untimed,
+    daily,
+    shared,
+  }) => {
     check(sizes.includes(n) && boxShapes[n] && level >= 0 && level < levels.length)
     check(Array.isArray(notes) && notes.length === n * n && Array.isArray(history))
     return {
       ...createGame({ n, level }),
-      givens: boardOf(givens, n),
-      solution: boardOf(solution, n),
-      board: boardOf(board, n),
+      givens: boardOf(givens, n, EMPTY, n),
+      solution: boardOf(solution, n, EMPTY, n),
+      board: boardOf(board, n, EMPTY, n),
       notes: Int32Array.from(notes),
       history,
+      future: Array.isArray(future) ? future : [],
       hinted: Boolean(hinted),
       untimed: Boolean(untimed),
+      daily: typeof daily === 'string' ? daily : null,
+      shared: Boolean(shared),
       dealing: false,
     }
   },
@@ -111,19 +163,36 @@ export const saved = resumable({
 
 const { actions: recordActions } = records('sudoku', sizes, levelNames)
 
+//the daily puzzle's size and level
+const DAILY = { n: 9, level: 1 }
+
+//the clues as a link's code, and a game from one: null unless it is a board with one solution
+const shareCode = ({ n, level, givens }) => codeOf(n, level, givens, n + 1)
+
+export const gameOf = (code) => {
+  //the digits are packed in the size's own base, so the size is read first
+  const base = Number(code.split('.')[0]) + 1
+  const parts = partsOf(code, base, (n, level) => sizes.includes(n) && allowed(n, level))
+  if (!parts) return null
+  const { n, level, values } = parts
+  const givens = Int8Array.from(values)
+  if (breaks(givens, n).length || countSolutions(givens, n, 2) !== 1) return null
+  return {
+    ...createGame({ n, level }),
+    givens,
+    solution: solve(givens, n),
+    board: givens.slice(),
+    dealing: false,
+    shared: true,
+  }
+}
+
+const linkedGame = () => {
+  const code = sharedCode()
+  return code && gameOf(code)
+}
+
 let deals = 0
-
-const prevent = (event) => {
-  event.preventDefault()
-  return false
-}
-
-//the clock starts on the first change or hint
-const begin = (game, actions) => {
-  if (game.start >= 0) return game
-  game.raf = requestAnimationFrame(actions.tick)
-  return { ...game, start: clock(), time: 1 }
-}
 
 //a cell the player may change
 const editable = (game, i) => i >= 0 && game.givens[i] === EMPTY
@@ -133,13 +202,13 @@ const playable = (game) => !game.dealing && !game.paused && !game.win
 
 //after a change: a win stops the clock, a full board that isn't one asks about a hint
 const changed = (state, board, notes, history, actions) => {
-  const next = { ...begin(state.game, actions), board, notes, history }
+  const next = { ...startClock(state.game, actions), board, notes, history, future: [] }
   next.win = solved(board, next.n)
   if (next.win) {
-    cancelAnimationFrame(next.raf)
+    stopTick(next.raf)
     celebrate()
     if (!state.game.win) tally('sudoku', { won: true, clean: !next.hinted })
-    if (timed({ ...state, game: next })) actions.win(next)
+    finish('sudoku', state, next, actions)
   }
   return { hint: null, prompt: !next.win && full(board), game: next }
 }
@@ -194,6 +263,9 @@ const digitOf = (event) => {
 
 const arrows = { 37: [-1, 0], 38: [0, -1], 39: [1, 0], 40: [0, 1] }
 
+//a board from a link comes first, then the game left in progress
+const opened = saved.open(linkedGame())
+
 export const state = {
   ...shellState('sudoku'),
   hint: null,
@@ -206,9 +278,8 @@ export const state = {
   picked: 0,
   //pad digits and typed ones are notes while this is on
   noting: false,
-  about: false,
   shelf: saved.list(),
-  game: saved.restore() || createGame(loadChoice()),
+  game: opened || createGame(loadChoice()),
   winner: null,
   bestTime: null,
 }
@@ -222,23 +293,12 @@ export const actions = {
     if (state.game.dealing) actions.reset()
   },
   press: (event) => (state, actions) => {
-    //undo is the one shortcut with a modifier
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.keyCode === 90) {
-      if (typing(event) || state.boss || state.windowState !== 'open') return
-      event.preventDefault()
-      actions.undo()
-      return
-    }
+    if (historyKey(event, state, actions)) return
     const key = shortcut(event, state, actions)
     if (key === null) return
     const digit = digitOf(event)
-    if (key === 113 || key === 78) {
-      actions.newGame()
-    } else if (key === 72) {
-      actions.hint()
-    } else if (key === 80) {
-      actions.pause()
-    } else if (arrows[key]) {
+    if (gameKey(key, actions)) return
+    if (arrows[key]) {
       event.preventDefault()
       actions.move(arrows[key])
     } else if (key === 32) {
@@ -255,14 +315,21 @@ export const actions = {
   reset:
     (payload) =>
     ({ game }, actions) => {
-      cancelAnimationFrame(game.raf)
-      const n = (payload && payload.n) || game.n
-      const asked = payload && payload.level !== undefined ? payload.level : game.level
+      stopTick(game.raf)
+      //the day's board is one size and level for everyone and leaves the saved choice alone,
+      //and after it or a board from a link the next game goes back to that choice
+      const day = payload && payload.daily ? dayOf() : null
+      const base = day ? DAILY : special(game) ? loadChoice() : game
+      const n = (payload && payload.n) || base.n
+      const asked = payload && payload.level !== undefined ? payload.level : base.level
       const level = fallback(n, asked)
-      save('sudoku.size', n)
-      save('sudoku.level', level)
+      const seed = day ? seedOf(day, 'sudoku') : Math.floor(Math.random() * 2 ** 32)
+      if (!day) {
+        save('sudoku.size', n)
+        save('sudoku.level', level)
+      }
       const id = ++deals
-      deal(n, level, Math.floor(Math.random() * 2 ** 32)).then((dealt) =>
+      deal(n, level, seed, day ? DAILY_BUDGET : undefined).then((dealt) =>
         actions.dealt({ id, ...dealt }),
       )
       return {
@@ -271,7 +338,7 @@ export const actions = {
         prompt: false,
         selected: -1,
         picked: 0,
-        game: { ...createGame({ n, level }), deal: id },
+        game: { ...createGame({ n, level }), deal: id, daily: day },
       }
     },
   //an answer for an older deal is dropped
@@ -342,11 +409,30 @@ export const actions = {
     if (!game.history.length || !playable(game)) return { menu: null }
     const board = game.board.slice()
     const notes = game.notes.slice()
-    for (const [i, digit, mask] of game.history.at(-1)) {
+    const step = game.history.at(-1)
+    for (const [i, digit, mask] of step) {
       board[i] = digit
       notes[i] = mask
     }
-    return { menu: null, ...changed(state, board, notes, game.history.slice(0, -1), actions) }
+    const next = changed(state, board, notes, game.history.slice(0, -1), actions)
+    next.game.future = [...game.future, step.map(([i]) => [i, game.board[i], game.notes[i]])]
+    return { menu: null, ...next }
+  },
+  //puts back the step undo took, until something else changes
+  redo: () => (state, actions) => {
+    const { game } = state
+    if (!game.future.length || !playable(game)) return { menu: null }
+    const board = game.board.slice()
+    const notes = game.notes.slice()
+    const step = game.future.at(-1)
+    for (const [i, digit, mask] of step) {
+      board[i] = digit
+      notes[i] = mask
+    }
+    const history = [...game.history, step.map(([i]) => [i, game.board[i], game.notes[i]])]
+    const next = changed(state, board, notes, history, actions)
+    next.game.future = game.future.slice(0, -1)
+    return { menu: null, ...next }
   },
   hint:
     () =>
@@ -357,7 +443,7 @@ export const actions = {
         menu: null,
         prompt: false,
         hint: findHint({ board, notes, solution, n }),
-        game: { ...begin(game, actions), hinted: true },
+        game: { ...startClock(game, actions), hinted: true },
       }
     },
   //yes asks for a hint, no leaves the player to find the mistake
@@ -368,27 +454,12 @@ export const actions = {
   toggleNoting:
     () =>
     ({ noting }) => ({ noting: !noting }),
-  toggleErrors: () => (state) => {
-    save('sudoku.errors', state.errors ? '' : 'yes')
-    return { menu: null, errors: !state.errors }
-  },
-  toggleTidy: () => (state) => {
-    save('sudoku.tidy', state.tidy ? 'off' : '')
-    return { menu: null, tidy: !state.tidy }
-  },
+  toggleErrors: toggleAction('errors', 'sudoku.errors', 'yes'),
+  toggleTidy: toggleAction('tidy', 'sudoku.tidy', '', 'off'),
   toggleTimer: timerAction('sudoku.timer'),
-  toggleAbout:
-    () =>
-    ({ about }) => ({ menu: null, about: !about }),
+  share: shareAction(shareCode),
   pause: pauseAction(running),
-  tick:
-    () =>
-    ({ game }, actions) => {
-      game.raf = requestAnimationFrame(actions.tick)
-      const next = seconds(game.start)
-      if (game.time === next) return null
-      return { game: { ...game, time: next } }
-    },
+  tick: tickAction,
   ...recordActions,
   ...saved.actions,
 }

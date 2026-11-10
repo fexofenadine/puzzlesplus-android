@@ -4,6 +4,7 @@ import ThemeMenu from './shell/ThemeMenu'
 import ViewMenu from './shell/ViewMenu'
 import { resumeItems } from './shell/ResumeItems'
 import { gameLinks } from './shell/GameLinks'
+import { HelpMenu } from './shell/GameMenus'
 
 export const SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, children) => (
   <li key={key} class={s.item}>
@@ -101,11 +102,7 @@ const Menu = ({ state, actions }) => (
     </MenuItem>
     <ViewMenu state={state} actions={actions} />
     <ThemeMenu state={state} actions={actions} />
-    <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
-      <SubMenuItem name="How to Play..." onClick={actions.toggleHowTo} />
-      <Separator />
-      <SubMenuItem name="About Minesweeper Plus..." onClick={actions.toggleAbout} />
-    </MenuItem>
+    <HelpMenu state={state} actions={actions} name="Minesweeper Plus" />
   </ul>
 )
 

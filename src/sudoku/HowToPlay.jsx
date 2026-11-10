@@ -5,7 +5,8 @@ import HowToPlay from '../shell/HowToPlay'
 export const Rules = () => [
   <p>
     Fill the empty cells so every row, every column and every 3×3 box holds each digit from 1 to 9
-    exactly once. The digits in bold are the puzzle's own and can't be changed.
+    exactly once. The digits in bold are the puzzle's own and can't be changed. The Size menu has
+    smaller boards too: 6×6 with 3×2 boxes and the digits 1 to 6, and 4×4 with 2×2 boxes and 1 to 4.
   </p>,
   <p>
     Select a cell, then pick a digit on the pad below the board or type it. Picking the same digit
@@ -18,9 +19,9 @@ export const Rules = () => [
     fills in every candidate, and placing a digit takes it out of the notes it rules out.
   </p>,
   <p>
-    The left counter shows the cells still empty and Ctrl+Z undoes. Show Errors marks a digit that
-    repeats in a row, column or box, and Hint explains the next digit logic gives. Every board has
-    one solution that needs no guessing.
+    The left counter shows the cells still empty and Ctrl+Z undoes, Ctrl+Y redoes. Show Errors marks
+    a digit that repeats in a row, column or box, and Hint explains the next digit logic gives.
+    Every board has one solution that needs no guessing.
   </p>,
 ]
 

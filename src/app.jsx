@@ -19,9 +19,19 @@ import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './shell/storage'
 import { listen, shellActions, shellState, shortcut } from './shell/actions'
 import { clearStats, lossActions, lossesOn, lossState, readStats, tally } from './shell/stats'
-import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from './shell/clock'
+import {
+  clock,
+  loadTimer,
+  nextTick,
+  pauseAction,
+  seconds,
+  stopTick,
+  timed,
+  timerAction,
+} from './shell/clock'
 import { check, resumable } from './shell/resume'
 import { celebrate } from './shell/fireworks'
+import { capital } from './shell/grid'
 import FireworksCanvas from './shell/FireworksCanvas'
 
 const levels = {
@@ -108,9 +118,7 @@ export const saved = resumable({
   key: 'savedGame',
   running,
   label: ({ level, width, height, mines }) =>
-    level === 'custom'
-      ? `${width} × ${height}, ${mines} mines`
-      : level[0].toUpperCase() + level.slice(1),
+    level === 'custom' ? `${width} × ${height}, ${mines} mines` : capital(level),
   pack: ({ level, width, height, mines, field, left, flags, hinted, untimed }) => ({
     level,
     width,
@@ -239,7 +247,6 @@ export const state = {
   timer: loadTimer('timer'),
   winner: null,
   bestTime: null,
-  about: false,
   customField: null,
 }
 
@@ -268,7 +275,7 @@ export const actions = {
   reset:
     (payload) =>
     ({ game }) => {
-      cancelAnimationFrame(game.raf)
+      stopTick(game.raf)
       const params = (payload && levels[payload.level]) || payload || game
       save(
         'level',
@@ -453,7 +460,7 @@ export const actions = {
           noGuess,
         })
         field.forEach((row, y) => row.forEach((c, x) => (c.mined = mined[y * width + x] === 1)))
-        game.raf = requestAnimationFrame(actions.tick)
+        game.raf = nextTick(actions.tick)
       }
 
       const cell = field[pressedY][pressedX]
@@ -479,7 +486,7 @@ export const actions = {
 
       const win = left <= 0
       if (win || lose) {
-        cancelAnimationFrame(game.raf)
+        stopTick(game.raf)
         tally('minesweeper', { won: !lose, clean: !game.hinted })
         if (!lose) {
           celebrate()
@@ -521,7 +528,7 @@ export const actions = {
   tick:
     () =>
     ({ game }, actions) => {
-      game.raf = requestAnimationFrame(actions.tick)
+      game.raf = nextTick(actions.tick, game.start)
       const next = seconds(game.start)
       if (game.time === next) return null
       return { game: { ...game, time: next } }
@@ -556,9 +563,6 @@ export const actions = {
       actions.setBestTimeTab(winner.hinted ? 'hinted' : 'clean')
       return { winner: null }
     },
-  toggleAbout:
-    () =>
-    ({ about }) => ({ menu: null, about: !about }),
   toggleBestTime:
     () =>
     ({ bestTime, theme }) => ({

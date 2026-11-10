@@ -1,4 +1,7 @@
+import { dialogOpen } from '../Overlay'
 import { makeSheet } from './Boss'
+import { importData } from './backup'
+import { copy, linkOf } from './share'
 import { load, save } from './storage'
 import { themes } from './themes'
 import { closeDialog, leave, listenPhone, pageUrl, phone } from './phone'
@@ -22,9 +25,10 @@ import {
 
 //the game window's frame: opacity in percent, hidden fades it out entirely
 const loadGlass = () => {
-  const opacity = Number(load('windowOpacity'))
+  const saved = load('windowOpacity')
+  const opacity = Number(saved)
   return {
-    opacity: load('windowOpacity') && opacity >= 0 && opacity <= 100 ? opacity : 100,
+    opacity: saved && opacity >= 0 && opacity <= 100 ? opacity : 100,
     hidden: Boolean(load('windowHidden')),
   }
 }
@@ -77,6 +81,10 @@ export const shellState = (page, root = '../') => ({
   glass: loadGlass(),
   fireworks: load('fireworks') !== 'off',
   howTo: false,
+  about: false,
+  //the copy link and backup dialogs, null while shut
+  share: null,
+  backup: null,
   //a phone always fills the screen
   zoom: { chosen: loadZoom(), scale: loadZoom(), seen: null, maximised: phone || loadMaximised() },
   portrait: Boolean(window.matchMedia && matchMedia('(orientation: portrait)').matches),
@@ -113,8 +121,8 @@ export const shortcut = (event, state, actions) => {
     else if (!phone) actions.boss()
     return null
   }
-  //the spreadsheet only answers to esc, and a hidden window to nothing
-  if (state.boss || state.windowState !== 'open') return null
+  //the spreadsheet only answers to esc, a hidden window to nothing, a dialog to its own keys
+  if (state.boss || state.windowState !== 'open' || dialogOpen()) return null
   const zoom = { '+': 1, '=': 1, '-': -1 }[event.key]
   if (zoom) {
     actions.zoom(zoom)
@@ -123,7 +131,95 @@ export const shortcut = (event, state, actions) => {
   return event.keyCode
 }
 
+//the keys every game shares once the shell has had its turn, true when it was one of them
+export const gameKey = (key, actions) => {
+  if (key === 113 || key === 78) actions.newGame()
+  else if (key === 72) actions.hint()
+  else if (key === 80) actions.pause()
+  else return false
+  return true
+}
+
+//ctrl or cmd with a key, for the only shortcuts with a modifier
+//not while typing, behind the spreadsheet or a dialog, or with the window hidden
+const modified = (event, state) =>
+  (event.ctrlKey || event.metaKey) &&
+  !event.altKey &&
+  !typing(event) &&
+  !state.boss &&
+  state.windowState === 'open' &&
+  !dialogOpen()
+
+//ctrl z
+export const undoKey = (event, state) =>
+  modified(event, state) && event.keyCode === 90 && !event.shiftKey
+
+//ctrl y, or ctrl shift z
+export const redoKey = (event, state) =>
+  modified(event, state) && (event.keyCode === 89 || (event.keyCode === 90 && event.shiftKey))
+
+//undo and redo for a game that has both, true when the key was one of them
+export const historyKey = (event, state, actions) => {
+  const step = undoKey(event, state) ? actions.undo : redoKey(event, state) ? actions.redo : null
+  if (!step) return false
+  event.preventDefault()
+  step()
+  return true
+}
+
+//for the page's context menu and drags, which a game never wants
+export const prevent = (event) => {
+  event.preventDefault()
+  return false
+}
+
+//a menu option kept in storage: on is saved while state[name] holds, off while it doesn't
+export const toggleAction =
+  (name, key, on, off = '') =>
+  () =>
+  (state) => {
+    save(key, state[name] ? off : on)
+    return { menu: null, [name]: !state[name] }
+  }
+
+//the board in play as a link, code(game) packs it; the dialog shows the link either way
+export const shareAction = (code) => () => (state, actions) => {
+  if (state.game.dealing) return { menu: null }
+  const link = linkOf(state.page, code(state.game))
+  copy(link).then(actions.shareCopied)
+  return { menu: null, share: { link, copied: false } }
+}
+
 export const shellActions = {
+  closeShare: () => ({ share: null }),
+  shareCopied:
+    (copied) =>
+    ({ share }) =>
+      share && { share: { ...share, copied } },
+  copyShare:
+    () =>
+    ({ share }, actions) => {
+      copy(share.link).then(actions.shareCopied)
+    },
+  //the game in play is kept first, so the backup has it
+  toggleBackup:
+    () =>
+    ({ backup }, actions) => {
+      if (!backup && actions.keepGame) actions.keepGame()
+      return { menu: null, backup: backup ? null : { text: '', note: '', pending: null } }
+    },
+  changeBackup:
+    (values) =>
+    ({ backup }) =>
+      backup && { backup: { ...backup, ...values } },
+  //the page starts again from what the backup held
+  restoreBackup:
+    () =>
+    ({ backup }) => {
+      if (importData(backup.pending)) location.reload()
+      else
+        return { backup: { ...backup, pending: null, note: 'That is not a Puzzles Plus backup.' } }
+    },
   closeMenu: () => ({ menu: null }),
   toggleDrawer:
     () =>
@@ -180,6 +276,9 @@ export const shellActions = {
   toggleHowTo:
     () =>
     ({ howTo }) => ({ menu: null, howTo: !howTo }),
+  toggleAbout:
+    () =>
+    ({ about }) => ({ menu: null, about: !about }),
   //esc covers everything with a spreadsheet and pauses the game
   boss:
     () =>

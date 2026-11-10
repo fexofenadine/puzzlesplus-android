@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest'
 import { along, finishes, lockOf, offsetsOf, planOf, progressOf } from './drag'
 import { move, tilesOf } from './rules'

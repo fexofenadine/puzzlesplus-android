@@ -10,8 +10,23 @@ import PhoneMenu from './PhoneMenu'
 import OpenGames from '../shell/OpenGames'
 import Prompt from '../shell/Prompt'
 import { load, save } from '../shell/storage'
-import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
-import { clock, pauseAction, seconds } from '../shell/clock'
+import {
+  gameKey,
+  listen,
+  prevent,
+  shellActions,
+  shellState,
+  shortcut,
+  undoKey,
+} from '../shell/actions'
+import {
+  nextTick,
+  pauseAction,
+  startClock,
+  stopTick,
+  tickAction,
+  timerAction,
+} from '../shell/clock'
 import { check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
 import BestScores from './BestScores'
@@ -114,18 +129,6 @@ export const saved = resumable({
   },
 })
 
-const prevent = (event) => {
-  event.preventDefault()
-  return false
-}
-
-//the clock starts on the first move or hint
-const begin = (game, actions) => {
-  if (game.start >= 0) return game
-  game.raf = requestAnimationFrame(actions.tick)
-  return { ...game, start: clock(), time: 1 }
-}
-
 //arrows and WASD
 const keyDirs = {
   37: 'left',
@@ -148,7 +151,6 @@ export const state = {
   prompt: false,
   //off unless switched on: a score game needs no clock
   timer: load('2048.timer') === 'on',
-  about: false,
   shelf: saved.list(),
   game: saved.restore() || createGame(loadSize()),
   winner: null,
@@ -166,22 +168,15 @@ export const actions = {
     listen(actions)
   },
   press: (event) => (state, actions) => {
-    //undo is the one shortcut with a modifier
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.keyCode === 90) {
-      if (typing(event) || state.boss || state.windowState !== 'open') return
+    if (undoKey(event, state)) {
       event.preventDefault()
       actions.undo()
       return
     }
     const key = shortcut(event, state, actions)
     if (key === null) return
-    if (key === 113 || key === 78) {
-      actions.newGame()
-    } else if (key === 72) {
-      actions.hint()
-    } else if (key === 80) {
-      actions.pause()
-    } else if (keyDirs[key]) {
+    if (gameKey(key, actions)) return
+    if (keyDirs[key]) {
       event.preventDefault()
       actions.slide(keyDirs[key])
     }
@@ -190,7 +185,7 @@ export const actions = {
   reset:
     (payload) =>
     ({ game, switching }) => {
-      cancelAnimationFrame(game.raf)
+      stopTick(game.raf)
       const n = (payload && payload.n) || game.n
       save('2048.size', n)
       swipe = null
@@ -219,7 +214,7 @@ export const actions = {
     const { tiles, nextId } = spawn(done.tiles, game.n, rng, done.nextId)
     const values = valuesOf(tiles, game.n)
     const next = {
-      ...begin(game, actions),
+      ...startClock(game, actions),
       tiles,
       nextId,
       score: game.score + done.score,
@@ -236,7 +231,7 @@ export const actions = {
     }
     let winner = null
     if (next.over) {
-      cancelAnimationFrame(next.raf)
+      stopTick(next.raf)
       if (!next.reached) tally('2048', { won: false })
       winner = offer(next)
       next.offered = true
@@ -307,7 +302,7 @@ export const actions = {
         offered: false,
       }
       //a lost game's clock had stopped
-      if (game.over && game.start >= 0) next.raf = requestAnimationFrame(actions.tick)
+      if (game.over && game.start >= 0) next.raf = nextTick(actions.tick, game.start)
       return { menu: null, hint: null, game: next }
     },
   hint:
@@ -318,7 +313,7 @@ export const actions = {
       return {
         menu: null,
         hint: found ? { kind: 'move', ...found } : { kind: 'stuck', text: 'No move is left.' },
-        game: { ...begin(game, actions), hinted: true },
+        game: { ...startClock(game, actions), hinted: true },
       }
     },
   //yes keeps going past the target, no starts a new game
@@ -326,29 +321,12 @@ export const actions = {
     if (!yes) actions.reset()
     return { prompt: false }
   },
-  toggleTimer: () => (state) => {
-    save('2048.timer', state.timer ? '' : 'on')
-    return {
-      menu: null,
-      timer: !state.timer,
-      game: state.timer ? { ...state.game, untimed: true } : state.game,
-    }
-  },
-  toggleAbout:
-    () =>
-    ({ about }) => ({ menu: null, about: !about }),
+  toggleTimer: timerAction('2048.timer', 'on', ''),
   pause: pauseAction(running, () => {
     swipe = null
     return {}
   }),
-  tick:
-    () =>
-    ({ game }, actions) => {
-      game.raf = requestAnimationFrame(actions.tick)
-      const next = seconds(game.start)
-      if (game.time === next) return null
-      return { game: { ...game, time: next } }
-    },
+  tick: tickAction,
   ...recordActions,
   ...saved.actions,
 }

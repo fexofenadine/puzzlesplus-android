@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { app, h } from 'hyperapp'
-import { state, actions, view, createGame, saved } from './app'
+import { state, actions, view, createGame, gameOf, saved } from './app'
 import { CROSS, EMPTY, FILL } from './rules'
 import { makePuzzle, random } from './generate'
 import { clockDigits } from '../shell/clock'
@@ -90,6 +90,11 @@ it('paints a stroke along the row it first moves along, as one undo step', () =>
   expect(board().slice(5, 10)).toEqual([EMPTY, FILL, FILL, EMPTY, EMPTY])
   wired.up()
   expect(now().game.history).toHaveLength(1)
+  wired.undo()
+  expect(board().every((v) => v === EMPTY)).toBe(true)
+  //redo paints the whole stroke again, and undo still takes it back
+  wired.redo()
+  expect(board().slice(5, 10)).toEqual([EMPTY, FILL, FILL, EMPTY, EMPTY])
   wired.undo()
   expect(board().every((v) => v === EMPTY)).toBe(true)
 })
@@ -315,4 +320,15 @@ it('keeps its picture when the game is saved and restored', async () => {
   saved.keep({ ...now().game, paused: true })
   vi.useRealTimers()
   expect(saved.restore()?.art).toEqual(now().game.art)
+})
+
+it('shares the picture as a link that opens the same clues', () => {
+  wired.share()
+  const opened = gameOf(now().share.link.split('#play=')[1])
+  expect(opened.clues).toEqual(now().game.clues)
+  expect(Array.from(opened.solution).map((v) => v === FILL)).toEqual(
+    Array.from(now().game.solution).map((v) => v === FILL),
+  )
+  expect(opened.shared).toBe(true)
+  expect(gameOf('5.0.0')).toBe(null)
 })

@@ -33,3 +33,31 @@
   min-width: 60px;
   padding: 4px 5px 3px;
 }
+
+/*who made it, straight under the name*/
+.root p.name {
+  margin-bottom: 0;
+}
+
+.root p.author {
+  opacity: 0.75;
+}
+
+/*other people's work, folded away under the repository link*/
+.credits {
+  margin: 0 0 8px;
+}
+
+.credits summary {
+  cursor: pointer;
+}
+
+.credits ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  line-height: 1.35;
+}
+
+.credits li {
+  margin: 0 0 4px;
+}

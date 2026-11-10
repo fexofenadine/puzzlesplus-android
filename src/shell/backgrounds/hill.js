@@ -1,6 +1,7 @@
 //classic's optional bliss style scene: a live sky over a hill made by hill.py
 import hillUrl from './hill.webp'
 import ridge from './ridge.json'
+import { hill as meta } from './meta'
 
 const HILL_WIDTH = 2400
 const HILL_HEIGHT = 851
@@ -92,37 +93,7 @@ export const hillLayout = (width, height) => {
 }
 
 export default {
-  name: 'Hill',
-  credit:
-    'Hill from a CC0 photo of Cattle Hill, Roedean by Hassocks5489, colour matched to Bliss, under a sky drawn live',
-  wallpaper: true,
-  //classic looks like the original game unless this is turned on
-  animated: false,
-  ratio: (pixels) => pixels,
-  options: [
-    {
-      key: 'wind',
-      label: 'Wind speed',
-      type: 'range',
-      min: 0.25,
-      max: 4,
-      step: 0.25,
-      value: 1,
-      format: (v) => `${v}×`,
-    },
-    {
-      key: 'cover',
-      label: 'Cloud cover',
-      type: 'range',
-      min: 0,
-      max: 100,
-      step: 5,
-      value: 35,
-      format: (v) => `${v}%`,
-    },
-    { key: 'shadows', label: 'Cloud shadows', type: 'toggle', value: true },
-  ],
-
+  ...meta,
   create: (context, settings) => {
     let f = settings
     let width = 0

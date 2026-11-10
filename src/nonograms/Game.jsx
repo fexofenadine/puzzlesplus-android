@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from '../shell/classes'
 import g from '../Game.module.css'
 import s from './Game.module.css'
 import Dialog from '../Dialog'
@@ -32,10 +33,7 @@ export const tracks = (n) =>
 export const place = (k) => k + Math.floor(k / 5) + 1
 
 const Clue = ({ clue, done, error, hinted, hidden, style }) => (
-  <div
-    class={[s.clue, done && s.done, error && s.error, hinted && s.hinted].filter(Boolean).join(' ')}
-    style={style}
-  >
+  <div class={cx(s.clue, done && s.done, error && s.error, hinted && s.hinted)} style={style}>
     {!hidden &&
       (clue.length ? clue : [0]).map((run) => <span class={run > 9 && s.wide}>{run}</span>)}
   </div>

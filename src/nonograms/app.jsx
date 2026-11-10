@@ -14,11 +14,30 @@ import { tally } from '../shell/stats'
 import BestTimes from '../shell/BestTimes'
 import Prompt from '../shell/Prompt'
 import { showRain } from '../shell/rain'
-import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
-import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from '../shell/clock'
-import { check, resumable } from '../shell/resume'
+import {
+  gameKey,
+  historyKey,
+  listen,
+  prevent,
+  shareAction,
+  shellActions,
+  shellState,
+  shortcut,
+  toggleAction,
+} from '../shell/actions'
+import {
+  loadTimer,
+  pauseAction,
+  startClock,
+  stopTick,
+  tickAction,
+  timerAction,
+} from '../shell/clock'
+import { boardOf, check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
-import { CROSS, EMPTY, FILL, emptyBoard, fillsLeft, sizes, solved } from './rules'
+import { CROSS, EMPTY, FILL, cluesOf, emptyBoard, fillsLeft, sizes, solved } from './rules'
+import { countSolutions } from './solver'
+import { filled } from './generate'
 import { deal } from './deal'
 import { completeWithErrors, findHint } from './hint'
 import { allowed, fallback, levelNames } from './Menu'
@@ -27,6 +46,8 @@ import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 import { celebrate } from '../shell/fireworks'
+import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
+import { codeOf, partsOf, sharedCode } from '../shell/share'
 import FireworksCanvas from '../shell/FireworksCanvas'
 
 //the saved size and level, easy 10x10 when missing or out of range
@@ -46,6 +67,8 @@ export const createGame = ({ n, level }) => ({
   solution: null,
   board: emptyBoard(n),
   history: [],
+  //the steps undo took back, until the next change
+  future: [],
   change: 0,
   stroke: null,
   dealing: true,
@@ -58,15 +81,12 @@ export const createGame = ({ n, level }) => ({
   win: false,
   hinted: false,
   untimed: false,
+  //the day of a daily puzzle, and whether the board came from a link
+  daily: null,
+  shared: false,
   art: null,
   picked: false,
 })
-
-//a board of empty, cross and fill cells for size n
-const boardOf = (cells, n) => {
-  check(Array.isArray(cells) && cells.length === n * n && cells.every((v) => v >= -1 && v <= 1))
-  return Int8Array.from(cells)
-}
 
 //the game in progress, kept so a reload comes back to it paused
 //a half done stroke is left out, the board it started from is kept
@@ -74,30 +94,65 @@ export const saved = resumable({
   key: 'nonograms.saved',
   running,
   label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
-  pack: ({ n, level, clues, solution, board, stroke, history, hinted, untimed, art, picked }) => ({
+  pack: ({
+    n,
+    level,
+    clues,
+    solution,
+    board,
+    stroke,
+    history,
+    future,
+    hinted,
+    untimed,
+    art,
+    picked,
+    daily,
+    shared,
+  }) => ({
     n,
     level,
     clues,
     solution: Array.from(solution),
     board: Array.from(stroke ? stroke.before : board),
     history,
+    future,
     hinted,
     untimed,
     art,
     picked,
+    daily,
+    shared,
   }),
-  unpack: ({ n, level, clues, solution, board, history, hinted, untimed, art, picked }) => {
+  unpack: ({
+    n,
+    level,
+    clues,
+    solution,
+    board,
+    history,
+    future,
+    hinted,
+    untimed,
+    art,
+    picked,
+    daily,
+    shared,
+  }) => {
     check(sizes.includes(n) && level >= 0 && level < levelNames.length && Array.isArray(history))
     check(Array.isArray(clues) && clues.length === 2 * n && clues.every(Array.isArray))
     check(!art || (typeof art.id === 'string' && typeof art.name === 'string' && art.level >= 0))
     return {
       ...createGame({ n, level }),
       clues,
-      solution: boardOf(solution, n),
-      board: boardOf(board, n),
+      solution: boardOf(solution, n, EMPTY, FILL),
+      board: boardOf(board, n, EMPTY, FILL),
       history,
+      future: Array.isArray(future) ? future : [],
       hinted: Boolean(hinted),
       untimed: Boolean(untimed),
+      daily: typeof daily === 'string' ? daily : null,
+      shared: Boolean(shared),
       art: art || null,
       picked: Boolean(picked),
       dealing: false,
@@ -117,33 +172,51 @@ const ASK_AFTER = 2500
 let deals = 0
 let changes = 0
 
-const prevent = (event) => {
-  event.preventDefault()
-  return false
-}
-
-//the clock starts on the first change
-const begin = (game, actions) => {
-  if (game.start >= 0) return game
-  game.raf = requestAnimationFrame(actions.tick)
-  return { ...game, start: clock(), time: 1 }
-}
-
 //after a stroke or undo: a win stops the clock and any hint is out of date
 //a full but unsolved board asks about a hint, at once when settled, else after a pause
 const changed = (state, game, board, history, actions, settled = false) => {
-  const next = { ...game, board, history, change: ++changes }
+  //a click that changed nothing leaves redo alone
+  const future = history === game.history ? game.future : []
+  const next = { ...game, board, history, future, change: ++changes }
   next.win = solved(board, next.n, next.clues)
   if (next.win) {
-    cancelAnimationFrame(next.raf)
+    stopTick(next.raf)
     celebrate()
     if (!state.game.win) tally('nonograms', { won: true, clean: !next.hinted })
-    if (timed({ ...state, game: next })) record(next, actions)
+    finish('nonograms', state, next, actions, record)
   }
   const stuck = !next.win && fillsLeft(board, next.n, next.clues) === 0
   if (stuck && !settled) setTimeout(() => actions.ask(next.change), ASK_AFTER)
   const done = next.win && next.art ? { solved: markSolved(state.solved, next.art.id) } : null
   return { hint: null, prompt: stuck && settled, game: next, ...done }
+}
+
+//the daily puzzle's size and level
+const DAILY = { n: 10, level: 1 }
+
+//the picture as a link's code, and a game from one: null unless its clues have one solution
+const shareCode = ({ n, level, solution }) =>
+  codeOf(
+    n,
+    level,
+    Array.from(solution, (v) => (v === FILL ? 1 : 0)),
+    2,
+  )
+
+export const gameOf = (code) => {
+  const parts = partsOf(code, 2, (n, level) => sizes.includes(n) && allowed(n, level))
+  if (!parts) return null
+  const { n, level, values } = parts
+  const solution = Int8Array.from(values, (v) => (v ? FILL : CROSS))
+  const clues = cluesOf(solution, n)
+  //a picture reaches every edge, like the ones dealt here
+  if (!filled(values, n) || countSolutions(clues, n, 2) !== 1) return null
+  return { ...createGame({ n, level }), clues, solution, dealing: false, shared: true }
+}
+
+const linkedGame = () => {
+  const code = sharedCode()
+  return code && gameOf(code)
 }
 
 //drawn boards and the pool's random pictures have best times, a picture chosen by hand or
@@ -209,6 +282,9 @@ const cellAt = (event) => {
   return cell ? Number(cell.dataset.cell) : -1
 }
 
+//a board from a link comes first, then the game left in progress
+const opened = saved.open(linkedGame())
+
 export const state = {
   ...shellState('nonograms'),
   hint: null,
@@ -223,9 +299,8 @@ export const state = {
   //touch screens have no right click, so a tap fills or crosses as this says
   touch: Boolean(window.matchMedia && matchMedia('(pointer: coarse)').matches),
   mode: FILL,
-  about: false,
   shelf: saved.list(),
-  game: saved.restore() || createGame(loadChoice()),
+  game: opened || createGame(loadChoice()),
   winner: null,
   bestTime: null,
 }
@@ -234,10 +309,7 @@ export const actions = {
   ...shellActions,
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
-    window.addEventListener('pointermove', (event) => {
-      const i = cellAt(event)
-      if (i >= 0) actions.drag(i)
-    })
+    window.addEventListener('pointermove', actions.trace)
     window.addEventListener('pointerup', () => actions.up())
     window.addEventListener('pointercancel', () => actions.up())
     listen(actions)
@@ -246,46 +318,44 @@ export const actions = {
     if (state.game.dealing) actions.reset()
   },
   press: (event) => (state, actions) => {
-    //undo is the one shortcut with a modifier
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.keyCode === 90) {
-      if (typing(event) || state.boss || state.windowState !== 'open') return
-      event.preventDefault()
-      actions.undo()
-      return
-    }
-    const key = shortcut(event, state, actions)
-    if (key === 113 || key === 78) {
-      actions.newGame()
-    } else if (key === 72) {
-      actions.hint()
-    } else if (key === 80) {
-      actions.pause()
-    }
+    if (historyKey(event, state, actions)) return
+    gameKey(shortcut(event, state, actions), actions)
   },
   //deals a new board, keeping the size and level unless given
   reset:
     (payload) =>
     ({ game, procedural, symmetric }, actions) => {
-      cancelAnimationFrame(game.raf)
-      const n = (payload && payload.n) || game.n
-      const asked = payload && payload.level !== undefined ? payload.level : game.level
+      stopTick(game.raf)
+      //the day's board is one size and level for everyone and leaves the saved choice alone,
+      //and after it or a board from a link the next game goes back to that choice
+      const day = payload && payload.daily ? dayOf() : null
+      const base = day ? DAILY : special(game) ? loadChoice() : game
+      const n = (payload && payload.n) || base.n
+      const asked = payload && payload.level !== undefined ? payload.level : base.level
       const level = fallback(n, asked)
+      const seed = day ? seedOf(day, 'nonograms') : Math.floor(Math.random() * 2 ** 32)
       //a picture picked by hand comes from the pool whatever the setting
       const pick = (payload && payload.pick) || null
-      save('nonograms.size', n)
-      save('nonograms.level', level)
+      if (!day) {
+        save('nonograms.size', n)
+        save('nonograms.level', level)
+      }
       const id = ++deals
-      deal(n, level, Math.floor(Math.random() * 2 ** 32), {
-        art: Boolean(pick) || !procedural,
-        pick,
-        avoid: game.art && game.art.id,
-        symmetric,
-      }).then((dealt) => actions.dealt({ id, ...dealt }))
+      //the day's board is always a drawn, symmetric one
+      const options = day
+        ? { budget: DAILY_BUDGET }
+        : {
+            art: Boolean(pick) || !procedural,
+            pick,
+            avoid: game.art && game.art.id,
+            symmetric,
+          }
+      deal(n, level, seed, options).then((dealt) => actions.dealt({ id, ...dealt }))
       return {
         menu: null,
         hint: null,
         prompt: false,
-        game: { ...createGame({ n, level }), deal: id, picked: Boolean(pick) },
+        game: { ...createGame({ n, level }), deal: id, picked: Boolean(pick), daily: day },
       }
     },
   //an answer for an older deal is dropped
@@ -309,9 +379,15 @@ export const actions = {
       const stroke = { start: i, from, to, axis: null, before: game.board, touch }
       return {
         ...(touch && { touch }),
-        game: { ...begin(game, actions), stroke, board: paint(stroke, i, game.n) },
+        game: { ...startClock(game, actions), stroke, board: paint(stroke, i, game.n) },
       }
     },
+  //the pointer moved: only a stroke cares which cell is under it
+  trace: (event) => (state, actions) => {
+    if (!state.game.stroke) return
+    const i = cellAt(event)
+    if (i >= 0) actions.drag(i)
+  },
   drag:
     (i) =>
     ({ game }) => {
@@ -341,9 +417,26 @@ export const actions = {
     if (!game.history.length || game.win || game.paused || game.dealing || game.stroke) {
       return { menu: null }
     }
+    const step = game.history.at(-1)
     const board = game.board.slice()
-    for (const [c, from] of game.history[game.history.length - 1]) board[c] = from
-    return { menu: null, ...changed(state, game, board, game.history.slice(0, -1), actions) }
+    for (const [c, from] of step) board[c] = from
+    const next = changed(state, game, board, game.history.slice(0, -1), actions)
+    next.game.future = [...game.future, step.map(([c]) => [c, game.board[c]])]
+    return { menu: null, ...next }
+  },
+  //puts back the stroke undo took, until something else changes
+  redo: () => (state, actions) => {
+    const { game } = state
+    if (!game.future.length || game.win || game.paused || game.dealing || game.stroke) {
+      return { menu: null }
+    }
+    const step = game.future.at(-1)
+    const board = game.board.slice()
+    for (const [c, to] of step) board[c] = to
+    const history = [...game.history, step.map(([c]) => [c, game.board[c]])]
+    const next = changed(state, game, board, history, actions)
+    next.game.future = game.future.slice(0, -1)
+    return { menu: null, ...next }
   },
   //the delayed question, dropped if the board changed or the game moved on meanwhile
   ask:
@@ -361,7 +454,7 @@ export const actions = {
         menu: null,
         prompt: false,
         hint: findHint({ board, solution, clues, n }),
-        game: { ...begin(game, actions), hinted: true },
+        game: { ...startClock(game, actions), hinted: true },
       }
     },
   //yes asks for a hint, no leaves the player to find the mistake
@@ -370,24 +463,15 @@ export const actions = {
     return { prompt: false }
   },
   setMode: (mode) => ({ mode }),
-  toggleErrors: () => (state) => {
-    save('nonograms.errors', state.errors ? '' : 'yes')
-    return { menu: null, errors: !state.errors }
-  },
+  toggleErrors: toggleAction('errors', 'nonograms.errors', 'yes'),
   toggleTimer: timerAction('nonograms.timer'),
   toggleRain: () => (state) => {
     save('nonograms.rain', state.rain ? '' : 'yes')
     showRain(!state.rain)
     return { menu: null, rain: !state.rain }
   },
-  toggleProcedural: () => (state) => {
-    save('nonograms.procedural', state.procedural ? 'off' : '')
-    return { menu: null, procedural: !state.procedural }
-  },
-  toggleSymmetric: () => (state) => {
-    save('nonograms.symmetric', state.symmetric ? 'off' : '')
-    return { menu: null, symmetric: !state.symmetric }
-  },
+  toggleProcedural: toggleAction('procedural', 'nonograms.procedural', '', 'off'),
+  toggleSymmetric: toggleAction('symmetric', 'nonograms.symmetric', '', 'off'),
   togglePictures:
     () =>
     ({ pictures }) => ({ menu: null, pictures: !pictures }),
@@ -395,19 +479,10 @@ export const actions = {
     actions.newGame({ pick: id })
     return { pictures: false }
   },
-  toggleAbout:
-    () =>
-    ({ about }) => ({ menu: null, about: !about }),
   //a half done stroke is kept as it is
+  share: shareAction(shareCode),
   pause: pauseAction(running),
-  tick:
-    () =>
-    ({ game }, actions) => {
-      game.raf = requestAnimationFrame(actions.tick)
-      const next = seconds(game.start)
-      if (game.time === next) return null
-      return { game: { ...game, time: next } }
-    },
+  tick: tickAction,
   ...recordActions,
   ...saved.actions,
 }

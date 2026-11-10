@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from '../shell/classes'
 import s from './Cell.module.css'
 import { EMPTY, FILL } from './rules'
 
@@ -24,9 +25,7 @@ const Cell = ({ i, value, win, mark, style, onPress }) => (
     type="button"
     tabindex={-1}
     data-cell={i}
-    class={[classOf(value, win, mark), win && value !== FILL && s.blank, mark && hintClass[mark]]
-      .filter(Boolean)
-      .join(' ')}
+    class={cx(classOf(value, win, mark), win && value !== FILL && s.blank, mark && hintClass[mark])}
     style={style}
     onpointerdown={(event) => onPress({ event, i })}
   />

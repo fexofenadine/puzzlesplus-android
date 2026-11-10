@@ -1,0 +1,64 @@
+/*the backup and copy link dialogs*/
+.root {
+  width: 320px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px 12px;
+}
+
+.root p {
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.button {
+  display: block;
+  min-width: 60px;
+  padding: 4px 6px 3px;
+}
+
+/*sunken like the name box, in the theme's input colours*/
+.field {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 2px 3px;
+  color: inherit;
+  font: inherit;
+  background: var(--input);
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0;
+  outline: 0;
+}
+
+textarea.field {
+  height: 64px;
+  font-size: 0.85em;
+  resize: none;
+  word-break: break-all;
+}
+
+.root p.note {
+  min-height: 1.35em;
+  font-weight: bold;
+}
+
+.file {
+  display: none;
+}
+
+.footer {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 2px 0 0;
+}

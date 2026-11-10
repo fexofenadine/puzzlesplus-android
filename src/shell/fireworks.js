@@ -198,6 +198,7 @@ export const celebrate = (theme = document.documentElement.dataset.theme) => {
     alive = advance(alive, dt, look)
     context.clearRect(0, 0, width, height)
     context.globalCompositeOperation = 'lighter'
+    if (look.shape === glyph) context.font = `${look.size}px monospace`
     for (const r of rockets)
       draw(context, look, { ...r, color: look.colors[0], char: look.glyphs?.[0] || '' }, 1)
     for (const p of alive) draw(context, look, p, 1 - p.age / p.life)
@@ -212,7 +213,6 @@ const mark = (context, look, p, x, y, alpha) => {
   context.globalAlpha = Math.max(0, alpha)
   context.fillStyle = p.color
   if (look.shape === glyph) {
-    context.font = `${look.size}px monospace`
     context.fillText(p.char, x, y)
   } else if (look.shape === square) {
     context.fillRect(Math.round(x), Math.round(y), look.size, look.size)

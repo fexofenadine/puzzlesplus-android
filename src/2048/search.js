@@ -1,4 +1,7 @@
+import { capital, listOf } from '../shell/grid'
 import { arrows, directions, empties, highest, slide } from './rules'
+
+const corners = (n) => [0, n - 1, n * (n - 1), n * n - 1]
 
 //how promising a board looks: free cells, rows and columns that run one way, neighbours close in
 //value, and the biggest tile in a corner, the usual advice made into numbers
@@ -26,8 +29,7 @@ export const score = (values, n) => {
     mono -= Math.min(left, right) + Math.min(up, down)
   }
   const top = Math.max(...logs)
-  const corners = [0, n - 1, n * (n - 1), n * n - 1]
-  const cornered = corners.some((c) => logs[c] === top) ? top : 0
+  const cornered = corners(n).some((c) => logs[c] === top) ? top : 0
   return free * 2.7 + mono * 1.5 + smooth * 0.15 + cornered * 1.2
 }
 
@@ -75,18 +77,10 @@ export const rank = (values, n, depth = 2) =>
     .map((m) => ({ ...m, value: chance(m.values, n, depth - 1) }))
     .sort((a, b) => b.value - a.value)
 
-const corners = (n) => [0, n - 1, n * (n - 1), n * n - 1]
-
 const inCorner = (values, n) => corners(n).some((c) => values[c] === highest(values))
 
 //a 16 but an 8 or an 8192
 const a = (value) => (String(value).startsWith('8') ? 'an' : 'a')
-
-const capital = (text) => text[0].toUpperCase() + text.slice(1)
-
-//a list in words: a, b and c
-const listOf = (items) =>
-  items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
 
 //the move the search likes best and why, in words, or null when no move is left
 //{ dir, text }

@@ -11,8 +11,9 @@ export const deal = ({
   pick = null,
   avoid = null,
   symmetric = true,
+  budget,
 }) => {
   const rng = random(seed)
   const found = art && pickArt(n, level, rng, pick, avoid)
-  return found || makeGame(n, level, rng, undefined, symmetric)
+  return found || makeGame(n, level, rng, budget, symmetric)
 }

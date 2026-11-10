@@ -1,6 +1,8 @@
 import { h } from 'hyperapp'
 import s from './Taskbar.module.css'
 import { games } from './GameLinks'
+import Backup from './BackupBox'
+import Share from './ShareBox'
 import avatar from './avatar.png'
 import minesweeper from './icons/minesweeper.png'
 import takuzu from './icons/takuzu.png'
@@ -49,7 +51,7 @@ const go = (actions, href) => () => {
 const Taskbar = ({ key, name, own, state, actions }) => {
   const open = state.menu && state.menu.start
   const { root } = state
-  return (
+  return [
     <footer key={key} class={s.root}>
       <div class={s.start} tabindex={-1} onfocusout={leave(actions)}>
         <button
@@ -83,6 +85,7 @@ const Taskbar = ({ key, name, own, state, actions }) => {
                 </StartItem>
               ))}
               <li class={s.separator} />
+              <StartItem onClick={() => actions.toggleBackup()}>Backup...</StartItem>
               {name && <StartItem onClick={() => actions.toggleAbout()}>About {name}...</StartItem>}
               <StartItem
                 icon={avatar}
@@ -135,8 +138,10 @@ const Taskbar = ({ key, name, own, state, actions }) => {
         </button>
         <span class={s.clock} oncreate={clock} />
       </div>
-    </footer>
-  )
+    </footer>,
+    state.share && <Share key="share" state={state.share} actions={actions} />,
+    state.backup && <Backup key="backup" state={state.backup} actions={actions} />,
+  ]
 }
 
 export default Taskbar

@@ -1,10 +1,13 @@
+// @vitest-environment node
 import { expect, it } from 'vitest'
 import {
   EMPTY,
+  allowed,
   bit,
   breaks,
   candidatesOf,
   digitsOf,
+  fallback,
   full,
   geometry,
   solved,
@@ -264,10 +267,42 @@ it('deals each level exactly, with one solution, symmetric givens and enough of 
   }
 }, 120000)
 
-it('builds other sizes, so they can be offered later', () => {
+it('deals the smaller sizes at every level they offer, with one solution', () => {
   for (const n of [4, 6]) {
-    const game = makeGame(n, 1, random(n))
-    expect(solved(game.solution, n)).toBe(true)
-    expect(countSolutions(game.givens, n)).toBe(1)
+    for (let level = 0; level < 4; level++) {
+      if (!allowed(n, level)) continue
+      for (let seed = 1; seed <= 4; seed++) {
+        const game = makeGame(n, level, random(seed * 5 + level))
+        expect(game.level).toBe(level)
+        expect(solved(game.solution, n)).toBe(true)
+        expect(countSolutions(game.givens, n)).toBe(1)
+      }
+    }
   }
+}, 60000)
+
+it('falls back to a level the size can deal', () => {
+  expect(fallback(4, 3)).toBe(0)
+  expect(fallback(6, 1)).toBe(0)
+  expect(fallback(6, 3)).toBe(3)
+  expect(fallback(9, 1)).toBe(1)
+})
+
+it('names boxes by where they sit on each size', () => {
+  expect(
+    geometry(4)
+      .units.filter((u) => u.kind === 'box')
+      .map((u) => u.name),
+  ).toEqual([
+    'the top left box',
+    'the top right box',
+    'the bottom left box',
+    'the bottom right box',
+  ])
+  expect(geometry(6).units.find((u) => u.kind === 'box' && u.index === 3).name).toBe(
+    'the middle right box',
+  )
+  expect(geometry(9).units.find((u) => u.kind === 'box' && u.index === 4).name).toBe(
+    'the centre box',
+  )
 })

@@ -10,6 +10,7 @@ import {
   geometry,
   onlyDigit,
 } from './rules'
+import { listOf } from '../shell/grid'
 import { settle } from './solver'
 
 //the reasoning a person uses, easiest first, behind hints, difficulty and generation
@@ -18,10 +19,6 @@ import { settle } from './solver'
 export const levels = ['easy', 'medium', 'hard', 'expert']
 
 const words = ['no', 'one', 'two', 'three', 'four']
-
-//3 and 7, or 3, 5 and 7
-const listOf = (items) =>
-  items.length < 2 ? `${items[0]}` : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
 
 //3 or 7, or 3, 5 or 7
 const orList = (items) => `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`

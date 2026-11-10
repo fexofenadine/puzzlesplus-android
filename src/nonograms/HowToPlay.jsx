@@ -14,9 +14,9 @@ export const Rules = () => [
     column. On a touch screen, the button beside the face picks whether taps fill or cross.
   </p>,
   <p>
-    The left counter shows the cells still to fill and Ctrl+Z undoes a whole drag. Show Errors turns
-    a clue red once its line can't match any more, and Hint explains the next step logic gives.
-    Every board has one solution that needs no guessing.
+    The left counter shows the cells still to fill and Ctrl+Z undoes a whole drag, Ctrl+Y redoes it.
+    Show Errors turns a clue red once its line can't match any more, and Hint explains the next step
+    logic gives. Every board has one solution that needs no guessing.
   </p>,
 ]
 

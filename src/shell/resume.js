@@ -1,5 +1,5 @@
 import { load, remove, save } from './storage'
-import { clock } from './clock'
+import { clock, stopTick } from './clock'
 
 //the games parked for later, newest first, per game
 const SHELF = 3
@@ -125,24 +125,38 @@ export const resumable = ({ key, running, pack, unpack, label = () => '', fresh 
         const entries = read()
         const entry = entries.find((e) => e.id === id)
         let back
+        //it leaves the shelf either way, one that no longer fits is just dropped
+        save(shelfKey, JSON.stringify(entries.filter((e) => e.id !== id)))
         try {
           back = revive(entry)
         } catch {
-          //one that no longer fits is dropped
-          save(shelfKey, JSON.stringify(entries.filter((e) => e.id !== id)))
           return { menu: null, shelf: list() }
         }
-        save(shelfKey, JSON.stringify(entries.filter((e) => e.id !== id)))
-        cancelAnimationFrame(game.raf)
+        stopTick(game.raf)
         if (running(game)) park(game)
         return { menu: null, hint: null, prompt: false, ...fresh, game: back, shelf: list() }
       },
   }
 
-  return { keep, restore, list, actions }
+  //the game a page opens with: a board from a link, the saved game going on the shelf, else
+  //the saved game
+  const open = (linked) => {
+    const kept = restore()
+    if (linked && kept) park(kept)
+    return linked || kept
+  }
+
+  return { keep, restore, open, list, actions }
 }
 
 //a check for unpack, so a save from another version is dropped instead of half used
 export const check = (ok) => {
   if (!ok) throw new Error('saved game does not fit')
+}
+
+//a saved board of n * n cells, each from low to high
+export const boardOf = (cells, n, low, high) => {
+  check(Array.isArray(cells) && cells.length === n * n)
+  check(cells.every((v) => v >= low && v <= high))
+  return Int8Array.from(cells)
 }

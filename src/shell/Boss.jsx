@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from './classes'
 import s from './Boss.module.css'
 
 const departments = [
@@ -47,11 +48,7 @@ const Row = ({ number, cells, total }) => (
       const value = cells && cells[i]
       const negative = typeof value === 'number' && value < 0 && i === 6
       return (
-        <td
-          class={[i > 0 && s.figure, negative && s.negative, total && i === 4 && s.selected]
-            .filter(Boolean)
-            .join(' ')}
-        >
+        <td class={cx(i > 0 && s.figure, negative && s.negative, total && i === 4 && s.selected)}>
           {typeof value === 'number' ? money(value) : value}
         </td>
       )

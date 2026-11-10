@@ -1,5 +1,5 @@
 import { random } from '../shell/random'
-import { EMPTY, cluesOf, emptyBoard } from './rules'
+import { EMPTY, cellsOf, cluesOf, emptyBoard } from './rules'
 import { deduce } from './solver'
 import { levels, rate, solveAt } from './techniques'
 
@@ -7,11 +7,9 @@ export { random }
 
 //edges touched, and no empty line at all up to 10x10
 export const filled = (cells, n) => {
-  const used = (line) => line.some((k) => cells[k])
-  const rows = [...Array(n).keys()].map((y) => [...Array(n).keys()].map((x) => y * n + x))
-  const columns = [...Array(n).keys()].map((x) => [...Array(n).keys()].map((y) => y * n + x))
-  const lines = n <= 10 ? [...rows, ...columns] : [rows[0], rows[n - 1], columns[0], columns[n - 1]]
-  return lines.every(used)
+  const lines = cellsOf(n)
+  const edges = [lines[0], lines[n - 1], lines[n], lines[2 * n - 1]]
+  return (n <= 10 ? lines : edges).every((line) => line.some((k) => cells[k]))
 }
 
 //the same left to right

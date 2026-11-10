@@ -1,15 +1,15 @@
 import { h } from 'hyperapp'
-import About, { Link } from './shell/About'
+import About from './shell/About'
 
 const MinesweeperAbout = ({ key, actions }) => (
   <About key={key} name="Minesweeper Plus" actions={actions}>
     <p>
-      A Windows style minesweeper with boards that never need a guess, hints that explain their
-      reasoning, zoom, and animated themes ported from xscreensaver.
+      Open every square that hides no mine, from Beginner to Extreme or a field of your own size.
     </p>
     <p>
-      Based on <Link href="https://github.com/frenzzy/minesweeper">Minesweeper</Link> by Vladimir
-      Kutepov, extended by fexofenadine.
+      No Guessing deals boards that logic alone can clear, Hint explains the next safe move from the
+      numbers you can see, and a chord that opens nothing says why. Best times are kept apart for
+      games with and without hints.
     </p>
   </About>
 )

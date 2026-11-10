@@ -3,19 +3,14 @@ import s from './BestTime.module.css'
 import Overlay from './Overlay'
 import Dialog from './Dialog'
 import Button from './Button'
-import Tabs from './shell/Tabs'
+import Tabs, { hintTabs } from './shell/Tabs'
 import StatsList from './shell/StatsList'
-
-const tabs = [
-  { id: 'clean', name: 'No hints' },
-  { id: 'hinted', name: 'Hints used' },
-]
 
 const BestTime = ({ key, state, actions }) => (
   <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBestTime()}>
     <Dialog title="Fastest Mine Sweepers" onClose={actions.toggleBestTime}>
       <div class={s.root}>
-        <Tabs tabs={tabs} active={state.tab} onSelect={actions.setBestTimeTab} />
+        <Tabs tabs={hintTabs} active={state.tab} onSelect={actions.setBestTimeTab} />
         <table class={s.table}>
           <tbody>
             {state[state.tab].map((row) => (

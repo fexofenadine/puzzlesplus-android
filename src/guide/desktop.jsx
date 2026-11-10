@@ -31,6 +31,20 @@ export const desktopSection = {
         the timer off at any point doesn't count for best times.
       </li>
       <li>
+        <b>Daily Puzzle</b> in Takuzu's, Nonograms' and Sudoku's Game menu deals the day's board,
+        the same for everyone. Solving it counts the day, days in a row make a streak, and the Best
+        Times box shows today's time, your fastest and your streaks.
+      </li>
+      <li>
+        <b>Copy Link</b> in the same menus makes a link to the board in play. Anyone who opens it
+        gets the same board from its start. A board from a link keeps no best time.
+      </li>
+      <li>
+        <b>Backup</b> in the Start menu saves everything kept in this browser (settings, best times,
+        statistics and games in progress) as a file or as text, and restores it in another browser
+        or the app.
+      </li>
+      <li>
         <b>The boss key</b> (Esc or the tray's Esc button) covers the screen with a spreadsheet of
         made up figures and pauses the game. Press it again, or click the 100% in its status bar, to
         come back.
@@ -38,7 +52,8 @@ export const desktopSection = {
       <li>
         <b>Shortcuts</b>: F2 or N starts a new game, H asks for a hint, P pauses, + and - zoom and
         Esc is the boss key. They are ignored while typing in a dialog or with Ctrl, Alt or Cmd
-        held, except Ctrl+Z for undo.
+        held, except Ctrl+Z for undo and Ctrl+Y for redo. While a dialog is open the keys are its
+        own.
       </li>
     </ul>,
     <p>

@@ -4,13 +4,9 @@ import s from './BestTimes.module.css'
 import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
-import Tabs from './Tabs'
+import Tabs, { hintTabs } from './Tabs'
 import StatsList from './StatsList'
-
-const tabs = [
-  { id: 'clean', name: 'No hints' },
-  { id: 'hinted', name: 'Hints used' },
-]
+import DailyList from './DailyList'
 
 const artTab = { id: 'art', name: 'Art' }
 
@@ -20,7 +16,7 @@ const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art
     <Dialog title={title} onClose={actions.toggleBestTime}>
       <div class={b.root}>
         <Tabs
-          tabs={art ? [...tabs, artTab] : tabs}
+          tabs={art ? [...hintTabs, artTab] : hintTabs}
           active={state.tab}
           onSelect={actions.setBestTimeTab}
         />
@@ -56,6 +52,7 @@ const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art
           </tbody>
         </table>
         {state.stats && <StatsList stats={state.stats} />}
+        {state.daily && <DailyList daily={state.daily} />}
         <div class={b.footer}>
           <Button type="button" onClick={actions.resetBestTime}>
             <span class={b.button}>Reset Scores</span>

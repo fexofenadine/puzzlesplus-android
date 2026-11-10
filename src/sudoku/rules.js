@@ -7,8 +7,14 @@ export { capital }
 export const EMPTY = 0
 
 //sizes offered, and each size's box as width by height; another size is one line in boxShapes
-export const sizes = [9]
+export const sizes = [4, 6, 9]
 export const boxShapes = { 4: [2, 2], 6: [3, 2], 9: [3, 3], 12: [4, 3], 16: [4, 4] }
+
+//4x4 boards never need more than singles, and a 6x6 that needs exactly medium is too rare to deal
+export const allowed = (n, level) => (n === 4 ? level === 0 : n === 6 ? level !== 1 : true)
+
+//the level asked for, or the hardest one below it that the size allows
+export const fallback = (n, level) => (allowed(n, level) ? level : fallback(n, level - 1))
 
 export const emptyBoard = (n) => new Int8Array(n * n)
 
@@ -31,22 +37,22 @@ export const digitsOf = (mask) => {
 //the lone digit of a one bit mask
 export const onlyDigit = (mask) => 31 - Math.clz32(mask) + 1
 
-const boxNames = [
-  'top left',
-  'top middle',
-  'top right',
-  'middle left',
-  'centre',
-  'middle right',
-  'bottom left',
-  'bottom middle',
-  'bottom right',
-]
+//two or three boxes along a side have names, more are numbered
+const places = (count, first, last) =>
+  count === 2 ? [first, last] : count === 3 ? [first, 'middle', last] : null
 
-const nameOf = (kind, index, n) => {
-  if (kind !== 'box') return `${kind} ${index + 1}`
-  return n === 9 ? `the ${boxNames[index]} box` : `box ${index + 1}`
+//the top left box, the centre box, or box 7 on a board too big for names
+const boxName = (index, n) => {
+  const [bw, bh] = boxShapes[n]
+  const across = places(n / bw, 'left', 'right')
+  const down = places(n / bh, 'top', 'bottom')
+  if (!across || !down) return `box ${index + 1}`
+  const x = across[index % (n / bw)]
+  const y = down[Math.floor(index / (n / bw))]
+  return x === 'middle' && y === 'middle' ? 'the centre box' : `the ${y} ${x} box`
 }
+
+const nameOf = (kind, index, n) => (kind === 'box' ? boxName(index, n) : `${kind} ${index + 1}`)
 
 const geometries = {}
 

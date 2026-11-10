@@ -5,6 +5,7 @@ import ThemeMenu from '../shell/ThemeMenu'
 import ViewMenu from '../shell/ViewMenu'
 import { resumeItems } from '../shell/ResumeItems'
 import { gameLinks } from '../shell/GameLinks'
+import { HelpMenu, SizeMenu } from '../shell/GameMenus'
 import { sizes } from './rules'
 
 const Menu = ({ state, actions }) => (
@@ -26,22 +27,10 @@ const Menu = ({ state, actions }) => (
       {resumeItems(state, actions)}
       {gameLinks('2048')}
     </MenuItem>
-    <MenuItem name="Size" type="size" active={state.menu} onChange={actions.toggleMenu}>
-      {sizes.map((n) => (
-        <SubMenuItem
-          name={`${n} × ${n}`}
-          checked={state.game.n === n}
-          onClick={() => actions.newGame({ n })}
-        />
-      ))}
-    </MenuItem>
+    <SizeMenu state={state} actions={actions} sizes={sizes} />
     <ViewMenu state={state} actions={actions} />
     <ThemeMenu state={state} actions={actions} />
-    <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
-      <SubMenuItem name="How to Play..." onClick={actions.toggleHowTo} />
-      <Separator />
-      <SubMenuItem name="About 2048 Plus..." onClick={actions.toggleAbout} />
-    </MenuItem>
+    <HelpMenu state={state} actions={actions} name="2048 Plus" />
   </ul>
 )
 

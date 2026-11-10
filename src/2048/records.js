@@ -1,5 +1,6 @@
 import { load, remove, save } from '../shell/storage'
 import { clearStats, lossesOn, readStats } from '../shell/stats'
+import { winnerActions } from '../shell/records'
 import { sizes } from './rules'
 
 //the best five games per size, kept apart for games that used a hint or undo
@@ -62,9 +63,7 @@ export const offer = (game) => {
 }
 
 export const recordActions = {
-  changeWinner:
-    (payload) =>
-    ({ winner }) => ({ winner: { ...winner, ...payload } }),
+  ...winnerActions,
   submitBestTime:
     (event) =>
     ({ winner }, actions) => {
@@ -97,8 +96,6 @@ export const recordActions = {
             losses: lossesOn(),
           },
     }),
-  setBestTimeTab: (tab) => (state) =>
-    state.bestTime ? { bestTime: { ...state.bestTime, tab } } : null,
   resetBestTime:
     () =>
     ({ bestTime }) => {

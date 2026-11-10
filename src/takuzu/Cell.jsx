@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from '../shell/classes'
 import s from './Cell.module.css'
 import { EMPTY } from './rules'
 
@@ -21,15 +22,13 @@ const Cell = ({ i, value, given, error, mark, onPress }) => (
   <button
     type="button"
     tabindex={-1}
-    class={[
+    class={cx(
       value === EMPTY ? s.empty : value ? s.one : s.zero,
       given && s.given,
       error && s.error,
       value === EMPTY && mark && s.ghost,
       mark && hintClass[mark],
-    ]
-      .filter(Boolean)
-      .join(' ')}
+    )}
     onpointerdown={(event) => onPress({ event, i })}
   >
     {glyphOf(value, mark)}

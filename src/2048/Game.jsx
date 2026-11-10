@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from '../shell/classes'
 import g from '../Game.module.css'
 import s from './Board2048.module.css'
 import Dialog from '../Dialog'
@@ -30,15 +31,13 @@ export const Tile = ({ tile, n }) => {
       key={tile.id}
       data-id={tile.id}
       data-k={k}
-      class={[
+      class={cx(
         s.tile,
         k > 11 && s.beyond,
         tile.fresh && s.fresh,
         tile.merged && s.merged,
         tile.gone && s.gone,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
       data-digits={Math.min(5, String(tile.value).length)}
       style={{ '--x': x, '--y': y, '--k': k }}
       onupdate={(element, old) => glide(element, [old.style['--x'], old.style['--y']], [x, y])}

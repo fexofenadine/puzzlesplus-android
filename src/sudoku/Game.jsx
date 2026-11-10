@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from '../shell/classes'
 import g from '../Game.module.css'
 import s from './Sudoku.module.css'
 import Dialog from '../Dialog'
@@ -49,9 +50,7 @@ const Pad = ({ state, actions, counts }) => {
           <button
             type="button"
             tabindex={-1}
-            class={[s.key, picked === k + 1 && s.picked, counts[k + 1] >= n && s.used]
-              .filter(Boolean)
-              .join(' ')}
+            class={cx(s.key, picked === k + 1 && s.picked, counts[k + 1] >= n && s.used)}
             style={{ gridColumn: place(k) }}
             disabled={off}
             title={counts[k + 1] >= n ? `Every ${k + 1} is placed` : undefined}

@@ -9,7 +9,8 @@ export const Rules = () => [
   </p>,
   <p>
     Click a cell to step it through 0, 1 and empty, right click to step back. The framed cells are
-    clues and stay as they are. Ctrl+Z undoes, and the left counter shows the cells still empty.
+    clues and stay as they are. Ctrl+Z undoes and Ctrl+Y redoes, and the left counter shows the
+    cells still empty.
   </p>,
   <p>
     Show Errors marks broken rules as you play, and Hint explains the next step logic gives. Every

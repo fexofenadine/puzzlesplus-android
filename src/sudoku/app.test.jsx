@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
 import { app, h } from 'hyperapp'
-import { state, actions, view, createGame, saved } from './app'
+import { state, actions, view, createGame, gameOf, saved } from './app'
 import { EMPTY, bit, candidatesOf, geometry } from './rules'
 import { makeGame, random } from './generate'
 import { apply, nextSteps } from './techniques'
@@ -111,6 +111,10 @@ it('makes notes with shift, the notes switch or space, and tidies them as digits
   wired.undo()
   expect(now().game.board[i]).toBe(EMPTY)
   expect(now().game.notes[peer]).toBe(bit(5))
+  //and one redo places the digit and tidies the note again
+  wired.redo()
+  expect(now().game.board[i]).toBe(5)
+  expect(now().game.notes[peer]).toBe(0)
 })
 
 it('leaves notes alone when tidying is off', () => {
@@ -263,4 +267,21 @@ it('explains the removal that opens up the next digit on a harder board', () => 
   const [[c, d]] = hint.place
   expect(solution[c]).toBe(d)
   expect(Object.values(hint.marks)).toContain('remove')
+})
+
+it('shares the board as a link that opens the same clues on every size', () => {
+  for (const n of [4, 6, 9]) {
+    const { givens, solution } = makeGame(n, 0, random(3))
+    const game = { ...createGame({ n, level: 0 }), givens, solution, board: givens.slice() }
+    start({ game: { ...game, dealing: false } })
+    wired.share()
+    const opened = gameOf(now().share.link.split('#play=')[1])
+    expect(opened.n).toBe(n)
+    expect(Array.from(opened.givens)).toEqual(Array.from(givens))
+    expect(Array.from(opened.solution)).toEqual(Array.from(solution))
+    wired.closeShare()
+  }
+  //a board with a repeat or more than one solution is no puzzle
+  expect(gameOf('4.0.0')).toBe(null)
+  expect(gameOf('5.0.0')).toBe(null)
 })

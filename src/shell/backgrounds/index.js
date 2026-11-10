@@ -1,13 +1,17 @@
 import { load, save } from '../storage'
-import matrix from './matrix'
-import substrate from './substrate'
-import truchet from './truchet'
-import phosphor from './phosphor'
-import hill from './hill'
+import * as backgrounds from './meta'
 
-//each background: { name, credit, options, ratio(dpr, settings), filter?(dpr), wallpaper?, animated?, create }
-//create returns { configure, resize(w, h, scale), frame(now), still?(now) }
-export const backgrounds = { matrix, substrate, truchet, phosphor, hill }
+//each background is described in meta.js and drawn by its own file, loaded when first shown
+//its create(context, settings) returns { configure, resize(w, h, scale), frame(now), still?(now) }
+export { backgrounds }
+
+const loaders = {
+  matrix: () => import('./matrix'),
+  substrate: () => import('./substrate'),
+  truchet: () => import('./truchet'),
+  phosphor: () => import('./phosphor'),
+  hill: () => import('./hill'),
+}
 
 //which theme shows which background
 const themeBackgrounds = {
@@ -106,7 +110,8 @@ export const startBackgrounds = () => {
 
   const start = () => {
     cancelAnimationFrame(frame)
-    if (mode === 'wallpaper') return
+    //still loading: it starts once it arrives
+    if (mode === 'wallpaper' || !instances[active]) return
     resize()
     if (!root.dataset.boss) frame = requestAnimationFrame(mode === 'animated' ? loop : settle)
   }
@@ -114,7 +119,7 @@ export const startBackgrounds = () => {
   //nothing is drawn under the boss screen
   const cover = () => {
     cancelAnimationFrame(frame)
-    if (root.dataset.boss || !active || mode === 'wallpaper') return
+    if (root.dataset.boss || !instances[active] || mode === 'wallpaper') return
     frame = requestAnimationFrame(mode === 'animated' ? loop : settle)
   }
 
@@ -142,9 +147,20 @@ export const startBackgrounds = () => {
     active = id
     mode = next
     canvas.style.display = id && mode !== 'wallpaper' ? 'block' : 'none'
-    if (!id) return
-    instances[id] ??= backgrounds[id].create(context, settings[id])
-    start()
+    //a wallpaper is the theme's css, nothing to load
+    if (!id || mode === 'wallpaper') return
+    if (instances[id]) return start()
+    loaders[id]()
+      .then((loaded) => {
+        instances[id] ??= loaded.default.create(context, settings[id])
+        if (active === id) start()
+      })
+      //offline before it was ever shown: the theme's own wallpaper stays
+      .catch(() => {
+        if (active !== id) return
+        canvas.style.display = 'none'
+        root.dataset.background = 'wallpaper'
+      })
   }
 
   refresh = update

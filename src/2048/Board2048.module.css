@@ -2,7 +2,7 @@
 @font-face {
   font-family: 'Clear Sans';
   font-weight: 700;
-  src: url(../fonts/clear-sans-bold.woff) format('woff');
+  src: url(../fonts/clear-sans-bold.woff2) format('woff2');
 }
 
 /*tiles take a theme's palette (--t-c1 to --t-c11, text --t-text or --t-f1 to --t-f11) where it has

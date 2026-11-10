@@ -1,4 +1,4 @@
-import { BRIGHT, GLYPH, glyphImage } from './backgrounds/matrix'
+import { BRIGHT, GLYPH, glyphImage } from './backgrounds/glyph'
 
 //two glyphs from the matrix rain, a dim one and a bright one, drawn the way the rain draws them
 export const rain = ['ｼ', 'ﾓ']

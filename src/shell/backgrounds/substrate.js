@@ -21,6 +21,8 @@
  * implied warranty.
  */
 
+import { substrate as meta } from './meta'
+
 //canvas port of substrate.c, function for function; source-over blends like trans_point
 
 const STEP = 0.42
@@ -61,95 +63,7 @@ const random = (n) => Math.floor(Math.random() * n)
 const radians = (degrees) => (degrees * Math.PI) / 180
 
 export default {
-  name: 'Substrate',
-  credit: 'Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver',
-  //original is 1x, sharp the screen's pixels, balanced up to 1.5x
-  ratio: (pixels, { detail }) =>
-    detail === 'sharp' ? pixels : detail === 'balanced' ? Math.min(pixels, 1.5) : 1,
-  options: [
-    {
-      key: 'growthDelay',
-      label: 'Growth delay',
-      type: 'range',
-      min: 0,
-      max: 50,
-      step: 1,
-      value: 18,
-      format: (v) => `${v} ms`,
-    },
-    {
-      key: 'initialCracks',
-      label: 'Initial cracks',
-      type: 'range',
-      min: 3,
-      max: 20,
-      step: 1,
-      value: 3,
-    },
-    {
-      key: 'maxCracks',
-      label: 'Max cracks',
-      type: 'range',
-      min: 11,
-      max: 300,
-      step: 1,
-      value: 100,
-    },
-    {
-      key: 'sandGrains',
-      label: 'Sand grains',
-      type: 'range',
-      min: 2,
-      max: 256,
-      step: 1,
-      value: 64,
-    },
-    {
-      key: 'circlePercent',
-      label: 'Circular cracks',
-      type: 'range',
-      min: 0,
-      max: 100,
-      step: 1,
-      value: 33,
-      format: (v) => `${v}%`,
-    },
-    {
-      key: 'maxCycles',
-      label: 'Restart after',
-      type: 'range',
-      min: 0,
-      max: 50000,
-      step: 1000,
-      value: 10000,
-      format: (v) => (v ? `${v} cycles` : 'never'),
-    },
-    {
-      key: 'palette',
-      label: 'Colours',
-      type: 'select',
-      choices: [
-        ['nord', 'Frost and aurora'],
-        ['frost', 'Frost'],
-        ['aurora', 'Aurora'],
-      ],
-      value: 'nord',
-    },
-    { key: 'wireframe', label: 'Wireframe', type: 'toggle', value: false },
-    { key: 'seamless', label: 'Seamless', type: 'toggle', value: false },
-    {
-      key: 'detail',
-      label: 'Detail',
-      type: 'select',
-      choices: [
-        ['balanced', 'Balanced'],
-        ['sharp', 'Sharp (slow on big screens)'],
-        ['original', 'Original'],
-      ],
-      value: 'balanced',
-    },
-  ],
-
+  ...meta,
   create: (context, settings) => {
     let f = settings
     let width = 0

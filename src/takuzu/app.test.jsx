@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { app, h } from 'hyperapp'
-import { state, actions, view, createGame, saved, upgradeLadder } from './app'
+import { state, actions, view, createGame, gameOf, saved, upgradeLadder } from './app'
+import { readDaily } from '../shell/daily'
 import { EMPTY } from './rules'
 import { makeGame, random } from './generate'
 
@@ -83,6 +84,26 @@ it('undoes changes one at a time, also with ctrl+z', () => {
   wired.press({ keyCode: 90, ctrlKey: true, target: { tagName: 'BODY' }, preventDefault() {} })
   expect(now().game.board[i]).toBe(EMPTY)
   expect(now().game.history).toHaveLength(0)
+})
+
+it('redoes what undo took back, with ctrl+y or ctrl+shift+z, until the board changes', () => {
+  const body = { target: { tagName: 'BODY' }, preventDefault() {} }
+  const i = emptyCell()
+  wired.play({ event: left, i })
+  wired.play({ event: left, i })
+  wired.undo()
+  wired.undo()
+  wired.press({ keyCode: 89, ctrlKey: true, ...body })
+  expect(now().game.board[i]).toBe(0)
+  wired.press({ keyCode: 90, ctrlKey: true, shiftKey: true, ...body })
+  expect(now().game.board[i]).toBe(1)
+  expect(now().game.history).toHaveLength(2)
+  //a new change after an undo drops what could be redone
+  wired.undo()
+  wired.play({ event: right, i })
+  expect(now().game.future).toHaveLength(0)
+  wired.redo()
+  expect(now().game.board[i]).toBe(EMPTY)
 })
 
 //sets every open cell to its value with left clicks, leaving out skip
@@ -324,4 +345,48 @@ it('drops a saved game that does not fit', () => {
   expect(saved.restore()).toBe(null)
   localStorage.setItem('takuzu.saved', 'nonsense')
   expect(saved.restore()).toBe(null)
+})
+
+it('counts a solved daily puzzle for its day and shows the result, with no best time of its own', () => {
+  start({ game: { ...dealtGame(), daily: '2026-11-10' } })
+  fill(now().game.solution)
+  expect(now().game.win).toBe(true)
+  expect(readDaily('takuzu', '2026-11-10').done).toBe(true)
+  expect(readDaily('takuzu', '2026-11-10').streak).toBe(1)
+  expect(now().winner).toBe(null)
+  expect(now().bestTime.daily.best).toBe(1)
+})
+
+it('deals the daily puzzle at its own size without changing the saved choice', async () => {
+  localStorage.setItem('takuzu.size', '6')
+  wired.reset({ daily: true })
+  expect(now().game.daily).toMatch(/^\d{4}-\d\d-\d\d$/)
+  expect(now().game.n).toBe(8)
+  expect(localStorage.getItem('takuzu.size')).toBe('6')
+  await vi.waitFor(() => expect(now().game.dealing).toBe(false))
+  const first = Array.from(now().game.givens)
+  //the same day deals the same board
+  wired.reset({ daily: true })
+  await vi.waitFor(() => expect(now().game.dealing).toBe(false))
+  expect(Array.from(now().game.givens)).toEqual(first)
+  //and the next new game goes back to the saved size
+  wired.reset()
+  expect(now().game.n).toBe(6)
+  expect(now().game.daily).toBe(null)
+}, 60000)
+
+it('shares the board as a link that opens the same clues, and keeps no time for it', () => {
+  wired.share()
+  const { link } = now().share
+  const game = gameOf(link.split('#play=')[1])
+  expect(Array.from(game.givens)).toEqual(Array.from(now().game.givens))
+  expect(Array.from(game.solution)).toEqual(Array.from(now().game.solution))
+  expect(game.shared).toBe(true)
+  expect(gameOf('6.1.zz')).toBe(null)
+  expect(gameOf('7.1.0')).toBe(null)
+  start({ game })
+  fill(game.solution)
+  expect(now().game.win).toBe(true)
+  expect(now().winner).toBe(null)
+  expect(now().bestTime).toBe(null)
 })

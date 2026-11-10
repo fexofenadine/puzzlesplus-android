@@ -5,22 +5,25 @@ import ThemeMenu from '../shell/ThemeMenu'
 import ViewMenu from '../shell/ViewMenu'
 import { resumeItems } from '../shell/ResumeItems'
 import { gameLinks } from '../shell/GameLinks'
-import { sizes } from './rules'
+import { HelpMenu, SizeMenu } from '../shell/GameMenus'
+import { allowed, fallback, sizes } from './rules'
 import { levels } from './techniques'
 
 export const levelNames = ['Easy', 'Medium', 'Hard', 'Expert']
 
-//every size deals every level for now, a size that can't goes here
-export const allowed = () => true
-
-//the level asked for, or the hardest one below it that the size allows
-export const fallback = (n, level) => (allowed(n, level) ? level : fallback(n, level - 1))
+export { allowed, fallback }
 
 const Menu = ({ state, actions }) => (
   <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>
     <MenuItem name="Game" type="game" active={state.menu} onChange={actions.toggleMenu}>
       <SubMenuItem name="New" hotKey="F2" onClick={() => actions.newGame()} />
+      <SubMenuItem
+        name="Daily Puzzle"
+        checked={Boolean(state.game.daily)}
+        onClick={() => actions.newGame({ daily: true })}
+      />
       <SubMenuItem name="Undo" hotKey="Ctrl+Z" onClick={() => actions.undo()} />
+      <SubMenuItem name="Redo" hotKey="Ctrl+Y" onClick={() => actions.redo()} />
       <SubMenuItem name="Hint" hotKey="H" onClick={() => actions.hint()} />
       <SubMenuItem name="Auto Notes" onClick={() => actions.autoNotes()} />
       <Separator />
@@ -37,29 +40,16 @@ const Menu = ({ state, actions }) => (
       <SubMenuItem name="Tidy Notes" checked={state.tidy} onClick={actions.toggleTidy} />
       <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />
       <Separator />
+      <SubMenuItem name="Copy Link..." onClick={() => actions.share()} />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />
       {resumeItems(state, actions)}
       {gameLinks('sudoku')}
     </MenuItem>
-    {sizes.length > 1 && (
-      <MenuItem name="Size" type="size" active={state.menu} onChange={actions.toggleMenu}>
-        {sizes.map((n) => (
-          <SubMenuItem
-            name={`${n} × ${n}`}
-            checked={state.game.n === n}
-            onClick={() => actions.newGame({ n })}
-          />
-        ))}
-      </MenuItem>
-    )}
+    <SizeMenu state={state} actions={actions} sizes={sizes} />
     <ViewMenu state={state} actions={actions} />
     <ThemeMenu state={state} actions={actions} />
-    <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
-      <SubMenuItem name="How to Play..." onClick={actions.toggleHowTo} />
-      <Separator />
-      <SubMenuItem name="About Sudoku Plus..." onClick={actions.toggleAbout} />
-    </MenuItem>
+    <HelpMenu state={state} actions={actions} name="Sudoku Plus" />
   </ul>
 )
 

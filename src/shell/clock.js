@@ -9,6 +9,12 @@ export const clock = () => performance.timeOrigin + performance.now()
 //the clock's shown seconds for a game started at start
 export const seconds = (start) => Math.floor((clock() - start) / 1000) + 1
 
+//wakes the clock as its next second begins, a timer where every frame used to look
+export const nextTick = (tick, start = clock()) =>
+  setTimeout(tick, 1000 - ((clock() - start) % 1000) + 4)
+
+export const stopTick = (id) => clearTimeout(id)
+
 //pausing stops the clock and hides the board, only while running(game) holds
 //onPause adds the game's own changes, like dropping a half done click
 export const pauseAction =
@@ -18,25 +24,42 @@ export const pauseAction =
     const next = paused === undefined ? !game.paused : paused
     if (!running(game) || next === game.paused) return null
     if (!next) {
-      game.raf = requestAnimationFrame(actions.tick)
-      return {
-        game: { ...game, paused: false, start: game.start + clock() - game.pausedAt },
-      }
+      const start = game.start + clock() - game.pausedAt
+      game.raf = nextTick(actions.tick, start)
+      return { game: { ...game, paused: false, start } }
     }
-    cancelAnimationFrame(game.raf)
+    stopTick(game.raf)
     return {
       menu: null,
       game: { ...game, ...onPause(game, actions), paused: true, pausedAt: clock() },
     }
   }
 
+//the clock starts on a game's first change or hint
+export const startClock = (game, actions) => {
+  if (game.start >= 0) return game
+  game.raf = nextTick(actions.tick)
+  return { ...game, start: clock(), time: 1 }
+}
+
+//once a second, the window only draws when the shown second changes
+export const tickAction =
+  () =>
+  ({ game }, actions) => {
+    game.raf = nextTick(actions.tick, game.start)
+    const next = seconds(game.start)
+    if (game.time === next) return null
+    return { game: { ...game, time: next } }
+  }
+
 //the timer option: off shows dashes and keeps the game out of the best times
 //a game that had the timer off at any point stays out even if it comes back on
+//on and off are what is saved, so a game can default either way
 export const timerAction =
-  (key) =>
+  (key, on = '', off = 'off') =>
   () =>
   ({ timer, game }) => {
-    save(key, timer ? 'off' : '')
+    save(key, timer ? off : on)
     return { menu: null, timer: !timer, game: timer ? { ...game, untimed: true } : game }
   }
 

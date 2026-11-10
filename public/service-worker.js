@@ -21,6 +21,18 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+//keeps a copy for offline, in place of any older version of the same file (?v=<hash>)
+const keep = async (request, copy) => {
+  const cache = await caches.open(CACHE)
+  if (new URL(request.url).searchParams.has('v')) {
+    const versions = await cache.keys(request, { ignoreSearch: true })
+    await Promise.all(
+      versions.filter((old) => old.url !== request.url).map((old) => cache.delete(old)),
+    )
+  }
+  await cache.put(request, copy)
+}
+
 //network first, cache only for offline
 self.addEventListener('fetch', (event) => {
   const { request } = event
@@ -28,8 +40,10 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        const copy = response.clone()
-        caches.open(CACHE).then((cache) => cache.put(request, copy))
+        //only whole, good answers are worth keeping, an error page would come back offline
+        //the worker stays up until the copy is stored
+        if (response.status === 200)
+          event.waitUntil(keep(request, response.clone()).catch(() => {}))
         return response
       })
       .catch(() => caches.match(request)),

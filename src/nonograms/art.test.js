@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { expect, it } from 'vitest'
 import { artFiles, artFor, levelOf, parseArt, pickArt, pool } from './art'
 import { cluesOf } from './rules'

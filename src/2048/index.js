@@ -1,9 +1,4 @@
-import { app } from 'hyperapp'
-import { state, actions, view } from './app'
-import { startBackgrounds } from '../shell/backgrounds'
-import { registerWorker } from '../shell/worker'
+import * as game from './app'
+import { start } from '../shell/start'
 
-app(state, actions, view, document.getElementById('app'))
-startBackgrounds()
-
-registerWorker()
+start(game)

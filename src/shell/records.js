@@ -1,5 +1,17 @@
 import { load, remove, save } from './storage'
 import { clearStats, readStats } from './stats'
+import { clearDaily, readDaily } from './daily'
+
+//the name box's edits and the open tab, the same whatever a game keeps
+export const winnerActions = {
+  changeWinner:
+    (payload) =>
+    ({ winner }) => ({
+      winner: { ...winner, ...payload },
+    }),
+  setBestTimeTab: (tab) => (state) =>
+    state.bestTime ? { bestTime: { ...state.bestTime, tab } } : null,
+}
 
 //best times by size and level under prefix, apart for games with and without hints
 //withArt adds the art board, which counts only games played without hints
@@ -35,6 +47,7 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
   }
 
   const actions = {
+    ...winnerActions,
     win:
       ({ n, level, hinted, time, art = false }) =>
       () => {
@@ -56,11 +69,6 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
           },
         }
       },
-    changeWinner:
-      (payload) =>
-      ({ winner }) => ({
-        winner: { ...winner, ...payload },
-      }),
     submitBestTime:
       (event) =>
       ({ winner }, actions) => {
@@ -85,10 +93,9 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
               hinted: bestTimes('hinted'),
               ...(withArt && { art: bestTimes('art') }),
               stats: readStats(prefix),
+              daily: readDaily(prefix),
             },
       }),
-    setBestTimeTab: (tab) => (state) =>
-      state.bestTime ? { bestTime: { ...state.bestTime, tab } } : null,
     resetBestTime:
       () =>
       ({ bestTime }) => ({
@@ -96,7 +103,9 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
       }),
     resetStats:
       () =>
-      ({ bestTime }) => ({ bestTime: { ...bestTime, stats: clearStats(prefix) } }),
+      ({ bestTime }) => ({
+        bestTime: { ...bestTime, stats: clearStats(prefix), daily: clearDaily(prefix) },
+      }),
   }
 
   return { timeKey, eachSlot, actions }

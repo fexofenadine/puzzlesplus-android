@@ -9,6 +9,9 @@
  * implied warranty.
  */
 
+import { BRIGHT, GLYPH, PAD, drawGlyph } from './glyph'
+import { matrix as meta } from './meta'
+
 //canvas port of glmatrix.c's strips, waves and fog, with a level camera
 
 const GRID_SIZE = 70
@@ -92,31 +95,6 @@ const newStrip = (count) => {
   return s
 }
 
-//each sprite is padded to hold a glyph plus the glow around it
-const PAD = 1.6
-
-export const GLYPH = '#2cff6e'
-export const BRIGHT = '#d4ffe0'
-
-//one mirrored glowing glyph centred at x, y in a cell sized sprite
-const drawGlyph = (context, glyph, x, y, cell, colour) => {
-  context.save()
-  context.font = `${Math.round((cell / PAD) * 0.8)}px monospace`
-  context.textAlign = 'center'
-  context.textBaseline = 'middle'
-  context.fillStyle = colour
-  context.shadowColor = colour
-  context.translate(x, y)
-  context.scale(-1, 1)
-  //a wide soft halo then a tighter one for a phosphor glow
-  context.shadowBlur = cell * 0.3
-  context.fillText(glyph, 0, 0)
-  context.fillText(glyph, 0, 0)
-  context.shadowBlur = cell * 0.07
-  context.fillText(glyph, 0, 0)
-  context.restore()
-}
-
 //mirrored glowing glyphs, a plain row and a bright row
 const buildAtlas = (glyphs, cell) => {
   const atlas = document.createElement('canvas')
@@ -131,55 +109,8 @@ const buildAtlas = (glyphs, cell) => {
   return atlas
 }
 
-//a single rain glyph as an image url, for other pages to draw with, null without canvas
-export const glyphImage = (glyph, cell, colour = GLYPH) => {
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = cell
-  const context = canvas.getContext('2d')
-  if (!context) return null
-  drawGlyph(context, glyph, cell / 2, cell / 2, cell, colour)
-  return canvas.toDataURL()
-}
-
-//the defaults are the look the matrix theme was tuned with
 export default {
-  name: 'GLMatrix',
-  credit: 'Ported from GLMatrix by Jamie Zawinski, part of xscreensaver',
-  //turned off, the theme shows its digital rain photo
-  wallpaper: true,
-  //0.6 screen pixels of blur at any pixel ratio
-  filter: (pixels) => `blur(${0.6 / pixels}px)`,
-  //up to 2x keeps glyphs crisp without overdrawing
-  ratio: (pixels) => Math.min(pixels, 2),
-  options: [
-    { key: 'density', label: 'Density', type: 'range', min: 10, max: 100, step: 1, value: 44 },
-    {
-      key: 'speed',
-      label: 'Speed',
-      type: 'range',
-      min: 0.25,
-      max: 3,
-      step: 0.25,
-      value: 1,
-      format: (v) => `${v}×`,
-    },
-    {
-      key: 'encoding',
-      label: 'Glyphs',
-      type: 'select',
-      choices: [
-        ['matrix', 'Matrix'],
-        ['binary', 'Binary'],
-        ['hexadecimal', 'Hexadecimal'],
-        ['decimal', 'Decimal'],
-        ['dna', 'DNA'],
-      ],
-      value: 'matrix',
-    },
-    { key: 'fog', label: 'Fog', type: 'toggle', value: true },
-    { key: 'waves', label: 'Waves', type: 'toggle', value: true },
-  ],
-
+  ...meta,
   create: (context, settings) => {
     const cell = 96
     let options = settings

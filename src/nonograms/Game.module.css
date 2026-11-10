@@ -88,3 +88,9 @@
   composes: field;
   cursor: default;
 }
+
+/*a faded or hidden window leaves the clues on the wallpaper, so they keep a backing of their own*/
+:global(.Dialog_clear) .columns,
+:global(.Dialog_clear) .rows {
+  background: color-mix(in srgb, var(--face) 80%, transparent);
+}

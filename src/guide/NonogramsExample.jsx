@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { cx } from '../shell/classes'
 import s from '../nonograms/Game.module.css'
 import Cell from '../nonograms/Cell'
 import { place, tracks } from '../nonograms/Game'
@@ -43,7 +44,7 @@ const marksOf = (step) =>
 const noop = () => null
 
 const Clue = ({ clue, done, hinted, style }) => (
-  <div class={[s.clue, done && s.done, hinted && s.hinted].filter(Boolean).join(' ')} style={style}>
+  <div class={cx(s.clue, done && s.done, hinted && s.hinted)} style={style}>
     {(clue.length ? clue : [0]).map((run) => (
       <span class={run > 9 && s.wide}>{run}</span>
     ))}

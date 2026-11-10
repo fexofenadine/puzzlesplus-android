@@ -10,6 +10,8 @@
  * implied warranty.
  */
 
+import { truchet as meta } from './meta'
+
 //canvas port of truchet.c, redrawing tiles at the scroll offset instead of a big pixmap
 
 const MAXRATIO = 2
@@ -60,115 +62,7 @@ const angle = (context, x, y, w, h, flip) => {
 }
 
 export default {
-  name: 'Truchet',
-  credit: 'Ported from Truchet by Adrian Likins, part of xscreensaver',
-  wallpaper: true,
-  ratio: (pixels) => pixels,
-  //xscreensaver's options with calmer defaults
-  options: [
-    {
-      key: 'minWidth',
-      label: 'Smallest tile',
-      type: 'range',
-      min: 12,
-      max: 256,
-      step: 4,
-      value: 40,
-    },
-    {
-      key: 'maxWidth',
-      label: 'Largest tile',
-      type: 'range',
-      min: 12,
-      max: 512,
-      step: 4,
-      value: 150,
-    },
-    {
-      key: 'minLineWidth',
-      label: 'Thinnest line',
-      type: 'range',
-      min: 1,
-      max: 48,
-      step: 1,
-      value: 2,
-    },
-    {
-      key: 'maxLineWidth',
-      label: 'Thickest line',
-      type: 'range',
-      min: 2,
-      max: 96,
-      step: 1,
-      value: 25,
-    },
-    { key: 'curves', label: 'Curves', type: 'toggle', value: true },
-    { key: 'angles', label: 'Angles', type: 'toggle', value: true },
-    { key: 'square', label: 'Square tiles', type: 'toggle', value: true },
-    { key: 'erase', label: 'Erase each pattern', type: 'toggle', value: true },
-    {
-      key: 'eraseCount',
-      label: 'Layers before erasing',
-      type: 'range',
-      min: 2,
-      max: 50,
-      step: 1,
-      value: 25,
-    },
-    { key: 'scroll', label: 'Scroll', type: 'toggle', value: true },
-    {
-      key: 'delay',
-      label: 'Pattern delay',
-      type: 'range',
-      min: 0.2,
-      max: 20,
-      step: 0.2,
-      value: 6,
-      format: (v) => `${v} s`,
-    },
-    {
-      key: 'animDelay',
-      label: 'Scroll step delay',
-      type: 'range',
-      min: 10,
-      max: 200,
-      step: 5,
-      value: 30,
-      format: (v) => `${v} ms`,
-    },
-    {
-      key: 'animStep',
-      label: 'Scroll step size',
-      type: 'range',
-      min: 1,
-      max: 9,
-      step: 1,
-      value: 1,
-    },
-    {
-      key: 'palette',
-      label: 'Colours',
-      type: 'select',
-      choices: [
-        ['accents', 'All accents'],
-        ['cool', 'Violet to green'],
-        ['warm', 'Yellow to magenta'],
-        ['base', 'Base tones'],
-      ],
-      value: 'accents',
-    },
-    {
-      key: 'opacity',
-      label: 'Line strength',
-      type: 'range',
-      min: 10,
-      max: 100,
-      step: 5,
-      value: 45,
-      format: (v) => `${v}%`,
-    },
-  ],
-
+  ...meta,
   create: (context, settings) => {
     let f = settings
     let width = 0
