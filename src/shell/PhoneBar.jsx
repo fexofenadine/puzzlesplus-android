@@ -151,6 +151,9 @@ const PhoneBar = (
         {!back && <BarButton title="New game" d={NEW} onClick={() => actions.newGame()} />}
         {!back && <BarButton title="Hint" d={HINT} onClick={() => actions.hint()} />}
         {!back && (
+          <BarButton title="Best times" d={TROPHY} onClick={() => actions.toggleBestTime()} />
+        )}
+        {!back && (
           <BarButton
             title={paused ? 'Resume' : 'Pause'}
             d={paused ? PLAY : PAUSE}

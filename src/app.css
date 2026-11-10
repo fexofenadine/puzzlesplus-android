@@ -567,7 +567,9 @@ main::before {
   margin: 8px;
 }
 
+/*the table fills the dialog, a size or place a row stays readable*/
 :root[data-phone] [class*='BestTimes_table'] {
+  width: 100%;
   margin: 0;
 }
 

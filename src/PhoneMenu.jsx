@@ -29,6 +29,9 @@ const PhoneMenu = ({ state, actions }) => [
     />
     <Check name="Marks (?)" checked={state.marks} onToggle={actions.toggleMarks} />
     <Check name="Timer" checked={state.timer} onToggle={actions.toggleTimer} />
+    {state.theme !== 'classic' && (
+      <Check name="Track losses" checked={state.trackLosses} onToggle={actions.toggleTrackLosses} />
+    )}
     <Item d={TROPHY} name="Best times" onClick={actions.toggleBestTime} actions={actions} />
   </Section>,
 ]
