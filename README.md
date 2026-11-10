@@ -2,13 +2,13 @@
 
 # Puzzles Plus for Android
 
-Minesweeper, Takuzu, Nonograms, Sudoku and 2048 in a Windows 95 style, with hints that explain their reasoning and boards you can solve by logic alone, as an Android app. It is the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) made for phones: the same games, six themes and animated backgrounds, guides and best times, all inside the app so it plays offline.
+Minesweeper, Takuzu, Nonograms, Sudoku and 2048 in a Windows 95 style, with hints that explain their reasoning and boards you can solve by logic alone, as an Android app. It is the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) ([source](https://github.com/fexofenadine/puzzlesplus)) made for phones: the same games, six themes and animated backgrounds, guides and best times, all inside the app so it plays offline.
 
 **[Download the latest release](https://github.com/fexofenadine/puzzlesplus-android/releases/latest)**
 
-| Minesweeper on Classic                                          | Synthwave                                                           | The menu, on Matrix                            | Nonograms on Matrix                                       |
-| --------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------- |
-| ![Minesweeper on Classic](docs/android/minesweeper-classic.jpg) | ![Minesweeper on Synthwave](docs/android/minesweeper-synthwave.jpg) | ![The menu on Matrix](docs/android/drawer.jpg) | ![Nonograms on Matrix](docs/android/nonograms-matrix.jpg) |
+| Minesweeper on Classic                                          | Synthwave                                                           | The menu                             | Options                              | Nonograms on Matrix, with a hint                          |
+| --------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------ | ------------------------------------ | --------------------------------------------------------- |
+| ![Minesweeper on Classic](docs/android/minesweeper-classic.jpg) | ![Minesweeper on Synthwave](docs/android/minesweeper-synthwave.jpg) | ![The menu](docs/android/drawer.jpg) | ![Options](docs/android/options.jpg) | ![Nonograms on Matrix](docs/android/nonograms-matrix.jpg) |
 
 ## Installing
 
@@ -20,10 +20,12 @@ Android 6 or later. Each release lists its APK's SHA-256, so you can check the d
 
 ## On a phone
 
-- **The game fills the screen** under a top bar in the theme's colours, with the menu, new game, hint and pause. Wide boards turn on their side in portrait.
-- **The menu** has the five games, new game, hint and undo, difficulty and size as buttons, each game's options, the six themes, background settings, the guides and About.
+- **The game fills the screen** under a top bar in the theme's colours with new game, hint, pause and options. Wide boards turn on their side in portrait.
+- **The menu** (the button at the top left) lists the five games, any games you saved to resume later, each game's guide, how to play and About.
+- **Options** (the button at the top right) hold the game's difficulty, size and options (Nonograms adds Procedural, Symmetric and Choose picture), then the six themes, **Fireworks**, a slider for the window's opacity, Hide window, Board without frame and the background settings. The look follows the theme: Windows 95 on Classic, material design on the others.
+- **Fireworks** in the theme's colours go up when you win, until you tap or press a key.
 - **The back button** closes the menu or a dialog first, then leaves the app; a guide's back goes to its game.
-- The phone's status and navigation bars take the theme's colour, and the system font size leaves the games' pixel layout alone; the games have their own zoom.
+- The phone's status and navigation bars take the theme's colour, and the system font size leaves the games' pixel layout alone.
 - **Resume**: a game in progress comes back paused after the app is closed, and a **Timer** option turns the clock off (and best times with it).
 - No taskbar, Start menu, boss key or window buttons: those belong to the website's desktop.
 
