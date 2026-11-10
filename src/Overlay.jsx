@@ -38,7 +38,9 @@ export const fitDialog = (el) => {
   const dialog = el.querySelector(`.${d.dialog}`)
   if (!dialog || !dialog.offsetWidth) return
   const frame = getComputedStyle(dialog.parentElement.parentElement)
-  const room = el.clientWidth - parseFloat(frame.marginLeft) - parseFloat(frame.marginRight)
+  //a board too wide for the screen widens the overlay with the page, the screen is the room
+  const width = Math.min(el.clientWidth, document.documentElement.clientWidth)
+  const room = width - parseFloat(frame.marginLeft) - parseFloat(frame.marginRight)
   const shown = parseFloat(getComputedStyle(el).getPropertyValue('--scale')) || 1
   const scale = Math.max(shown, loadZoom())
   //at 100% the dialog is as wide as its text wants, up to the room

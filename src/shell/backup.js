@@ -20,6 +20,7 @@ const plain = [
   'timer',
   'savedGame',
   'savedGame.shelf',
+  'windowCard',
 ]
 
 export const ours = (key) =>
