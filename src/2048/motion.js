@@ -1,6 +1,5 @@
-//tile movement done on the elements themselves, outside the view's render
-//a drag moves tiles every frame without rendering the window, and slides start from wherever a
-//tile is on screen, mid-slide or mid-drag, so quick moves and releases never jump
+//tile movement on the elements themselves, outside the render
+//slides start from wherever a tile is on screen, so quick moves never jump
 
 const still = () => !globalThis.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches
 

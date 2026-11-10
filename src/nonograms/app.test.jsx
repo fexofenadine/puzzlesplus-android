@@ -252,3 +252,67 @@ it('comes back to a game in progress paused, leaving out a half done stroke', ()
   wired.undo()
   expect(board().every((v) => v === EMPTY)).toBe(true)
 })
+
+//deals from the pool: the board arrives asynchronously
+const dealtArt = async (payload) => {
+  wired.reset(payload)
+  await vi.waitFor(() => expect(now().game.dealing).toBe(false))
+}
+
+const solve = () => now().game.solution.forEach((v, i) => v && click(i))
+
+it('deals pictures from the pool with procedural off, on a board of their own', async () => {
+  wired.toggleProcedural()
+  expect(localStorage.getItem('nonograms.procedural')).toBe('off')
+  await dealtArt({ n: 5 })
+  const { art } = now().game
+  expect(art).toMatchObject({ licence: 'CC0' })
+  expect(now().game.picked).toBe(false)
+  solve()
+  expect(now().winner).toMatchObject({ board: 'art' })
+  expect(now().winner.key).toMatch(/^nonograms\.art\.5\.\d$/)
+  expect(now().winner.text).toMatch(/fastest art time/)
+  wired.submitBestTime({ preventDefault() {} })
+  expect(now().bestTime.tab).toBe('art')
+  expect(now().bestTime.art[`5.${art.level}`].time).toBe(now().game.time)
+  expect(now().bestTime.clean[`5.${art.level}`].time).toBe(999)
+  expect(now().solved).toContain(art.id)
+})
+
+it('keeps no time for a picture chosen by hand, and remembers it as solved', async () => {
+  wired.toggleProcedural()
+  wired.togglePictures()
+  expect(now().pictures).toBe(true)
+  wired.choosePicture('5/heart')
+  await vi.waitFor(() => expect(now().game.dealing).toBe(false))
+  expect(now().pictures).toBe(false)
+  expect(now().game).toMatchObject({ picked: true, art: { id: '5/heart', name: 'Heart' } })
+  solve()
+  expect(now().game.win).toBe(true)
+  expect(now().winner).toBe(null)
+  expect(now().solved).toEqual(['5/heart'])
+  expect(JSON.parse(localStorage.getItem('nonograms.solved'))).toEqual(['5/heart'])
+})
+
+it('remembers procedural and symmetric as asked', () => {
+  expect(now()).toMatchObject({ procedural: true, symmetric: true })
+  wired.toggleSymmetric()
+  expect(now().symmetric).toBe(false)
+  expect(localStorage.getItem('nonograms.symmetric')).toBe('off')
+  wired.toggleSymmetric()
+  expect(now().symmetric).toBe(true)
+})
+
+it('keeps its picture when the game is saved and restored', async () => {
+  wired.toggleProcedural()
+  await dealtArt({ n: 5 })
+  click(0)
+  const back = saved.restore()
+  wired.peek()
+  expect(back).toBe(null)
+  wired.pause(true)
+  vi.useFakeTimers()
+  saved.keep({ ...now().game, paused: true })
+  vi.useRealTimers()
+  expect(saved.restore()?.art).toEqual(now().game.art)
+})

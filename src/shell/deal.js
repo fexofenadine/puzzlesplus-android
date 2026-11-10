@@ -1,6 +1,5 @@
-//big hard boards take a while, so they are dealt off the main thread
-//without workers (tests, old browsers) or if the worker fails, the deal runs here instead
-//start makes the game's worker, here deals one ask on the page
+//hard boards take a while, so they are dealt in a worker, or on the page without one
+//start makes the worker, here deals one ask on the page
 
 export const dealer = (start, here) => {
   let worker = null

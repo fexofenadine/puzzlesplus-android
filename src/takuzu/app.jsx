@@ -25,6 +25,8 @@ import { showRain } from '../shell/rain'
 import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
+import { celebrate } from '../shell/fireworks'
+import FireworksCanvas from '../shell/FireworksCanvas'
 
 //the saved size and level, medium 8x8 when missing or out of range
 const loadChoice = () => {
@@ -115,14 +117,14 @@ const begin = (game, actions) => {
   return { ...game, start: clock(), time: 1 }
 }
 
-//after a cell changes: a win, or a full board that isn't one
-//settled means another click the same way would only empty the cell again, so ask now
-//otherwise the cell may be passing through on its way to the value meant, so ask later
+//after a cell changes: a win, or a full board that is not one
+//settled means another click would only empty the cell, so ask now, else ask later
 const changed = (state, board, history, actions, settled = false) => {
   const next = { ...begin(state.game, actions), board, history, change: ++changes }
   next.win = solved(board, next.n)
   if (next.win) {
     cancelAnimationFrame(next.raf)
+    celebrate()
     if (timed({ ...state, game: next })) actions.win(next)
   }
   const stuck = !next.win && full(board)
@@ -293,6 +295,7 @@ export const view = (state, actions) => (
     oncreate={actions.init}
     onupdate={() => saved.keep(state.game)}
   >
+    <FireworksCanvas key="fw" />
     <Game key="a" state={state} actions={actions} />
     {phone ? (
       <PhoneBar

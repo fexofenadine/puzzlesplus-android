@@ -21,9 +21,12 @@ import { CROSS, EMPTY, FILL, emptyBoard, fillsLeft, sizes, solved } from './rule
 import { deal } from './deal'
 import { completeWithErrors, findHint } from './hint'
 import { allowed, fallback, levelNames } from './Menu'
+import Pictures from './Pictures'
 import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
+import { celebrate } from '../shell/fireworks'
+import FireworksCanvas from '../shell/FireworksCanvas'
 
 //the saved size and level, easy 10x10 when missing or out of range
 const loadChoice = () => {
@@ -54,6 +57,8 @@ export const createGame = ({ n, level }) => ({
   win: false,
   hinted: false,
   untimed: false,
+  art: null,
+  picked: false,
 })
 
 //a board of empty, cross and fill cells for size n
@@ -68,7 +73,7 @@ export const saved = resumable({
   key: 'nonograms.saved',
   running,
   label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
-  pack: ({ n, level, clues, solution, board, stroke, history, hinted, untimed }) => ({
+  pack: ({ n, level, clues, solution, board, stroke, history, hinted, untimed, art, picked }) => ({
     n,
     level,
     clues,
@@ -77,10 +82,13 @@ export const saved = resumable({
     history,
     hinted,
     untimed,
+    art,
+    picked,
   }),
-  unpack: ({ n, level, clues, solution, board, history, hinted, untimed }) => {
+  unpack: ({ n, level, clues, solution, board, history, hinted, untimed, art, picked }) => {
     check(sizes.includes(n) && level >= 0 && level < levelNames.length && Array.isArray(history))
     check(Array.isArray(clues) && clues.length === 2 * n && clues.every(Array.isArray))
+    check(!art || (typeof art.id === 'string' && typeof art.name === 'string' && art.level >= 0))
     return {
       ...createGame({ n, level }),
       clues,
@@ -89,12 +97,14 @@ export const saved = resumable({
       history,
       hinted: Boolean(hinted),
       untimed: Boolean(untimed),
+      art: art || null,
+      picked: Boolean(picked),
       dealing: false,
     }
   },
 })
 
-const { actions: recordActions } = records('nonograms', sizes, levelNames)
+const { actions: recordActions } = records('nonograms', sizes, levelNames, true)
 
 //a click steps forward through these, a right click back
 const cycle = [EMPTY, FILL, CROSS]
@@ -118,19 +128,44 @@ const begin = (game, actions) => {
   return { ...game, start: clock(), time: 1 }
 }
 
-//after a stroke or undo: a win stops the clock, and any hint is out of date
-//a board with all its fills placed that isn't solved asks about a hint, at once when settled,
-//otherwise only if nothing changes for a moment
+//after a stroke or undo: a win stops the clock and any hint is out of date
+//a full but unsolved board asks about a hint, at once when settled, else after a pause
 const changed = (state, game, board, history, actions, settled = false) => {
   const next = { ...game, board, history, change: ++changes }
   next.win = solved(board, next.n, next.clues)
   if (next.win) {
     cancelAnimationFrame(next.raf)
-    if (timed({ ...state, game: next })) actions.win(next)
+    celebrate()
+    if (timed({ ...state, game: next })) record(next, actions)
   }
   const stuck = !next.win && fillsLeft(board, next.n, next.clues) === 0
   if (stuck && !settled) setTimeout(() => actions.ask(next.change), ASK_AFTER)
-  return { hint: null, prompt: stuck && settled, game: next }
+  const done = next.win && next.art ? { solved: markSolved(state.solved, next.art.id) } : null
+  return { hint: null, prompt: stuck && settled, game: next, ...done }
+}
+
+//drawn boards and the pool's random pictures have best times, a picture chosen by hand or
+//played with hints has none
+const record = (game, actions) => {
+  if (!game.art) actions.win({ ...game, art: false })
+  else if (!game.picked && !game.hinted) actions.win({ ...game, level: game.art.level, art: true })
+}
+
+//the pictures solved so far, kept so the picker can show them
+const markSolved = (solved, id) => {
+  if (solved.includes(id)) return solved
+  const next = [...solved, id]
+  save('nonograms.solved', JSON.stringify(next))
+  return next
+}
+
+const loadSolved = () => {
+  try {
+    const list = JSON.parse(load('nonograms.solved'))
+    return Array.isArray(list) ? list.filter((id) => typeof id === 'string') : []
+  } catch {
+    return []
+  }
 }
 
 //the cells a stroke covers: the start cell, then a straight run along the row or column it
@@ -179,6 +214,10 @@ export const state = {
   errors: Boolean(load('nonograms.errors')),
   timer: loadTimer('nonograms.timer'),
   rain: Boolean(load('nonograms.rain')),
+  procedural: load('nonograms.procedural') !== 'off',
+  symmetric: load('nonograms.symmetric') !== 'off',
+  pictures: false,
+  solved: loadSolved(),
   //touch screens have no right click, so a tap fills or crosses as this says
   touch: Boolean(window.matchMedia && matchMedia('(pointer: coarse)').matches),
   mode: FILL,
@@ -224,30 +263,36 @@ export const actions = {
   //deals a new board, keeping the size and level unless given
   reset:
     (payload) =>
-    ({ game }, actions) => {
+    ({ game, procedural, symmetric }, actions) => {
       cancelAnimationFrame(game.raf)
       const n = (payload && payload.n) || game.n
       const asked = payload && payload.level !== undefined ? payload.level : game.level
       const level = fallback(n, asked)
+      //a picture picked by hand comes from the pool whatever the setting
+      const pick = (payload && payload.pick) || null
       save('nonograms.size', n)
       save('nonograms.level', level)
       const id = ++deals
-      deal(n, level, Math.floor(Math.random() * 2 ** 32)).then((dealt) =>
-        actions.dealt({ id, ...dealt }),
-      )
+      deal(n, level, Math.floor(Math.random() * 2 ** 32), {
+        art: Boolean(pick) || !procedural,
+        pick,
+        avoid: game.art && game.art.id,
+        symmetric,
+      }).then((dealt) => actions.dealt({ id, ...dealt }))
       return {
         menu: null,
         hint: null,
         prompt: false,
-        game: { ...createGame({ n, level }), deal: id },
+        game: { ...createGame({ n, level }), deal: id, picked: Boolean(pick) },
       }
     },
   //an answer for an older deal is dropped
   dealt:
-    ({ id, clues, solution }) =>
+    ({ id, clues, solution, level, art }) =>
     ({ game }) => {
       if (game.deal !== id) return null
-      return { game: { ...game, clues, solution, dealing: false } }
+      const picture = art ? { ...art, level } : null
+      return { game: { ...game, clues, solution, dealing: false, art: picture } }
     },
   //a press starts a stroke
   down:
@@ -333,6 +378,21 @@ export const actions = {
     showRain(!state.rain)
     return { menu: null, rain: !state.rain }
   },
+  toggleProcedural: () => (state) => {
+    save('nonograms.procedural', state.procedural ? 'off' : '')
+    return { menu: null, procedural: !state.procedural }
+  },
+  toggleSymmetric: () => (state) => {
+    save('nonograms.symmetric', state.symmetric ? 'off' : '')
+    return { menu: null, symmetric: !state.symmetric }
+  },
+  togglePictures:
+    () =>
+    ({ pictures }) => ({ menu: null, pictures: !pictures }),
+  choosePicture: (id) => (state, actions) => {
+    actions.newGame({ pick: id })
+    return { pictures: false }
+  },
   toggleAbout:
     () =>
     ({ about }) => ({ menu: null, about: !about }),
@@ -357,6 +417,7 @@ export const view = (state, actions) => (
     oncreate={actions.init}
     onupdate={() => saved.keep(state.game)}
   >
+    <FireworksCanvas key="fw" />
     <Game key="a" state={state} actions={actions} />
     {phone ? (
       <PhoneBar
@@ -382,6 +443,7 @@ export const view = (state, actions) => (
         sizes={sizes}
         levelNames={levelNames}
         allowed={allowed}
+        art
         state={state.bestTime}
         actions={actions}
       />
@@ -392,6 +454,7 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.pictures && <Pictures key="l" state={state} actions={actions} />}
     {state.switching && <Switching key="k" title="Nonograms" actions={actions} />}
     {state.about && <About key="f" actions={actions} />}
     {state.howTo && <HowToPlay key="i" actions={actions} />}

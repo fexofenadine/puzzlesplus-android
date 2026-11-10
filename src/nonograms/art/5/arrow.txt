@@ -1,0 +1,10 @@
+name: Arrow
+credit: drawn for Puzzles Plus
+licence: CC0
+source: original
+---
+..#..
+.###.
+#.#.#
+..#..
+..#..

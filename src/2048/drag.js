@@ -17,8 +17,7 @@ export const lockOf = (dx, dy) => {
 export const along = (dir, dx, dy) => ({ left: -dx, right: dx, up: -dy, down: dy })[dir]
 
 //where each tile would go: { moved, far, shift: { id: [dx, dy] } } in cells
-//far is the longest way any tile travels, so all of them arrive together
-//halves of a last move's merge go with the tile on their cell
+//far is the longest travel, so all tiles arrive together
 export const planOf = (tiles, n, dir, nextId) => {
   const done = move(tiles, n, dir, nextId)
   const to = new Map()

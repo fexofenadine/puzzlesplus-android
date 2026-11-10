@@ -4,9 +4,8 @@ import { CROSS, EMPTY, FILL, cellsOf, settleLine } from './rules'
 //each line settles what its clue allows, and a line that changed wakes the lines crossing it
 
 //fills the board in place, false on a contradiction
-//lines lists the lines to start from, every line unless the board was already settled
-//trace, when given, is told the line that could no longer match
-//settle works out one line, the full line logic unless the techniques limit it
+//lines are the ones to start from, trace hears of the line that broke
+//settle works out one line
 export const propagate = (board, n, clues, lines = null, trace = null, settle = settleLine) => {
   const all = cellsOf(n)
   const waiting = new Uint8Array(2 * n)
@@ -38,9 +37,8 @@ export const propagate = (board, n, clues, lines = null, trace = null, settle = 
 //the two lines through a cell
 export const linesThrough = (i, n) => [Math.floor(i / n), n + (i % n)]
 
-//what-if: a value that leads the lines into a contradiction can't be right, so the cell takes the other
-//returns { cell, value, line } with the line that broke, or null when no single guess fails
-//or the deadline passes
+//what-if: a value that breaks the lines is wrong, so the cell takes the other
+//returns { cell, value, line }, or null when no guess fails or time runs out
 export const contradiction = (board, n, clues, deadline = Infinity) => {
   for (let i = 0; i < board.length; i++) {
     if (board[i] !== EMPTY) continue
@@ -57,9 +55,8 @@ export const contradiction = (board, n, clues, deadline = Infinity) => {
   return null
 }
 
-//as far as logic goes, in place: line by line, then what-if when deep
-//returns 0 when line logic was enough, 1 when what-if was needed, null when stuck or contradictory
-//or out of time
+//as far as logic goes, in place: lines, then what-if when deep
+//returns 0 for line logic, 1 for what-if, null when stuck, contradictory or out of time
 export const deduce = (board, n, clues, deep = true, deadline = Infinity) => {
   if (!propagate(board, n, clues)) return null
   let level = 0

@@ -11,12 +11,18 @@ const tabs = [
   { id: 'hinted', name: 'Hints used' },
 ]
 
+const artTab = { id: 'art', name: 'Art' }
+
 //a size a row, a level a column, empty slots stay blank and levels a size can't deal show a dash
-const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions }) => (
+const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art = false }) => (
   <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBestTime()}>
     <Dialog title={title} onClose={actions.toggleBestTime}>
       <div class={b.root}>
-        <Tabs tabs={tabs} active={state.tab} onSelect={actions.setBestTimeTab} />
+        <Tabs
+          tabs={art ? [...tabs, artTab] : tabs}
+          active={state.tab}
+          onSelect={actions.setBestTimeTab}
+        />
         <table class={s.table}>
           <thead>
             <tr>

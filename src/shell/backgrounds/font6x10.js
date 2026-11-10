@@ -1,6 +1,5 @@
-//xscreensaver's built-in phosphor font: the public domain x11 misc-fixed 6x10, 256 latin-1 glyphs
-//each 7 pixels wide (6 plus a gap) in one 1792x10 strip, one bit per pixel, rows top to bottom
-//generated from xscreensaver/hacks/images/6x10font.png
+//xscreensaver's phosphor font: public domain x11 misc-fixed 6x10, from 6x10font.png
+//256 latin-1 glyphs, 7 pixels wide each, in one 1792x10 strip of bits
 const data =
   'AAFQAAAAAAAAAIAABAh+AAAAAgQIACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
   'AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +

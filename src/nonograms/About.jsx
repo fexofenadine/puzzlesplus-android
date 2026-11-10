@@ -10,7 +10,8 @@ const NonogramsAbout = ({ key, actions }) => (
     </p>
     <p>
       Every board has exactly one solution and can be solved by logic alone. Nonograms were devised
-      in 1987 by Non Ishida and, independently, Tetsuya Nishio.
+      in 1987 by Non Ishida and, independently, Tetsuya Nishio. The pictures are drawn for Puzzles
+      Plus and free to reuse (CC0).
     </p>
     <p>
       Part of Puzzles Plus by fexofenadine, sharing its window, themes and backgrounds with

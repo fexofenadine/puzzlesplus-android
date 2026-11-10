@@ -36,10 +36,8 @@ export const makePuzzle = (n, rng, keep, least = 0) => {
   return { givens, solution }
 }
 
-//a puzzle the techniques up to level can finish and that needs that level, within a time budget
-//falls back to the hardest board found when time runs out
-//the top level's what-if finishes nearly any board with one solution, so there the quick count
-//stands in while clues come away, and the rating comes once at the end
+//a puzzle that needs exactly level within a time budget, else the hardest found
+//the top level's what-if finishes nearly anything, so a quick count stands in while clues come away
 export const makeGame = (n, level, rng, budget = 1500) => {
   const start = performance.now()
   const top = level === levels.length - 1

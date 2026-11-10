@@ -20,6 +20,8 @@ import { load, save, remove } from './shell/storage'
 import { listen, shellActions, shellState, shortcut } from './shell/actions'
 import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from './shell/clock'
 import { check, resumable } from './shell/resume'
+import { celebrate } from './shell/fireworks'
+import FireworksCanvas from './shell/FireworksCanvas'
 
 const levels = {
   beginner: {
@@ -475,7 +477,10 @@ export const actions = {
       const win = left <= 0
       if (win || lose) {
         cancelAnimationFrame(game.raf)
-        if (!lose) actions.win()
+        if (!lose) {
+          celebrate()
+          actions.win()
+        }
       }
       //a win flags the mines left, as windows did
       if (win && !lose) {
@@ -618,6 +623,7 @@ export const view = (state, actions) => (
     oncreate={actions.init}
     onupdate={() => saved.keep(state.game)}
   >
+    <FireworksCanvas key="fw" />
     {state.game && <Game key="a" state={state} actions={actions} />}
     {phone ? (
       <PhoneBar

@@ -19,10 +19,8 @@ export const running = ({ start, over }) => start >= 0 && !over
 //cells shrink a little as boards grow, so every size makes a similar window
 export const cellSizes = { 3: 72, 4: 60, 5: 52 }
 
-//a tile's look: its power of two picks the colour and the css the text that reads on it
-//its digit count picks the font size
-//it slides from script (glide) because a keyed update can put a tile back into the page, which
-//cancels a css transition
+//a tile's power of two picks its colour and text, its digit count the font size
+//it slides from script (glide) since a keyed update can cancel a css transition
 export const Tile = ({ tile, n }) => {
   const k = Math.log2(tile.value)
   const x = tile.cell % n

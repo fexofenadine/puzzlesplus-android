@@ -50,9 +50,8 @@ const nameOf = (kind, index, n) => {
 
 const geometries = {}
 
-//the units every digit appears once in: rows, then columns, then boxes
-//each unit is { kind, index, cells, name }, unitsOf[i] the three a cell is in, peers[i] the cells
-//sharing one with it; a variant adds units here (diagonals) or rules beside them (cages)
+//the units every digit appears once in: rows, columns, boxes, each { kind, index, cells, name }
+//unitsOf[i] are the three a cell is in, peers[i] the cells sharing one; variants add units here
 export const geometry = (n) => {
   if (geometries[n]) return geometries[n]
   const [bw, bh] = boxShapes[n]

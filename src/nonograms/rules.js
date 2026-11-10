@@ -41,10 +41,9 @@ export const lineDone = (board, cells, clue) => sameRuns(runsOf(cells.map((i) =>
 export const solved = (board, n, clues) =>
   cellsOf(n).every((cells, line) => lineDone(board, cells, clues[line]))
 
-//every way to place a clue's runs that fits the cells known so far, or null when none fit
-//before[j][i] says the first j runs fit in cells 0 to i - 1, after[j][i] that runs j on fit from cell i
-//so it takes time in proportion to cells times runs, where listing the placements could take millions
-//canStart(j, s) says some placement of the whole clue puts run j at cell s
+//every way to place a clue that fits the known cells, or null when none fit
+//before and after tables keep it to cells times runs
+//canStart(j, s) says some placement puts run j at cell s
 export const placements = (values, clue) => {
   const n = values.length
   const k = clue.length

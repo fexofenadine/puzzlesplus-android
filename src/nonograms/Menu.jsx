@@ -31,6 +31,23 @@ const Menu = ({ state, actions }) => (
         />
       ))}
       <Separator />
+      <SubMenuItem
+        name="Procedural"
+        checked={state.procedural}
+        onClick={actions.toggleProcedural}
+      />
+      <SubMenuItem
+        name="Symmetric"
+        checked={state.symmetric}
+        disabled={!state.procedural}
+        onClick={actions.toggleSymmetric}
+      />
+      <SubMenuItem
+        name="Choose Picture..."
+        disabled={state.procedural}
+        onClick={actions.togglePictures}
+      />
+      <Separator />
       <SubMenuItem name="Show Errors" checked={state.errors} onClick={actions.toggleErrors} />
       <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />
       <Separator />

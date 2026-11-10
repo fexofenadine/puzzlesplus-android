@@ -19,6 +19,9 @@ import { windowClear } from '../shell/actions'
 //the guide's section on a hint, none for a solved board
 const more = (hint) => guideTopic(hint) && pageUrl(`guide/#${guideTopic(hint)}`)
 
+//what a solved picture is called and who drew it
+const captionOf = ({ name, credit, licence }) => `${name}, ${credit} (${licence})`
+
 export const running = ({ start, win, dealing }) => start >= 0 && !win && !dealing
 
 //cells in blocks of five with a thin gap between, the same tracks for clues and cells
@@ -128,6 +131,7 @@ const Game = ({ key, state, actions }) => {
           </div>
         </div>
         {hint && !paused && <HintPanel text={hint.text} more={more(hint)} />}
+        {game.win && game.art && <HintPanel text={captionOf(game.art)} />}
       </div>
     </Dialog>
   )

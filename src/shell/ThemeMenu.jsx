@@ -29,6 +29,9 @@ const ThemeMenu = ({ state, actions }, children) => (
         onClick={actions.toggleHideWindow}
       />
     )}
+    {isGame(state.page) && (
+      <SubMenuItem name="Fireworks" checked={state.fireworks} onClick={actions.toggleFireworks} />
+    )}
     {children}
   </MenuItem>
 )

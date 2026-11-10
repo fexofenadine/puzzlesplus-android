@@ -14,10 +14,8 @@ export const guideTopic = ({ kind }) =>
 const misfit = (board, solution, i) =>
   (board[i] === FILL && !solution[i]) || (board[i] === CROSS && solution[i] === 1)
 
-//the next thing to do: a clue that can't be matched first, then a cell that can't be right,
-//then the easiest step
-//returns { kind, text, marks, line?, place? }, marks maps a cell to source, fill, cross or wrong
-//and line is the clue to outline
+//the next thing to do: a broken clue, a wrong cell, then the easiest step
+//returns { kind, text, marks, line?, place? }
 export const findHint = ({ board, solution, clues, n }) => {
   if (solved(board, n, clues)) return { kind: 'solved', text: 'The puzzle is solved.', marks: {} }
   const broken = breaks(board, n, clues)

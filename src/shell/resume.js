@@ -4,10 +4,9 @@ import { clock } from './clock'
 //the games parked for later, newest first, per game
 const SHELF = 3
 
-//the game in progress kept under key, so a reload or a closed app comes back to it, paused
-//pack(game) gives the plain parts worth keeping, unpack(parts) rebuilds a game or throws
-//running(game) says whether there is anything to keep, a won, lost or fresh game drops it
-//label(game) names a game for the resume list, fresh is the state a resumed game starts from
+//the game in progress kept under key, so a reload comes back to it paused
+//pack gives the plain parts, unpack rebuilds a game or throws, running says it is worth keeping
+//label names a game in the resume list, fresh is the state a resumed game starts from
 export const resumable = ({ key, running, pack, unpack, label = () => '', fresh = {} }) => {
   let last = null
   const shelfKey = `${key}.shelf`

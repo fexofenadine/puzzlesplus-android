@@ -23,6 +23,8 @@ import { hold, letGo } from './motion'
 import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
+import { celebrate } from '../shell/fireworks'
+import FireworksCanvas from '../shell/FireworksCanvas'
 
 //the saved size, 4x4 when missing or out of range
 const loadSize = () => {
@@ -224,7 +226,10 @@ export const actions = {
     }
     //making the target asks whether to keep going, once a game
     const reached = !game.reached && highest(values) >= targets[game.n]
-    if (reached) next.reached = true
+    if (reached) {
+      next.reached = true
+      celebrate()
+    }
     let winner = null
     if (next.over) {
       cancelAnimationFrame(next.raf)
@@ -238,9 +243,8 @@ export const actions = {
       game: next,
     }
   },
-  //drags on the board, by touch or with the mouse held down: the tiles follow along the direction
-  //the drag settles on, and the release finishes the move or lets them spring back
-  //the tiles are moved on the page directly, so a drag never renders the window
+  //drags on the board: tiles follow the settled direction, the release finishes or springs back
+  //tiles move on the page directly, so a drag never renders the window
   swipeStart: (event) => (state) => {
     const { game } = state
     if (game.paused || game.over || state.prompt || event.button > 0) return
@@ -351,6 +355,7 @@ export const view = (state, actions) => (
     oncreate={actions.init}
     onupdate={() => saved.keep(state.game)}
   >
+    <FireworksCanvas key="fw" />
     <Game key="a" state={state} actions={actions} />
     {phone ? (
       <PhoneBar

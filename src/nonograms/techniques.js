@@ -14,9 +14,8 @@ import {
 import { contradiction, deduce, propagate } from './solver'
 
 //the reasoning a person uses, easiest first, behind hints, difficulty and generation
-//each level's finder looks at one line and returns steps with places along the line:
-//{ technique, place: [[k, value]], sources: [k], text(name, ends) }
-//a board's level is the hardest one it needs, and each level includes the ones before
+//a finder looks at one line: { technique, place: [[k, value]], sources: [k], text(name, ends) }
+//a board needs the hardest level it uses, and each level includes the ones before
 
 export const levels = ['easy', 'medium', 'hard', 'expert']
 

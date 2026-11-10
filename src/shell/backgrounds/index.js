@@ -5,9 +5,8 @@ import truchet from './truchet'
 import phosphor from './phosphor'
 import hill from './hill'
 
-//canvas backgrounds behind the game, each one
-//{ name, credit, options, ratio(dpr, settings), filter?(dpr), wallpaper?, animated?, create(context, settings) }
-//where create returns { configure, resize(w, h, scale), frame(now), still?(now) }
+//each background: { name, credit, options, ratio(dpr, settings), filter?(dpr), wallpaper?, animated?, create }
+//create returns { configure, resize(w, h, scale), frame(now), still?(now) }
 export const backgrounds = { matrix, substrate, truchet, phosphor, hill }
 
 //which theme shows which background

@@ -38,8 +38,7 @@ let gameWindow = null
 let hanging = 0
 
 //the largest zoom that fits, and the window's unzoomed size and room
-//offset sizes are unzoomed in every engine, rects only since chrome 128 (android 15's first
-//webview, 124, left them unzoomed, so dividing by the zoom shrank the window and fit never settled)
+//offset sizes are unzoomed everywhere, rects only since chrome 128 (android 15 webview 124 left them zoomed)
 export const measureFit = () => {
   if (!gameWindow || !gameWindow.offsetWidth || !gameWindow.offsetHeight) {
     return { fit: Infinity, size: null }
@@ -67,9 +66,8 @@ export const sameSize = (a, b) =>
   Math.abs(a.width / b.width - 1) < 0.03 &&
   Math.abs(a.height / b.height - 1) < 0.03
 
-//the explanation under the board hangs below the window's place instead of growing it
-//so the board never moves under the pointer when one appears or goes, nor does the zoom
-//measured inside the window, so unzoomed; the margin outside it scales by the zoom
+//the explanation under the board hangs below the window instead of growing it
+//so the board never moves under the pointer, measured unzoomed, the margin scales
 const bottom = (el) => el.offsetTop + el.offsetHeight
 const hang = (panel) => {
   const height = panel ? bottom(panel) - bottom(panel.previousElementSibling) : 0

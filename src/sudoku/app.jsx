@@ -16,6 +16,8 @@ import { listen, shellActions, shellState, shortcut, typing } from '../shell/act
 import { clock, loadTimer, pauseAction, seconds, timed, timerAction } from '../shell/clock'
 import { check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
+import { celebrate } from '../shell/fireworks'
+import FireworksCanvas from '../shell/FireworksCanvas'
 import {
   EMPTY,
   bit,
@@ -134,6 +136,7 @@ const changed = (state, board, notes, history, actions) => {
   next.win = solved(board, next.n)
   if (next.win) {
     cancelAnimationFrame(next.raf)
+    celebrate()
     if (timed({ ...state, game: next })) actions.win(next)
   }
   return { hint: null, prompt: !next.win && full(board), game: next }
@@ -395,6 +398,7 @@ export const view = (state, actions) => (
     oncreate={actions.init}
     onupdate={() => saved.keep(state.game)}
   >
+    <FireworksCanvas key="fw" />
     <Game key="a" state={state} actions={actions} />
     {phone ? (
       <PhoneBar

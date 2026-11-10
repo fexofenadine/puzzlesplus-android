@@ -14,7 +14,6 @@ import { settle } from './solver'
 
 //the reasoning a person uses, easiest first, behind hints, difficulty and generation
 //a step is { technique, level, place: [[cell, digit]], remove: [[cell, mask]], sources, text }
-//steps work on candidates, the digits each empty cell may still hold
 
 export const levels = ['easy', 'medium', 'hard', 'expert']
 
@@ -392,9 +391,8 @@ export const apply = (board, cands, n, steps) => {
   return true
 }
 
-//the hardest level a board needs, or null when techniques up to top can't finish it
-//finishing by sound steps also proves the solution is the only one
-//the singles are exactly what the solver's settle places, so it stands in for them
+//the hardest level a board needs, or null when techniques up to top cannot finish it
+//finishing by sound steps proves uniqueness, singles use the solver as a stand-in
 export const rate = (givens, n, top = levels.length - 1) => {
   const board = givens.slice()
   const cands = candidatesOf(board, n)

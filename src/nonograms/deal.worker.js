@@ -1,6 +1,6 @@
-import { makeGame, random } from './generate'
+import { deal } from './dealing'
 
-self.onmessage = ({ data: { id, n, level, seed } }) => {
-  const { solution, clues, level: got } = makeGame(n, level, random(seed))
-  self.postMessage({ id, solution, clues, level: got }, [solution.buffer])
+self.onmessage = ({ data }) => {
+  const { solution, clues, level, art } = deal(data)
+  self.postMessage({ id: data.id, solution, clues, level, art }, [solution.buffer])
 }

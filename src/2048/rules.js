@@ -1,6 +1,5 @@
-//boards of n * n cells in row order; values are 0 for empty, else a power of two
+//boards of n * n cells in row order, 0 for empty else a power of two
 //tiles carry ids so the view can slide them: { id, value, cell, fresh, merged, gone }
-//fresh tiles just appeared, merged ones were just made, gone ones slid into a merge and go next move
 
 export const sizes = [3, 4, 5]
 

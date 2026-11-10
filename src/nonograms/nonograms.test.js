@@ -13,7 +13,14 @@ import {
   solved,
 } from './rules'
 import { countSolutions, deduce, propagate } from './solver'
-import { makeGame, makePicture, makePuzzle, random } from './generate'
+import {
+  filled as fillsGrid,
+  makeGame,
+  makePicture,
+  makePuzzle,
+  mirrored,
+  random,
+} from './generate'
 import { levels, lineSteps, rate, solveAt } from './techniques'
 import { findHint } from './hint'
 import { allowed } from './Menu'
@@ -126,12 +133,32 @@ it('draws pictures with shapes rather than static', () => {
   expect(lone).toBeLessThan(20)
 })
 
+it('fills the grid: edges touched, no empty line up to 10x10', () => {
+  const flat = (rows) => Int8Array.from(rows.join('').split(''), (c) => (c === '#' ? 1 : 0))
+  //column 1 is empty
+  const gap = flat(['#.#', '#.#', '#.#'])
+  expect(fillsGrid(gap, 3)).toBe(false)
+  expect(fillsGrid(flat(['###', '#.#', '###']), 3)).toBe(true)
+  //15x15 only needs its edges
+  const big = new Int8Array(225)
+  for (const k of [0, 14, 210, 224]) big[k] = 1
+  expect(fillsGrid(big, 15)).toBe(true)
+  big[0] = 0
+  expect(fillsGrid(big, 15)).toBe(true)
+  big[210] = 0
+  expect(fillsGrid(big, 15)).toBe(false)
+  for (let seed = 0; seed < 200; seed++) {
+    for (const n of sizes) expect(fillsGrid(makePicture(n, random(seed)), n)).toBe(true)
+  }
+})
+
 it('deals every size at every level it allows, needing exactly that level', () => {
   for (const n of sizes) {
     for (let level = 0; level < levels.length; level++) {
       if (!allowed(n, level)) continue
       const { solution, clues, level: got } = makeGame(n, level, random(n * 10 + level), 30000)
       expect(got).toBe(level)
+      expect(fillsGrid(solution, n)).toBe(true)
       expect(cluesOf(solution, n)).toEqual(clues)
       expect(rate(clues, n)).toBe(level)
       const board = emptyBoard(n)
@@ -263,3 +290,23 @@ it('points at the cells that are really wrong in a broken line', () => {
     marks: { 0: 'wrong' },
   })
 })
+
+it('draws symmetric pictures mirrored and the others not', () => {
+  for (const n of sizes) {
+    for (let seed = 0; seed < 30; seed++) {
+      expect(mirrored(makePicture(n, random(seed), 0, true), n)).toBe(true)
+      expect(mirrored(makePicture(n, random(seed), 0, false), n)).toBe(false)
+    }
+  }
+})
+
+it('deals symmetric boards by default and asymmetric ones when asked', () => {
+  for (const n of sizes) {
+    for (const symmetric of [true, false]) {
+      const { solution, clues } = makeGame(n, 1, random(n), 5000, symmetric)
+      expect(mirrored(solution, n)).toBe(symmetric)
+      expect(fillsGrid(solution, n)).toBe(true)
+      expect(cluesOf(solution, n)).toEqual(clues)
+    }
+  }
+}, 60000)

@@ -219,6 +219,7 @@ const PhoneBar = (
               kind="swatches"
             />
             {look}
+            <Check name="Fireworks" checked={state.fireworks} onToggle={actions.toggleFireworks} />
             <Range
               name="Window"
               value={state.glass.opacity}

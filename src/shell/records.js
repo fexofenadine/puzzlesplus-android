@@ -1,36 +1,41 @@
 import { load, remove, save } from './storage'
 
-//best times by size and level for a game saved under its own prefix, kept apart for games with
-//and without hints, with the winner and best times dialog actions that go with them
-export const records = (prefix, sizes, levelNames) => {
-  const timeKey = (n, level, hinted) => `${prefix}.${n}.${level}${hinted ? '.hints' : ''}`
+//best times by size and level under prefix, apart for games with and without hints
+//withArt adds the art board, which counts only games played without hints
+export const records = (prefix, sizes, levelNames, withArt = false) => {
+  const timeKey = (n, level, hinted, art = false) =>
+    `${prefix}${art ? '.art' : ''}.${n}.${level}${hinted ? '.hints' : ''}`
 
   const eachSlot = (fn) =>
     sizes.flatMap((n) => levelNames.map((_, level) => fn(n, level, `${n}.${level}`)))
 
-  const bestTimes = (hinted) =>
+  //a board is clean, hinted or art
+  const keyOf = (board, n, level) => timeKey(n, level, board === 'hinted', board === 'art')
+
+  const bestTimes = (board) =>
     Object.fromEntries(
       eachSlot((n, level, slot) => {
-        const key = timeKey(n, level, hinted)
+        const key = keyOf(board, n, level)
         const time = parseInt(load(key), 10) || 999
         return [slot, { time, name: load(`${key}.name`) || 'Anonymous' }]
       }),
     )
 
-  const clearBestTimes = (hinted) => {
+  const clearBestTimes = (board) => {
     eachSlot((n, level) => {
-      const key = timeKey(n, level, hinted)
+      const key = keyOf(board, n, level)
       remove(key)
       remove(`${key}.name`)
     })
-    return bestTimes(hinted)
+    return bestTimes(board)
   }
 
   const actions = {
     win:
-      ({ n, level, hinted, time }) =>
+      ({ n, level, hinted, time, art = false }) =>
       () => {
-        const key = timeKey(n, level, hinted)
+        const board = art ? 'art' : hinted ? 'hinted' : 'clean'
+        const key = keyOf(board, n, level)
         const best = parseInt(load(key), 10)
         if (best && best <= time) return null
         return {
@@ -38,7 +43,11 @@ export const records = (prefix, sizes, levelNames) => {
             key,
             time,
             hinted,
+            board,
             level: `${levelNames[level].toLowerCase()} ${n} × ${n}`,
+            text:
+              art &&
+              `You have the fastest art time for ${levelNames[level].toLowerCase()} ${n} × ${n}.`,
             name: load(`${prefix}.name`) || '',
           },
         }
@@ -57,7 +66,7 @@ export const records = (prefix, sizes, levelNames) => {
         save(`${winner.key}.name`, name)
         save(`${prefix}.name`, name)
         actions.toggleBestTime()
-        actions.setBestTimeTab(winner.hinted ? 'hinted' : 'clean')
+        actions.setBestTimeTab(winner.board)
         return { winner: null }
       },
     toggleBestTime:
@@ -66,14 +75,19 @@ export const records = (prefix, sizes, levelNames) => {
         menu: null,
         bestTime: bestTime
           ? null
-          : { tab: 'clean', clean: bestTimes(false), hinted: bestTimes(true) },
+          : {
+              tab: 'clean',
+              clean: bestTimes('clean'),
+              hinted: bestTimes('hinted'),
+              ...(withArt && { art: bestTimes('art') }),
+            },
       }),
     setBestTimeTab: (tab) => (state) =>
       state.bestTime ? { bestTime: { ...state.bestTime, tab } } : null,
     resetBestTime:
       () =>
       ({ bestTime }) => ({
-        bestTime: { ...bestTime, [bestTime.tab]: clearBestTimes(bestTime.tab === 'hinted') },
+        bestTime: { ...bestTime, [bestTime.tab]: clearBestTimes(bestTime.tab) },
       }),
   }
 

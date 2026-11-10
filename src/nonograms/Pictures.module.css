@@ -1,0 +1,77 @@
+.root {
+  width: 300px;
+  padding: 10px 12px 12px;
+}
+
+.text {
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+
+/*a sunken list box, like a file dialog's*/
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 0 0 10px;
+  padding: 8px 4px;
+  list-style: none;
+  background: var(--input);
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  box-shadow: inset 1px 1px var(--dark-shadow);
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  width: 84px;
+  padding: 4px 2px;
+  font: inherit;
+  color: var(--text);
+  text-align: center;
+  cursor: pointer;
+  background: none;
+  border: 1px solid transparent;
+}
+
+.option:hover,
+.option:focus-visible {
+  color: var(--highlight-text);
+  background: var(--highlight);
+  outline: 0;
+}
+
+.thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  color: var(--text);
+  background: var(--light);
+  border: 1px solid var(--shadow);
+}
+
+svg.thumb {
+  padding: 3px;
+  fill: currentcolor;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.level {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}

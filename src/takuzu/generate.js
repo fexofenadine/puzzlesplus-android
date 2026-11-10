@@ -26,9 +26,8 @@ export const makePuzzle = (n, rng, keep = (board) => countSolutions(board, n, 2)
   return { givens, solution }
 }
 
-//a puzzle the techniques up to level can finish and that needs that level, within a time budget
-//finishing by sound steps also proves the solution is the only one
-//falls back to the hardest board found when time runs out
+//a puzzle that needs exactly level within a time budget, else the hardest found
+//finishing by sound steps proves the solution is the only one
 export const makeGame = (n, level, rng, budget = 1500) => {
   const start = performance.now()
   const keep = (board) => rate(board, n, level) !== null

@@ -37,9 +37,8 @@ const enabler = (rounds, placement, n) => {
 
 const lower = (text) => text[0].toLowerCase() + text.slice(1)
 
-//the next digit logic gives, with the reasoning that leads there
-//when only removals are left at first, they are made in the background until a digit follows,
-//and the one that opened it up is the one explained
+//the next digit logic gives, with the reasoning
+//removals that come first are made silently and the one that opened the digit is explained
 const nextDigit = (board, n) => {
   const work = board.slice()
   const cands = candidatesOf(work, n)
@@ -58,9 +57,8 @@ const nextDigit = (board, n) => {
   return null
 }
 
-//the next thing to do: a broken rule first, then a digit that can't be right, then notes that
-//leave out the digit a cell needs, then the easiest step
-//returns { kind, text, marks, place? }, marks maps a cell to source, place, remove or wrong
+//the next thing to do: a broken rule, a wrong digit, notes missing the answer, then the easiest step
+//returns { kind, text, marks, place? }
 export const findHint = ({ board, notes, solution, n }) => {
   if (solved(board, n)) return { kind: 'solved', text: 'The puzzle is solved.', marks: {} }
   const broken = breaks(board, n)
