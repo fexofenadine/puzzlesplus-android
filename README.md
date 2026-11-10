@@ -41,7 +41,7 @@ yarn start:android        #dev server in phone mode
 yarn build:android        #web files in www/
 npx cap sync android      #copy them into the android project
 cd android
-gradlew assembleDebug     #app/build/outputs/apk/debug/puzzlesplus-<version>-debug.apk
+gradlew assembleDebug     #app/build/outputs/apk/debug/puzzlesplus-<version>-debug.apk (installs beside the release as Puzzles Plus Debug)
 gradlew assembleRelease   #app/build/outputs/apk/release/puzzlesplus-<version>.apk
 ```
 

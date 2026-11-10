@@ -36,6 +36,10 @@ android {
         }
     }
     buildTypes {
+        //a debug build installs beside the release one, with its own id and name
+        debug {
+            applicationIdSuffix '.debug'
+        }
         release {
             if (releasePropsFile.exists()) signingConfig signingConfigs.release
             minifyEnabled false
