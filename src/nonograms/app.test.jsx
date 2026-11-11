@@ -299,13 +299,32 @@ it('keeps no time for a picture chosen by hand, and remembers it as solved', asy
   expect(JSON.parse(localStorage.getItem('nonograms.solved'))).toEqual(['5/heart'])
 })
 
-it('remembers procedural and symmetric as asked', () => {
+it('remembers procedural and symmetric as asked, dealing a board for them', () => {
   expect(now()).toMatchObject({ procedural: true, symmetric: true })
+  const before = now().game
   wired.toggleSymmetric()
   expect(now().symmetric).toBe(false)
+  expect(now().game).not.toBe(before)
+  expect(now().game.dealing).toBe(true)
   expect(localStorage.getItem('nonograms.symmetric')).toBe('off')
   wired.toggleSymmetric()
   expect(now().symmetric).toBe(true)
+})
+
+it('asks before a picture setting ends a game in play, and cancel keeps both', () => {
+  click(0)
+  const before = now().game
+  wired.toggleProcedural()
+  expect(now().switching).toEqual({ payload: { procedural: false } })
+  wired.answerSwitch(null)
+  expect(now()).toMatchObject({ procedural: true, switching: null })
+  expect(now().game).toBe(before)
+  expect(localStorage.getItem('nonograms.procedural')).toBe(null)
+  wired.toggleProcedural()
+  wired.answerSwitch('discard')
+  expect(now().procedural).toBe(false)
+  expect(now().game.dealing).toBe(true)
+  expect(localStorage.getItem('nonograms.procedural')).toBe('off')
 })
 
 it('keeps its picture when the game is saved and restored', async () => {

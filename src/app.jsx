@@ -104,6 +104,21 @@ const createGame = ({ level, width, height, mines }) => {
   }
 }
 
+const saveSettings = ({ safeStart, noGuess }) => {
+  if (safeStart !== undefined) save('safeStart', safeStart ? '' : 'off')
+  if (noGuess !== undefined) save('noGuess', noGuess ? 'yes' : '')
+}
+
+//mines are laid on the first click, so a game in play would ignore the change: ask to start another
+const setting = (state, actions, settings) => {
+  if (!running(state.game)) {
+    saveSettings(settings)
+    return { menu: null, ...settings }
+  }
+  const { level, width, height, mines } = state.game
+  actions.newGame({ level, width, height, mines, settings })
+}
+
 //a cell as one number: its count, then opened, mined, flag and mark bits
 const packCell = ({ opened, mined, flag, mark, num }) =>
   num | (opened ? 16 : 0) | (mined ? 32 : 0) | (flag ? 64 : 0) | (mark ? 128 : 0)
@@ -283,9 +298,12 @@ export const actions = {
           ? [params.width, params.height, params.mines].join()
           : params.level,
       )
+      const settings = (payload && payload.settings) || {}
+      saveSettings(settings)
       return {
         menu: null,
         hint: null,
+        ...settings,
         game: createGame(params),
       }
     },
@@ -612,16 +630,9 @@ export const actions = {
       actions.newGame(customLevel(customField, game))
       return { customField: null }
     },
-  toggleSafeStart: () => (state) => {
-    const safeStart = !state.safeStart
-    save('safeStart', safeStart ? '' : 'off')
-    return { menu: null, safeStart }
-  },
-  toggleNoGuess: () => (state) => {
-    const noGuess = !state.noGuess
-    save('noGuess', noGuess ? 'yes' : '')
-    return { menu: null, noGuess }
-  },
+  toggleSafeStart: () => (state, actions) =>
+    setting(state, actions, { safeStart: !state.safeStart }),
+  toggleNoGuess: () => (state, actions) => setting(state, actions, { noGuess: !state.noGuess }),
   toggleTimer: timerAction('timer'),
   toggleMarks: () => (state) => {
     const marks = !state.marks

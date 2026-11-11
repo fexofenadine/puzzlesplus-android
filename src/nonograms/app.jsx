@@ -321,11 +321,17 @@ export const actions = {
     if (historyKey(event, state, actions)) return
     gameKey(shortcut(event, state, actions), actions)
   },
-  //deals a new board, keeping the size and level unless given
+  //deals a new board, keeping the size, level and picture settings unless given
   reset:
     (payload) =>
-    ({ game, procedural, symmetric }, actions) => {
+    ({ game, ...state }, actions) => {
       stopTick(game.raf)
+      const setting = (name) =>
+        payload && payload[name] !== undefined ? payload[name] : state[name]
+      const procedural = setting('procedural')
+      const symmetric = setting('symmetric')
+      save('nonograms.procedural', procedural ? '' : 'off')
+      save('nonograms.symmetric', symmetric ? '' : 'off')
       //the day's board is one size and level for everyone and leaves the saved choice alone,
       //and after it or a board from a link the next game goes back to that choice
       const day = payload && payload.daily ? dayOf() : null
@@ -355,6 +361,8 @@ export const actions = {
         menu: null,
         hint: null,
         prompt: false,
+        procedural,
+        symmetric,
         game: { ...createGame({ n, level }), deal: id, picked: Boolean(pick), daily: day },
       }
     },
@@ -470,8 +478,17 @@ export const actions = {
     showRain(!state.rain)
     return { menu: null, rain: !state.rain }
   },
-  toggleProcedural: toggleAction('procedural', 'nonograms.procedural', '', 'off'),
-  toggleSymmetric: toggleAction('symmetric', 'nonograms.symmetric', '', 'off'),
+  //a picture setting only means something on a new board, so it deals one (asking first mid game)
+  toggleProcedural:
+    () =>
+    ({ procedural }, actions) => {
+      actions.newGame({ procedural: !procedural })
+    },
+  toggleSymmetric:
+    () =>
+    ({ symmetric }, actions) => {
+      actions.newGame({ symmetric: !symmetric })
+    },
   togglePictures:
     () =>
     ({ pictures }) => ({ menu: null, pictures: !pictures }),
