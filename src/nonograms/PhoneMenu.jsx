@@ -1,5 +1,5 @@
 import { h } from 'hyperapp'
-import { Check, Chips, Item, Section, TROPHY } from '../shell/PhoneBar'
+import { Check, Chips, Item, PlayItems, Section, TROPHY } from '../shell/PhoneBar'
 import { allowed, levelNames } from './Menu'
 import { sizes } from './rules'
 
@@ -35,6 +35,7 @@ const PhoneMenu = ({ state, actions }) => [
     )}
     <Check name="Show Errors" checked={state.errors} onToggle={actions.toggleErrors} />
     <Check name="Timer" checked={state.timer} onToggle={actions.toggleTimer} />
+    <PlayItems state={state} actions={actions} />
     <Item d={TROPHY} name="Best times" onClick={actions.toggleBestTime} actions={actions} />
   </Section>,
 ]

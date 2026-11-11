@@ -45,9 +45,11 @@ export const measureFit = () => {
   }
   //the margin is outside the zoom; inner sizes ignore scrollbars
   const frame = getComputedStyle(gameWindow.parentElement.parentElement)
-  const width = innerWidth - parseFloat(frame.marginLeft) - parseFloat(frame.marginRight)
-  //the taskbar's room is main's bottom padding, a phone's top bar its top padding
+  //the taskbar's room is main's bottom padding, a phone's bar its top padding, or its side
+  //padding when held sideways
   const main = getComputedStyle(gameWindow.closest('main'))
+  const sides = (parseFloat(main.paddingLeft) || 0) + (parseFloat(main.paddingRight) || 0)
+  const width = innerWidth - parseFloat(frame.marginLeft) - parseFloat(frame.marginRight) - sides
   const bar = (parseFloat(main.paddingBottom) || 0) + (parseFloat(main.paddingTop) || 0)
   const height = innerHeight - parseFloat(frame.marginTop) - parseFloat(frame.marginBottom) - bar
   const size = {

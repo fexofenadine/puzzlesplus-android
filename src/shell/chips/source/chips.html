@@ -1,0 +1,150 @@
+<!doctype html>
+<!--the theme picker's icons: a piece of each theme's background with a glyph in the theme's look-->
+<!--chips.py renders each one to ../<theme>.webp-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Pixel';
+        src: url(../../../fonts/ms_sans_serif_bold.woff2);
+      }
+      @font-face {
+        font-family: 'Nunito';
+        src: url(../../../fonts/nunito.woff2);
+        font-weight: 200 1000;
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        src: url(../../../fonts/jetbrains-mono-bold.woff2);
+      }
+      body {
+        margin: 0;
+        background: #000;
+      }
+      .chip {
+        position: relative;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        width: 40px;
+        height: 40px;
+        background-size: cover;
+        background-position: center;
+      }
+      .chip span {
+        position: relative;
+        line-height: 1;
+      }
+      .chip::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      /*the hill with a 1 from the minesweeper board*/
+      #classic {
+        background-image: url(../../../background.jpg);
+        background-size: 420%;
+        background-position: 30% 62%;
+      }
+      #classic span {
+        font: 22px Pixel;
+        color: #0000ff;
+      }
+
+      /*neon outline with the chromatic split and vhs scanlines*/
+      #synthwave {
+        background-image: url(../../../synthwave.webp);
+        background-size: 300%;
+        background-position: 50% 45%;
+      }
+      #synthwave span {
+        font: 900 22px sans-serif;
+        color: #fff;
+        text-shadow:
+          0 0 2px #ff7edb,
+          0 0 5px #f92aad,
+          -1px 0 0 #36f9f6,
+          1px 0 0 #f92aad;
+      }
+      #synthwave::after {
+        background: repeating-linear-gradient(rgba(0, 0, 0, 0.3) 0 1px, transparent 1px 3px);
+      }
+
+      /*a rain glyph, mirrored and glowing like the rain's own, under crt scanlines*/
+      #matrix {
+        background-image: url(still-matrix.jpg);
+        background-color: #000;
+      }
+      #matrix span {
+        font:
+          24px 'MS Gothic',
+          monospace;
+        color: #d4ffe0;
+        transform: scaleX(-1);
+        text-shadow:
+          0 0 3px #2cff6e,
+          0 0 8px #2cff6e;
+      }
+      #matrix::after {
+        background:
+          repeating-linear-gradient(rgba(0, 0, 0, 0.5) 0 1px, transparent 1px 3px),
+          radial-gradient(transparent 40%, rgba(0, 0, 0, 0.6));
+      }
+
+      /*the n rune in frost over substrate's cracks*/
+      #nord {
+        background-image: url(still-nord.jpg);
+        background-size: 160%;
+      }
+      #nord span {
+        font:
+          800 24px Nunito,
+          'Segoe UI Historic';
+        color: #88c0d0;
+        text-shadow: 0 1px 2px rgba(46, 52, 64, 0.8);
+      }
+
+      /*a sun over truchet's arcs*/
+      #solarized {
+        background-image: url(still-solarized.jpg);
+        background-size: 200%;
+      }
+      #solarized span {
+        font:
+          24px 'JetBrains Mono',
+          'Segoe UI Symbol';
+        color: #fdf6e3;
+        text-shadow: 0 1px 0 #002b36;
+      }
+
+      /*a prompt in glowing phosphor under scanlines*/
+      #solarized-phosphor {
+        background-image: url(still-solarized-phosphor.jpg);
+        background-size: 230%;
+        background-position: 0 0;
+      }
+      #solarized-phosphor span {
+        font: 20px 'JetBrains Mono';
+        color: #93e0d6;
+        text-shadow:
+          0 0 4px #2aa198,
+          0 0 9px #2aa198;
+        letter-spacing: -1px;
+      }
+      #solarized-phosphor::after {
+        background: repeating-linear-gradient(rgba(0, 43, 54, 0.45) 0 1px, transparent 1px 3px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chip" id="classic"><span>1</span></div>
+    <div class="chip" id="synthwave"><span>△</span></div>
+    <div class="chip" id="matrix"><span>ｼ</span></div>
+    <div class="chip" id="nord"><span>ᚾ</span></div>
+    <div class="chip" id="solarized"><span>☼</span></div>
+    <div class="chip" id="solarized-phosphor"><span>&gt;_</span></div>
+  </body>
+</html>

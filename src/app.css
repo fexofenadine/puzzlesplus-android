@@ -871,3 +871,22 @@ main::before {
   [class*='Game_scoreboard'] {
   border-color: transparent;
 }
+
+/*a game held sideways: its bar stands down both sides, leaving the board the full height*/
+@media (orientation: landscape) {
+  :root[data-phone][data-sides] {
+    --phone-bar: env(safe-area-inset-top);
+    --phone-left: calc(52px + env(safe-area-inset-left));
+    --phone-right: calc(52px + env(safe-area-inset-right));
+  }
+
+  :root[data-phone][data-sides] main {
+    padding-right: var(--phone-right);
+    padding-left: var(--phone-left);
+  }
+
+  :root[data-phone][data-sides] [class*='Overlay_root'] {
+    left: var(--phone-left);
+    width: calc(100% - var(--phone-left) - var(--phone-right));
+  }
+}

@@ -207,8 +207,7 @@
 }
 
 /*material's ticks, not drawn on classic*/
-.tick,
-.swatchTick {
+.tick {
   display: none;
 }
 
@@ -216,9 +215,11 @@
   min-width: 0;
 }
 
+/*a theme's picture*/
 .swatch {
-  width: 12px;
-  height: 12px;
+  width: 22px;
+  height: 22px;
+  background-size: cover;
   border: 1px solid #000;
 }
 
@@ -587,11 +588,6 @@
   outline-offset: 3px;
 }
 
-:root:not([data-theme='classic']) .swatchTick {
-  display: block;
-  fill: #fff;
-}
-
 /*switches at the end of their rows*/
 :root:not([data-theme='classic']) .row {
   min-height: 52px;
@@ -687,5 +683,77 @@
   .drawer,
   .sheet {
     animation: none !important;
+  }
+}
+
+/*a game's bar is two halves round its title, in one row while the phone is upright:*/
+/*menu, title, then the rest*/
+.split {
+  composes: bar;
+}
+
+.side {
+  display: contents;
+}
+
+.split .title {
+  order: 1;
+}
+
+.split .side > * {
+  order: 2;
+}
+
+.split .side:first-child > :first-child {
+  order: 0;
+}
+
+/*held sideways the halves stand down the screen's two sides and the title goes,*/
+/*so the board has the full height*/
+@media (orientation: landscape) {
+  .split,
+  :root:not([data-theme='classic']) .split {
+    bottom: 0;
+    display: block;
+    height: auto;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  .split .title {
+    display: none;
+  }
+
+  .split .side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    box-sizing: border-box;
+    width: var(--phone-left);
+    padding: calc(6px + env(safe-area-inset-top)) 0 env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+    background: linear-gradient(to bottom, var(--title-start), var(--title-end));
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+  }
+
+  .split .side:last-child {
+    right: 0;
+    left: auto;
+    width: var(--phone-right);
+    padding-right: env(safe-area-inset-right);
+    padding-left: 0;
+  }
+
+  :root:not([data-theme='classic']) .split .side {
+    background: var(--md-bar);
+    box-shadow: none;
   }
 }

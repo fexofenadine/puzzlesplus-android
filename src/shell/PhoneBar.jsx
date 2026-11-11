@@ -6,6 +6,14 @@ import { backgroundFor } from './backgrounds'
 import avatar from './avatar.png'
 import { pageUrl } from './phone'
 import { clockText } from './ResumeItems'
+import Backup from './BackupBox'
+import Share from './ShareBox'
+import classic from './chips/classic.webp'
+import synthwave from './chips/synthwave.webp'
+import matrix from './chips/matrix.webp'
+import nord from './chips/nord.webp'
+import solarized from './chips/solarized.webp'
+import phosphor from './chips/solarized-phosphor.webp'
 
 //material symbols paths (apache 2.0)
 const MENU = 'M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z'
@@ -26,15 +34,26 @@ export const TROPHY =
 const WALLPAPER =
   'M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z'
 
-//short names and a swatch of each theme for the theme picker
+//short names and a picture of each theme for the theme picker: a piece of its background
+//under a glyph in its look, drawn by chips/source/chips.py
 const themeChips = [
-  ['classic', 'Classic', '#0a246a'],
-  ['synthwave', 'Synthwave', '#ff7edb'],
-  ['matrix', 'Matrix', '#0b6e24'],
-  ['nord', 'Nord', '#88c0d0'],
-  ['solarized', 'Solarized', '#268bd2'],
-  ['solarized-phosphor', 'Phosphor', '#2aa198'],
+  ['classic', 'Classic', classic],
+  ['synthwave', 'Synthwave', synthwave],
+  ['matrix', 'Matrix', matrix],
+  ['nord', 'Nord', nord],
+  ['solarized', 'Solarized', solarized],
+  ['solarized-phosphor', 'Phosphor', phosphor],
 ]
+
+//more material symbols: today, redo, link, save alt
+const TODAY =
+  'M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'
+const REDO =
+  'M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z'
+const LINK =
+  'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z'
+const SAVE =
+  'M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z'
 
 const Icon = ({ d, class: name }) => (
   <svg class={name} width="24" height="24" viewBox="0 0 24 24">
@@ -72,11 +91,7 @@ export const Chips = ({ label, options, value, onPick, actions, kind = 'chips' }
           onPick(option)
         }}
       >
-        {swatch && (
-          <span class={s.swatch} style={{ background: swatch }}>
-            {option === value && <Icon class={s.swatchTick} d={CHECK} />}
-          </span>
-        )}
+        {swatch && <span class={s.swatch} style={{ backgroundImage: `url(${swatch})` }} />}
         {!swatch && option === value && <Icon class={s.tick} d={CHECK} />}
         <span class={s.chipName}>{name}</span>
       </button>
@@ -110,6 +125,19 @@ export const Item = ({ icon, d, name, end, active, onClick, actions }) => (
   </button>
 )
 
+//the day's board, redo and a link to the board, for the games that have them
+export const PlayItems = ({ state, actions }) => [
+  <Item
+    d={TODAY}
+    name="Daily puzzle"
+    active={Boolean(state.game.daily)}
+    onClick={() => actions.newGame({ daily: true })}
+    actions={actions}
+  />,
+  <Item d={REDO} name="Redo" onClick={() => actions.redo()} actions={actions} />,
+  <Item d={LINK} name="Copy link" onClick={() => actions.share()} actions={actions} />,
+]
+
 //a slider that applies as it moves
 const Range = ({ name, value, onInput }) => (
   <label class={s.range}>
@@ -137,32 +165,41 @@ const PhoneBar = (
 ) => {
   const name = page && games.find(([id]) => id === page)[1]
   return (
-    <div key={key}>
-      <header class={s.bar}>
-        {back ? (
+    <div
+      key={key}
+      oncreate={() => {
+        //a game's bar splits down the sides of a screen held sideways, the stylesheet makes room
+        if (!back) document.documentElement.dataset.sides = ''
+      }}
+    >
+      {back ? (
+        <header class={s.bar}>
           <a class={s.button} href={pageUrl(back)} title="Back">
             <Icon d={BACK} />
           </a>
-        ) : (
-          <BarButton title="Menu" d={MENU} onClick={() => actions.toggleDrawer()} />
-        )}
-        {/*the side panel says puzzles plus, so the bar has room for the game's own name*/}
-        <span class={s.title}>{(title || '').replace(/ Plus$/, '')}</span>
-        {!back && <BarButton title="New game" d={NEW} onClick={() => actions.newGame()} />}
-        {!back && <BarButton title="Hint" d={HINT} onClick={() => actions.hint()} />}
-        {!back && (
-          <BarButton title="Best times" d={TROPHY} onClick={() => actions.toggleBestTime()} />
-        )}
-        {!back && (
-          <BarButton
-            title={paused ? 'Resume' : 'Pause'}
-            d={paused ? PLAY : PAUSE}
-            disabled={!canPause}
-            onClick={() => actions.pause()}
-          />
-        )}
-        {!back && <BarButton title="Options" d={TUNE} onClick={() => actions.toggleSheet()} />}
-      </header>
+          <span class={s.title}>{title}</span>
+        </header>
+      ) : (
+        <header class={s.split}>
+          <div class={s.side}>
+            <BarButton title="Menu" d={MENU} onClick={() => actions.toggleDrawer()} />
+            <BarButton title="New game" d={NEW} onClick={() => actions.newGame()} />
+            <BarButton title="Hint" d={HINT} onClick={() => actions.hint()} />
+          </div>
+          {/*the side panel says puzzles plus, so the bar has room for the game's own name*/}
+          <span class={s.title}>{(title || '').replace(/ Plus$/, '')}</span>
+          <div class={s.side}>
+            <BarButton title="Best times" d={TROPHY} onClick={() => actions.toggleBestTime()} />
+            <BarButton
+              title={paused ? 'Resume' : 'Pause'}
+              d={paused ? PLAY : PAUSE}
+              disabled={!canPause}
+              onClick={() => actions.pause()}
+            />
+            <BarButton title="Options" d={TUNE} onClick={() => actions.toggleSheet()} />
+          </div>
+        </header>
+      )}
       {(state.drawer || state.sheet) && (
         <div class={s.shade} onclick={() => actions.closeDrawer()} />
       )}
@@ -204,6 +241,7 @@ const PhoneBar = (
               onClick={go(`${root}how-to-play/`)}
               actions={actions}
             />
+            <Item d={SAVE} name="Backup" onClick={actions.toggleBackup} actions={actions} />
             <Item d={INFO} name="About" onClick={actions.toggleAbout} actions={actions} />
           </Section>
         </nav>
@@ -249,6 +287,8 @@ const PhoneBar = (
           </Section>
         </div>
       )}
+      {state.share && <Share key="share" state={state.share} actions={actions} />}
+      {state.backup && <Backup key="backup" state={state.backup} actions={actions} />}
     </div>
   )
 }
