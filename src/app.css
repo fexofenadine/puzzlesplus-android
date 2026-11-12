@@ -889,4 +889,35 @@ main::before {
     left: var(--phone-left);
     width: calc(100% - var(--phone-left) - var(--phone-right));
   }
+
+  /*the screen is short, so the window goes nearly to its top and bottom*/
+  :root[data-phone][data-sides] [class*='Dialog_a']:not([class*='Overlay_root'] *) {
+    margin: 4px 16px;
+  }
+
+  /*the card keeps only a thin edge, the frame's invisible borders give up their room*/
+  :root[data-phone][data-sides][data-card]:not([data-theme='classic'])
+    [class*='Dialog_dialog']:not([class*='Overlay_root'] *) {
+    padding: 3px 6px;
+    border-radius: 14px;
+  }
+
+  :root[data-phone][data-sides][data-card]:not([data-theme='classic'])
+    [class*='Dialog_dialog']:not([class*='Overlay_root'] *)
+    [class*='Dialog_container'] {
+    padding: 0;
+    border-width: 0;
+  }
+
+  :root[data-phone][data-sides][data-card]:not([data-theme='classic'])
+    [class*='Dialog_dialog']:not([class*='Overlay_root'] *)
+    [class*='Game_root'] {
+    padding: 2px;
+    border-width: 0;
+  }
+}
+
+/*the phone's own bar has pause, so the scoreboard keeps its width*/
+:root[data-phone] [class*='SideButton_pause'] {
+  display: none;
 }
