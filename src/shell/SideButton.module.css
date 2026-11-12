@@ -35,6 +35,11 @@
   cursor: default;
 }
 
+/*marks the pause button, which a phone leaves to its own bar*/
+.pause {
+  flex: none;
+}
+
 .root svg {
   display: block;
   fill: currentColor;

@@ -5,7 +5,13 @@ import s from './Game.module.css'
 import Dialog from '../Dialog'
 import Digit from '../Digit'
 import Play from '../Play'
-import SideButton, { CrossIcon, FillIcon, HintIcon, UndoIcon } from '../shell/SideButton'
+import SideButton, {
+  CrossIcon,
+  FillIcon,
+  HintIcon,
+  PauseButton,
+  UndoIcon,
+} from '../shell/SideButton'
 import WindowControls, { windowProps } from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { guideTopic } from './hint'
@@ -95,6 +101,9 @@ const Game = ({ key, state, actions }) => {
             >
               <HintIcon />
             </SideButton>
+            {game.n >= 15 && (
+              <PauseButton {...windowProps(state, actions, paused, running(game))} />
+            )}
             {state.touch && (
               <SideButton
                 title={state.mode === FILL ? 'Taps fill cells' : 'Taps cross cells out'}

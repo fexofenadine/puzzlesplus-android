@@ -5,7 +5,7 @@ import s from './Board2048.module.css'
 import Dialog from '../Dialog'
 import Digit from '../Digit'
 import Play from '../Play'
-import SideButton, { HintIcon, UndoIcon } from '../shell/SideButton'
+import SideButton, { HintIcon, PauseButton, UndoIcon } from '../shell/SideButton'
 import WindowControls, { windowProps } from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { watchWindow } from '../shell/zoom'
@@ -103,6 +103,7 @@ const Game = ({ key, state, actions }) => {
             <SideButton title="Hint (H)" disabled={game.over || paused} onClick={actions.hint}>
               <HintIcon />
             </SideButton>
+            <PauseButton {...windowProps(state, actions, paused, running(game))} />
           </div>
           <Digit
             value={game.time}

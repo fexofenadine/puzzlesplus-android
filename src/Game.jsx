@@ -5,7 +5,7 @@ import Menu from './Menu'
 import Digit from './Digit'
 import Play from './Play'
 import Cell from './Cell'
-import SideButton, { HintIcon } from './shell/SideButton'
+import SideButton, { HintIcon, PauseButton } from './shell/SideButton'
 import WindowControls, { windowProps } from './shell/WindowControls'
 import { PausedCover, HintPanel } from './shell/Board'
 import { guideTopic } from './hint'
@@ -21,6 +21,9 @@ export const running = ({ start, win, lose }) => start >= 0 && !win && !lose
 
 //wide boards on portrait screens are shown transposed, cells keep their own x and y
 export const transposed = ({ portrait, game }) => portrait && game.width > game.height
+
+//columns a board needs before the scoreboard fits a pause button without widening the window
+const ROOMY = 11
 
 const rowsOf = (state) => {
   const { field } = state.game
@@ -46,7 +49,10 @@ const Game = ({ key, state, actions }) => (
     titleHint="Double-click for 100% zoom"
     onTitleDoubleClick={() => actions.zoom(0)}
     controls={
-      <WindowControls {...windowProps(state, actions, state.game.paused, running(state.game))} />
+      <WindowControls
+        {...windowProps(state, actions, state.game.paused, running(state.game))}
+        original={state.theme === 'classic'}
+      />
     }
     onClose={actions.close}
     onCreate={(dialog) => {
@@ -71,6 +77,11 @@ const Game = ({ key, state, actions }) => (
             >
               <HintIcon />
             </SideButton>
+            {(transposed(state) ? state.game.height : state.game.width) >= ROOMY && (
+              <PauseButton
+                {...windowProps(state, actions, state.game.paused, running(state.game))}
+              />
+            )}
           </div>
         )}
         <Digit

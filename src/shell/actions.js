@@ -3,6 +3,7 @@ import { makeSheet } from './Boss'
 import { importData } from './backup'
 import { copy, linkOf } from './share'
 import { load, save } from './storage'
+import { fireworksKey, fireworksOn } from './fireworks'
 import { themes } from './themes'
 import { closeDialog, leave, listenPhone, pageUrl, phone } from './phone'
 import { games } from './GameLinks'
@@ -79,7 +80,7 @@ export const shellState = (page, root = '../') => ({
   backgrounds: loadSettings(),
   backgroundSettings: null,
   glass: loadGlass(),
-  fireworks: load('fireworks') !== 'off',
+  fireworks: fireworksOn(page, loadTheme()),
   howTo: false,
   about: false,
   //the copy link and backup dialogs, null while shut
@@ -341,8 +342,9 @@ export const shellActions = {
     },
   toggleFireworks:
     () =>
-    ({ fireworks }) => {
-      save('fireworks', fireworks ? 'off' : '')
+    ({ fireworks, page, theme }) => {
+      const key = fireworksKey(page, theme)
+      save(key, key === 'fireworks' ? (fireworks ? 'off' : '') : fireworks ? '' : 'on')
       return { menu: null, fireworks: !fireworks }
     },
   //a phone's options sheet sets the opacity straight away, saved as it goes
@@ -387,14 +389,17 @@ export const shellActions = {
       applyZoom(scale)
       return { menu: null, zoom: { chosen, scale, seen: size, maximised: false } }
     },
-  setTheme: (theme) => () => {
-    save('theme', theme)
-    document.documentElement.dataset.theme = theme
-    return {
-      menu: null,
-      theme,
-    }
-  },
+  setTheme:
+    (theme) =>
+    ({ page }) => {
+      save('theme', theme)
+      document.documentElement.dataset.theme = theme
+      return {
+        menu: null,
+        theme,
+        fireworks: fireworksOn(page, theme),
+      }
+    },
   toggleMenu:
     (event) =>
     ({ menu }) => {

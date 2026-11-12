@@ -507,7 +507,7 @@ export const actions = {
         stopTick(game.raf)
         tally('minesweeper', { won: !lose, clean: !game.hinted })
         if (!lose) {
-          celebrate()
+          celebrate('minesweeper')
           actions.win()
         }
       }

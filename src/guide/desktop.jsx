@@ -22,9 +22,10 @@ export const desktopSection = {
         to fit, but not below about 10 pixel cells, where the page scrolls instead.
       </li>
       <li>
-        <b>Pause</b> (the title bar button or P) stops the clock and hides the board. The game also
-        pauses when you switch tabs or windows, and waits for you to press play. A game in progress
-        is kept when you leave or reload the page, and comes back paused at the same time.
+        <b>Pause</b> (the title bar button, the one beside the hint on larger boards, or P) stops
+        the clock and hides the board. The game also pauses when you switch tabs or windows, and
+        waits for you to press play. A game in progress is kept when you leave or reload the page,
+        and comes back paused at the same time.
       </li>
       <li>
         <b>Timer</b> in the Game menu turns the clock off. It shows dashes, and a game played with

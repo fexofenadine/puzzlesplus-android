@@ -4,7 +4,7 @@ import s from './Game.module.css'
 import Dialog from '../Dialog'
 import Digit from '../Digit'
 import Play from '../Play'
-import SideButton, { HintIcon, UndoIcon } from '../shell/SideButton'
+import SideButton, { HintIcon, PauseButton, UndoIcon } from '../shell/SideButton'
 import WindowControls, { windowProps } from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { guideTopic } from './hint'
@@ -62,6 +62,7 @@ const Game = ({ key, state, actions }) => {
             >
               <HintIcon />
             </SideButton>
+            {n >= 10 && <PauseButton {...windowProps(state, actions, paused, running(game))} />}
           </div>
           <Digit
             value={game.time}

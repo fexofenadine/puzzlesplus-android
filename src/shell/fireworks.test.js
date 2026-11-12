@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { advance, celebrate, launch, lookOf, sparks } from './fireworks'
+import { advance, celebrate, fireworksOn, launch, lookOf, sparks } from './fireworks'
 import { themes } from './themes'
 import { random } from './random'
 
@@ -138,6 +138,18 @@ it('stays quiet when off, hidden, reduced or under the boss key', () => {
   document.documentElement.dataset.boss = 'on'
   celebrate()
   expect(frames.length).toBe(0)
+})
+
+it('keeps classic minesweeper quiet unless its own setting is on', () => {
+  celebrate('minesweeper', 'classic')
+  expect(frames.length).toBe(0)
+  expect(fireworksOn('takuzu', 'classic')).toBe(true)
+  expect(fireworksOn('minesweeper', 'nord')).toBe(true)
+  localStorage.setItem('minesweeper.fireworks', 'on')
+  localStorage.setItem('fireworks', 'off')
+  expect(fireworksOn('minesweeper', 'classic')).toBe(true)
+  expect(fireworksOn('minesweeper', 'nord')).toBe(false)
+  localStorage.clear()
 })
 
 it('stops at once when the boss key comes up mid show', () => {

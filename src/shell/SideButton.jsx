@@ -1,11 +1,12 @@
 import { h } from 'hyperapp'
 import s from './SideButton.module.css'
+import { cx } from './classes'
 
 //a small scoreboard button beside the face, drawn like it
-const SideButton = ({ title, disabled, onClick }, children) => (
+const SideButton = ({ title, disabled, onClick, pause }, children) => (
   <button
     type="button"
-    class={s.root}
+    class={cx(s.root, pause && s.pause)}
     tabindex={-1}
     title={title}
     disabled={disabled}
@@ -23,6 +24,18 @@ export const HintIcon = () => (
 
 export const UndoIcon = () => (
   <path d="M8 4L3 8.5 8 13v-3h4.5a2.5 2.5 0 0 1 0 5H9v2h3.5a4.5 4.5 0 0 0 0-9H8z" />
+)
+
+//the title bar's pause again, easier to find, for boards with room to spare beside the hint
+export const PauseButton = ({ paused, canPause, onPause }) => (
+  <SideButton
+    title={paused ? 'Resume (P)' : 'Pause (P)'}
+    disabled={!canPause}
+    onClick={() => onPause()}
+    pause
+  >
+    <path d={paused ? 'M7 4.5v10l7.5-5z' : 'M5.5 5h3v9h-3zM10.5 5h3v9h-3z'} />
+  </SideButton>
 )
 
 export const FillIcon = () => <path d="M4 4h11v11H4z" />

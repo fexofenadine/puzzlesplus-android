@@ -125,11 +125,20 @@ const place = () => {
   return canvas
 }
 
+//classic minesweeper keeps the original's quiet win, so its fireworks are a setting of their own, off at first
+export const fireworksKey = (page, theme) =>
+  page === 'minesweeper' && theme === 'classic' ? 'minesweeper.fireworks' : 'fireworks'
+
+export const fireworksOn = (page, theme) =>
+  fireworksKey(page, theme) === 'fireworks'
+    ? load('fireworks') !== 'off'
+    : load('minesweeper.fireworks') === 'on'
+
 //a show for a win, unless they are off, the tab is hidden, the boss key is up or motion is reduced
 //it keeps launching until the next press or key (not one that came before it, nor a held key
 //repeating) or two minutes, then the rockets and bursts in the air finish
-export const celebrate = (theme = document.documentElement.dataset.theme) => {
-  if (running || load('fireworks') === 'off' || document.hidden || calm()) return
+export const celebrate = (page, theme = document.documentElement.dataset.theme) => {
+  if (running || !fireworksOn(page, theme) || document.hidden || calm()) return
   const root = document.documentElement
   if (root.dataset.boss) return
   const target = place()
