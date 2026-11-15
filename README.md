@@ -2,7 +2,7 @@
 
 # Puzzles Plus for Android
 
-Minesweeper, Takuzu, Nonograms, Sudoku, 2048 and Light Up in a Windows 95 style, with hints that explain their reasoning and boards you can solve by logic alone, as an Android app. It is the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) ([source](https://github.com/fexofenadine/puzzlesplus)) made for phones: the same games, six themes and animated backgrounds, guides and best times, all inside the app so it plays offline.
+Minesweeper, Takuzu, Nonograms, Sudoku, 2048, Light Up and Futoshiki in a Windows 95 style, with hints that explain their reasoning and boards you can solve by logic alone, as an Android app. It is the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) ([source](https://github.com/fexofenadine/puzzlesplus)) made for phones: the same games, six themes and animated backgrounds, guides and best times, all inside the app so it plays offline.
 
 **[Download the latest release](https://github.com/fexofenadine/puzzlesplus-android/releases/latest)**
 
@@ -21,7 +21,7 @@ Android 6 or later. Each release lists its APK's SHA-256, so you can check the d
 ## On a phone
 
 - **The game fills the screen** under a top bar in the theme's colours with new game, hint, pause and options. Wide boards turn on their side in portrait.
-- **The menu** (the button at the top left) lists the six games, any games you saved to resume later, each game's guide, how to play and About.
+- **The menu** (the button at the top left) lists the seven games, any games you saved to resume later, each game's guide, how to play and About.
 - **Options** (the button at the top right) hold the game's difficulty, size and options (Nonograms adds Procedural, Symmetric and Choose picture), then the eight themes, **Fireworks**, a slider for the window's opacity, Hide window, Board without frame and the background settings. The look follows the theme: Windows 95 on Classic, material design on the others.
 - **Fireworks** in the theme's colours go up when you win, until you tap or press a key.
 - **The back button** closes the menu or a dialog first, then leaves the app; a guide's back goes to its game.

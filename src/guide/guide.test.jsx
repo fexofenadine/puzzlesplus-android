@@ -20,6 +20,15 @@ import {
 } from './LightUpExample'
 import { examples as lightExamples, parts as lightParts, solved as lightSolved } from './lightup'
 import { solved as lightIsSolved } from '../lightup/rules'
+import { exampleStep as futoshikiStep, puzzleOf as futoshikiPuzzle } from './FutoshikiExample'
+import {
+  examples as futoshikiExamples,
+  parts as futoshikiParts,
+  solved as futoshikiSolved,
+} from './futoshiki'
+import { solved as futoshikiIsSolved } from '../futoshiki/rules'
+import { countSolutions as futoshikiCount } from '../futoshiki/solver'
+import { guideTopic as futoshikiTopic } from '../futoshiki/hint'
 
 const ids = (parts) => parts.flatMap((part) => part.sections.map((section) => section.id))
 
@@ -75,6 +84,18 @@ it('finds every light up technique in its example, as the easiest step there', (
   expect(lightIsSolved(layout, board, n)).toBe(true)
 })
 
+it('reaches every futoshiki technique in its example before any digit can be placed', () => {
+  for (const [technique, example] of Object.entries(futoshikiExamples)) {
+    expect(futoshikiStep(example, technique), technique).toBeTruthy()
+    expect(ids(futoshikiParts)).toContain(futoshikiTopic({ kind: technique }))
+    //each is a real puzzle part way through: one answer
+    expect(futoshikiCount(futoshikiPuzzle(example)), technique).toBe(1)
+  }
+  expect(ids(futoshikiParts)).toContain('mistakes')
+  const puzzle = futoshikiPuzzle(futoshikiSolved)
+  expect(futoshikiIsSolved(puzzle.givens, puzzle)).toBe(true)
+})
+
 //every hint a game gives lands on a section of its guide
 it('has a section for every topic a hint can link to', () => {
   const minesTopics = ['wrong-flags', 'chording', 'guessing', 'first-click', 'mine-counter']
@@ -91,6 +112,7 @@ it('renders every guide without crashing', async () => {
     sudokuParts,
     twentyParts,
     lightParts,
+    futoshikiParts,
     howToParts,
   ]) {
     const container = document.createElement('div')

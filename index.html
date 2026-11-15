@@ -5,14 +5,14 @@
     <title>Puzzles Plus</title>
     <meta
       name="description"
-      content="Free Windows style puzzle games: Minesweeper, Takuzu, Nonograms, Sudoku, 2048 and Light Up, with hints that explain themselves"
+      content="Free Windows style puzzle games: Minesweeper, Takuzu, Nonograms, Sudoku, 2048, Light Up and Futoshiki, with hints that explain themselves"
     />
     <!--the games live in their own folders, old links land on the last game or minesweeper-->
     <meta http-equiv="refresh" content="0; url=minesweeper/index.html" />
     <meta property="og:title" content="Puzzles Plus" />
     <meta
       property="og:description"
-      content="Free Windows style puzzle games: Minesweeper, Takuzu, Nonograms, Sudoku, 2048 and Light Up, with hints that explain themselves"
+      content="Free Windows style puzzle games: Minesweeper, Takuzu, Nonograms, Sudoku, 2048, Light Up and Futoshiki, with hints that explain themselves"
     />
     <meta property="og:url" content="https://fexofenadine.github.io/puzzlesplus/" />
     <meta property="og:image" content="https://fexofenadine.github.io/puzzlesplus/preview.png" />
@@ -27,7 +27,7 @@
       var game = 'minesweeper'
       try {
         var last = localStorage.getItem('lastGame')
-        if (/^(minesweeper|takuzu|nonograms|sudoku|2048|lightup)$/.test(last)) game = last
+        if (/^(minesweeper|takuzu|nonograms|sudoku|2048|lightup|futoshiki)$/.test(last)) game = last
       } catch (error) {}
       location.replace(game + '/index.html' + location.search + location.hash)
     </script>

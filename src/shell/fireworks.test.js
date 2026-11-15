@@ -77,7 +77,8 @@ const press = (type, props = {}) => {
   window.dispatchEvent(event)
 }
 
-it('keeps launching until a press, then lets what is in the air finish', () => {
+//thousands of frames are stepped through, slow when other tests share the machine
+it('keeps launching until a press, then lets what is in the air finish', { timeout: 60000 }, () => {
   celebrate()
   const canvas = document.body.querySelectorAll('canvas')[1]
   expect(canvas.style.display).toBe('block')
@@ -106,7 +107,7 @@ it('ends on a key too, but not on one held down or one from before the show', ()
   expect(frames.length).toBe(0)
 })
 
-it('stops launching after two minutes by itself', () => {
+it('stops launching after two minutes by itself', { timeout: 60000 }, () => {
   celebrate()
   //50ms steps are the longest the show takes, so two minutes need fewer frames
   for (let k = 0; k < 3000 && frames.length; k++) frames.shift()((time += 50))

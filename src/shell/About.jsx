@@ -23,9 +23,9 @@ const About = ({ key, name, actions, credits }, children) => (
         <p>
           Puzzles Plus began as a fork of{' '}
           <Link href="https://github.com/frenzzy/minesweeper">Minesweeper</Link> by Vladimir Kutepov
-          and has grown far beyond it: six games, hints that explain their reasoning, guides, themes
-          and animated backgrounds, with little of the original left outside the Classic Minesweeper
-          board. Released under the MIT licence.
+          and has grown far beyond it: seven games, hints that explain their reasoning, guides,
+          themes and animated backgrounds, with little of the original left outside the Classic
+          Minesweeper board. Released under the MIT licence.
         </p>
         <p>
           <Link href="https://github.com/fexofenadine/puzzlesplus">

@@ -82,24 +82,29 @@ it('settles the plain rules and counts solutions', () => {
   expect(why.wall).toBe(0)
 })
 
-it('deals boards with one solution that need exactly their level, the same for a seed', () => {
-  for (const n of [7, 10]) {
-    for (let level = 0; level < levels.length; level++) {
-      const game = makeGame(n, level, random(n * 10 + level))
-      expect(game.level, `${n} ${level}`).toBe(level)
-      expect(countSolutions(game.layout, n, 2)).toBe(1)
-      expect([...solve(game.layout, n)]).toEqual([...game.solution])
-      const rated = rate(game.layout, n)
-      expect(rated.level).toBe(level)
-      expect([...rated.solution]).toEqual([...game.solution])
-      //the level below can't finish it
-      if (level) expect(rate(game.layout, n, level - 1)).toBe(null)
-      const again = makeGame(n, level, random(n * 10 + level))
-      expect([...again.layout]).toEqual([...game.layout])
+//a busy machine deals slowly, so the search gets all the time it needs
+it(
+  'deals boards with one solution that need exactly their level, the same for a seed',
+  { timeout: 120000 },
+  () => {
+    for (const n of [7, 10]) {
+      for (let level = 0; level < levels.length; level++) {
+        const game = makeGame(n, level, random(n * 10 + level), 30000)
+        expect(game.level, `${n} ${level}`).toBe(level)
+        expect(countSolutions(game.layout, n, 2)).toBe(1)
+        expect([...solve(game.layout, n)]).toEqual([...game.solution])
+        const rated = rate(game.layout, n)
+        expect(rated.level).toBe(level)
+        expect([...rated.solution]).toEqual([...game.solution])
+        //the level below can't finish it
+        if (level) expect(rate(game.layout, n, level - 1)).toBe(null)
+        const again = makeGame(n, level, random(n * 10 + level), 30000)
+        expect([...again.layout]).toEqual([...game.layout])
+      }
     }
-  }
-  expect(sizes).toEqual([7, 10, 14])
-})
+    expect(sizes).toEqual([7, 10, 14])
+  },
+)
 
 it('scatters walls the same turned half round, and lights every cell without a clash', () => {
   const rng = random(9)

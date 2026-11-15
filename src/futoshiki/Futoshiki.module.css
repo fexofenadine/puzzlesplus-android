@@ -1,0 +1,51 @@
+/*the field and the pad under it, as wide as the field and centred*/
+.board {
+  --size: 32px;
+  --gap: 15px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/*cells stand apart on the window's face, the signs sit in the gaps between them*/
+.field {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tracks);
+  grid-template-rows: var(--tracks);
+  padding: 6px;
+  background: var(--panel);
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*each cell has its own frame, where sudoku's share the field's lines*/
+.field > button {
+  outline: 1px solid var(--grid-line, var(--dark-shadow));
+}
+
+.active {
+  composes: field;
+  cursor: pointer;
+}
+
+.inactive {
+  composes: field;
+  cursor: default;
+}
+
+.sign {
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  font: bold 16px/1 var(--digit-font, var(--text-font));
+  pointer-events: none;
+}
+
+/*the sign between two rows is the same glyph on its side*/
+.turned {
+  composes: sign;
+  transform: rotate(90deg);
+}

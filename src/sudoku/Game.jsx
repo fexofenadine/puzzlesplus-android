@@ -32,20 +32,21 @@ export const tracks = (n, box) =>
 export const place = (k) => 2 * k + 1
 
 //how a cell stands out: selected, the same digit as the focus, or sharing a unit with the selection
-const lookOf = (i, { selected, focus, board, peers }) => {
+export const lookOf = (i, { selected, focus, board, peers }) => {
   if (i === selected) return 'selected'
   if (focus && board[i] === focus) return 'same'
   if (peers && peers.has(i)) return 'peer'
   return null
 }
 
-const Pad = ({ state, actions, counts }) => {
+//columns are the pad's own tracks where a board's cells are not on sudoku's
+export const Pad = ({ state, actions, counts, columns }) => {
   const { game, picked, noting } = state
   const { n } = game
   const off = game.dealing || game.paused || game.win
   return (
     <div class={s.pad}>
-      <div class={s.digits} style={{ gridTemplateColumns: tracks(n, geometry(n).bw) }}>
+      <div class={s.digits} style={{ gridTemplateColumns: columns || tracks(n, geometry(n).bw) }}>
         {Array.from({ length: n }, (_, k) => (
           <button
             type="button"
