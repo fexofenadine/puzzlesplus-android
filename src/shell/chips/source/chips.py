@@ -1,13 +1,25 @@
 #renders chips.html's theme icons to ../<theme>.webp, 160px for a 40px chip on any screen
-#needs playwright's firefox and pillow: py -3 -I src/shell/chips/source/chips.py
+#needs playwright's firefox and pillow: py -3 -I src/shell/chips/source/chips.py [theme ...]
 import io
 import pathlib
+import sys
 
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
 here = pathlib.Path(__file__).parent
-themes = ['classic', 'synthwave', 'matrix', 'nord', 'solarized', 'solarized-phosphor']
+themes = [
+    'classic',
+    'synthwave',
+    'matrix',
+    'nord',
+    'solarized',
+    'solarized-phosphor',
+    'vaporwave',
+    'everforest',
+]
+#name themes to render only those, the rest keep their files
+themes = sys.argv[1:] or themes
 
 with sync_playwright() as p:
     browser = p.firefox.launch()

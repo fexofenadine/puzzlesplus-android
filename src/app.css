@@ -797,6 +797,40 @@ main::before {
   --md-switch-off: #0d0208;
 }
 
+/*the vaporwave pastels: pink bar, lavender surfaces, purple for what is chosen*/
+:root[data-phone][data-theme='vaporwave'] {
+  --md-bar: #ff71ce;
+  --md-panel: #e4def2;
+  --md-high: #efeaf8;
+  --md-card: rgba(214, 207, 230, 0.88);
+  --md-outline: #8f84b0;
+  --md-outline-variant: #bdb3d9;
+  --md-on: #2b1b4a;
+  --md-on-variant: #5b4d85;
+  --md-primary: #7b3fe4;
+  --md-on-primary: #fff;
+  --md-sec-cont: #b8f3ff;
+  --md-on-sec-cont: #2b1b4a;
+  --md-switch-off: #d6cfe6;
+}
+
+/*sainnhe's everforest dark: bg0 to bg3, fg, green #a7c080 and aqua #83c092*/
+:root[data-phone][data-theme='everforest'] {
+  --md-bar: #343f44;
+  --md-panel: #343f44;
+  --md-high: #3d484d;
+  --md-card: rgba(45, 53, 59, 0.86);
+  --md-outline: #7a8478;
+  --md-outline-variant: #475258;
+  --md-on: #d3c6aa;
+  --md-on-variant: #9da9a0;
+  --md-primary: #a7c080;
+  --md-on-primary: #2d353b;
+  --md-sec-cont: #3f6b5c;
+  --md-on-sec-cont: #f3ead3;
+  --md-switch-off: #3d484d;
+}
+
 /*material dialogs on the phone: everything that opens over the game, every theme but classic*/
 :root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] {
   background: rgba(0, 0, 0, 0.4);

@@ -549,10 +549,12 @@
 }
 
 /*round theme swatches with their names under them*/
+/*eight themes, four to a row*/
 :root:not([data-theme='classic']) .swatches {
-  flex-wrap: nowrap;
-  gap: 0;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px 0;
+  justify-items: center;
 }
 
 :root:not([data-theme='classic']) .swatches .chip,

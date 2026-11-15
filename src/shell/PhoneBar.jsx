@@ -14,6 +14,8 @@ import matrix from './chips/matrix.webp'
 import nord from './chips/nord.webp'
 import solarized from './chips/solarized.webp'
 import phosphor from './chips/solarized-phosphor.webp'
+import vaporwave from './chips/vaporwave.webp'
+import everforest from './chips/everforest.webp'
 
 //material symbols paths (apache 2.0)
 const MENU = 'M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z'
@@ -43,6 +45,8 @@ const themeChips = [
   ['nord', 'Nord', nord],
   ['solarized', 'Solarized', solarized],
   ['solarized-phosphor', 'Phosphor', phosphor],
+  ['vaporwave', 'Vaporwave', vaporwave],
+  ['everforest', 'Everforest', everforest],
 ]
 
 //more material symbols: today, redo, link, save alt
