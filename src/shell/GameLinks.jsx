@@ -8,6 +8,7 @@ export const games = [
   ['nonograms', 'Nonograms'],
   ['sudoku', 'Sudoku'],
   ['2048', '2048'],
+  ['lightup', 'Light Up'],
 ]
 
 //every game's page for the game menu, the open one checked

@@ -1,0 +1,124 @@
+/*walls in each theme's darkest tone, light in the colour of its smiley*/
+:global(:root) {
+  --lu-wall: var(--dark-shadow);
+  --lu-wall-text: var(--title-text);
+  --lu-light: var(--smiley);
+  --lu-bulb: var(--smiley);
+}
+
+/*matrix's walls would vanish into its black cells' lines, so they are a dim green*/
+:global(:root[data-theme='matrix']) {
+  --lu-wall: #145c2a;
+}
+
+:global(:root[data-theme='vaporwave']) {
+  --lu-light: #fffb96;
+  --lu-bulb: #ff71ce;
+}
+
+.root {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  font: bold 15px/24px var(--digit-font, var(--text-font));
+  text-align: center;
+  border: 0;
+  outline: 0;
+  cursor: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*a white cell lies flat like an opened one in minesweeper, darker until a bulb lights it*/
+.dark {
+  composes: root;
+  background: var(--cell-open, var(--cell));
+  box-shadow: inset 1px 1px 0 var(--grid-line, var(--cell-shadow));
+}
+
+.lit {
+  composes: root;
+  background: color-mix(in srgb, var(--lu-light) 42%, var(--cell-open, var(--cell)));
+  box-shadow: inset 1px 1px 0 var(--grid-line, var(--cell-shadow));
+}
+
+.wall {
+  composes: root;
+  color: var(--lu-wall-text);
+  background: var(--lu-wall);
+  cursor: default;
+}
+
+/*a number with too many bulbs, or no room left for its own*/
+.wallError {
+  color: #fff;
+  background: #c62828;
+}
+
+/*a round bulb with a shine, glowing a little into its cell*/
+.bulb {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 35% 30%, #fff 0 12%, var(--lu-bulb) 45%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--lu-bulb) 55%, #000),
+    0 0 6px 1px color-mix(in srgb, var(--lu-light) 80%, transparent);
+}
+
+/*a cross is a small dot: no bulb here*/
+.cross {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 4px;
+  height: 4px;
+  background: color-mix(in srgb, var(--text) 70%, transparent);
+  border-radius: 50%;
+}
+
+/*a hint's bulb or cross shows faintly until it is placed*/
+.ghost .bulb,
+.ghost .cross {
+  opacity: 0.45;
+}
+
+/*bulbs that light each other*/
+.error {
+  box-shadow: inset 0 0 0 2px #ff2020;
+}
+
+.error .bulb {
+  --lu-bulb: #ff2020;
+}
+
+/*where the arrow keys are*/
+.cursor {
+  z-index: 1;
+  outline: 2px solid var(--highlight);
+  outline-offset: -1px;
+}
+
+/*hint outlines, the same colours minesweeper uses*/
+
+.hintSource {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #2e8bff;
+}
+
+.hintPlace {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #12d12a;
+}
+
+.hintWrong {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #ff3b3b;
+}

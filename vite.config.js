@@ -69,11 +69,13 @@ export default defineConfig(({ mode }) => ({
         nonograms: 'nonograms/index.html',
         sudoku: 'sudoku/index.html',
         2048: '2048/index.html',
+        lightup: 'lightup/index.html',
         'minesweeper-guide': 'minesweeper/guide/index.html',
         'takuzu-guide': 'takuzu/guide/index.html',
         'nonograms-guide': 'nonograms/guide/index.html',
         'sudoku-guide': 'sudoku/guide/index.html',
         '2048-guide': '2048/guide/index.html',
+        'lightup-guide': 'lightup/guide/index.html',
         'how-to-play': 'how-to-play/index.html',
       },
       output: {

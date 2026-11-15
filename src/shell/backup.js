@@ -25,7 +25,7 @@ const plain = [
 
 export const ours = (key) =>
   plain.includes(key) ||
-  /^(minesweeper|takuzu|nonograms|sudoku|2048)\./.test(key) ||
+  /^(minesweeper|takuzu|nonograms|sudoku|2048|lightup)\./.test(key) ||
   /^(beginner|intermediate|expert|extreme)(Hints)?(Name|Date)?$/.test(key)
 
 export const exportData = (now = new Date()) =>

@@ -1,0 +1,23 @@
+/*as wide as its cells and centred, the window face takes any room left over*/
+.field {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 24px);
+  width: fit-content;
+  margin: 0 auto;
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.active {
+  composes: field;
+  cursor: pointer;
+}
+
+.inactive {
+  composes: field;
+  cursor: default;
+}

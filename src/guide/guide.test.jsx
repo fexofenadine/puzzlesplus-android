@@ -13,6 +13,13 @@ import { examples as sudokuExamples, parts as sudokuParts } from './sudoku'
 import { guideTopic as sudokuTopic } from '../sudoku/hint'
 import { examples as twentyExamples, parts as twentyParts } from './2048'
 import { suggest } from '../2048/search'
+import {
+  boardOf as lightBoard,
+  easiest as lightEasiest,
+  exampleStep as lightStep,
+} from './LightUpExample'
+import { examples as lightExamples, parts as lightParts, solved as lightSolved } from './lightup'
+import { solved as lightIsSolved } from '../lightup/rules'
 
 const ids = (parts) => parts.flatMap((part) => part.sections.map((section) => section.id))
 
@@ -57,6 +64,17 @@ it('captions every 2048 example with the move the hint really picks there', () =
   expect(ids(twentyParts)).toContain('hints')
 })
 
+it('finds every light up technique in its example, as the easiest step there', () => {
+  for (const [technique, rows] of Object.entries(lightExamples)) {
+    expect(lightStep(rows, technique), technique).toBeTruthy()
+    expect(lightEasiest(rows), technique).toBe(technique)
+    expect(ids(lightParts)).toContain(technique)
+  }
+  expect(ids(lightParts)).toContain('mistakes')
+  const { layout, board, n } = lightBoard(lightSolved)
+  expect(lightIsSolved(layout, board, n)).toBe(true)
+})
+
 //every hint a game gives lands on a section of its guide
 it('has a section for every topic a hint can link to', () => {
   const minesTopics = ['wrong-flags', 'chording', 'guessing', 'first-click', 'mine-counter']
@@ -72,6 +90,7 @@ it('renders every guide without crashing', async () => {
     nonogramsParts,
     sudokuParts,
     twentyParts,
+    lightParts,
     howToParts,
   ]) {
     const container = document.createElement('div')
