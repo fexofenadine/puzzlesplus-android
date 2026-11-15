@@ -40,7 +40,7 @@ const BestScores = ({ key, state, actions }) => (
                 {sizes.map((n) => {
                   const best = state[state.tab][n][place]
                   return (
-                    <td class={s.slot}>
+                    <td class={s.slot} title={best && best.date ? `Set on ${best.date}` : null}>
                       {!best && <span class={s.empty}>–</span>}
                       {best && <span class={s.time}>{best.score}</span>}
                       {best && (

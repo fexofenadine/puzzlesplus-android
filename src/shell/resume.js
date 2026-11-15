@@ -1,5 +1,5 @@
 import { load, remove, save } from './storage'
-import { clock, stopTick } from './clock'
+import { clock, showPaused, stopTick } from './clock'
 
 //the games parked for later, newest first, per game
 const SHELF = 3
@@ -20,6 +20,7 @@ export const resumable = ({ key, running, pack, unpack, label = () => '', fresh 
   const keep = (game, force = false) => {
     if (game === looked && !force) return
     looked = game
+    showPaused(Boolean(game.paused))
     if (!running(game)) {
       if (last !== '') remove(key)
       last = ''

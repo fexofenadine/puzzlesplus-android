@@ -1,3 +1,4 @@
+import { warmWhenIdle } from './offline'
 import { phone } from './phone'
 
 //the app carries its files, so only the website needs the worker
@@ -5,6 +6,9 @@ import { phone } from './phone'
 export const registerWorker = () => {
   if ('serviceWorker' in navigator && import.meta.env.PROD && !phone) {
     //refused when storage is blocked, which is fine
-    navigator.serviceWorker.register('../service-worker.js', { scope: './' }).catch(() => {})
+    navigator.serviceWorker
+      .register('../service-worker.js', { scope: './' })
+      .then(warmWhenIdle)
+      .catch(() => {})
   }
 }

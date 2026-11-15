@@ -1,6 +1,8 @@
 import { load, remove, save } from './storage'
 import { clearStats, readStats } from './stats'
-import { clearDaily, readDaily } from './daily'
+import { clearDaily, dayOf, readDaily, resultText } from './daily'
+import { capital } from './grid'
+import { SITE, copy } from './share'
 
 //the name box's edits and the open tab, the same whatever a game keeps
 export const winnerActions = {
@@ -32,7 +34,12 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
         const saved = parseInt(load(key), 10)
         return [
           slot,
-          { set: Boolean(saved), time: saved || 999, name: load(`${key}.name`) || 'Anonymous' },
+          {
+            set: Boolean(saved),
+            time: saved || 999,
+            name: load(`${key}.name`) || 'Anonymous',
+            date: load(`${key}.date`) || '',
+          },
         ]
       }),
     )
@@ -42,6 +49,7 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
       const key = keyOf(board, n, level)
       remove(key)
       remove(`${key}.name`)
+      remove(`${key}.date`)
     })
     return bestTimes(board)
   }
@@ -76,6 +84,7 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
         const name = winner.name.trim()
         save(winner.key, winner.time)
         save(`${winner.key}.name`, name)
+        save(`${winner.key}.date`, dayOf())
         save(`${prefix}.name`, name)
         actions.toggleBestTime()
         actions.setBestTimeTab(winner.board)
@@ -96,6 +105,17 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
               daily: readDaily(prefix),
             },
       }),
+    //today's solved daily puzzle as a line of text on the clipboard
+    copyDaily:
+      () =>
+      ({ bestTime }, actions) => {
+        const text = resultText(capital(prefix), `${SITE}${prefix}/`, bestTime.daily)
+        copy(text).then(actions.dailyCopied)
+      },
+    dailyCopied:
+      (copied) =>
+      ({ bestTime }) =>
+        bestTime && { bestTime: { ...bestTime, copied } },
     resetBestTime:
       () =>
       ({ bestTime }) => ({

@@ -14,7 +14,7 @@ const BestTime = ({ key, state, actions }) => (
         <table class={s.table}>
           <tbody>
             {state[state.tab].map((row) => (
-              <tr>
+              <tr title={row.date ? `Set on ${row.date}` : null}>
                 <td class={s.cell}>{row.level}:</td>
                 <td class={s.cell}>{row.time} seconds</td>
                 <td class={s.cell}>{row.name}</td>

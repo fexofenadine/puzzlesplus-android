@@ -39,7 +39,10 @@ const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art
                   const ok = allowed(n, level)
                   const best = ok && state[state.tab][`${n}.${level}`]
                   return (
-                    <td class={s.slot}>
+                    <td
+                      class={s.slot}
+                      title={best && best.set && best.date ? `Set on ${best.date}` : null}
+                    >
                       {!ok && <span class={s.never}>–</span>}
                       {ok && !best.set && <span class={s.empty}>–</span>}
                       {best && best.set && <span class={s.time}>{best.time} s</span>}
@@ -52,7 +55,9 @@ const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art
           </tbody>
         </table>
         {state.stats && <StatsList stats={state.stats} />}
-        {state.daily && <DailyList daily={state.daily} />}
+        {state.daily && (
+          <DailyList daily={state.daily} copied={state.copied} onCopy={actions.copyDaily} />
+        )}
         <div class={b.footer}>
           <Button type="button" onClick={actions.resetBestTime}>
             <span class={b.button}>Reset Scores</span>

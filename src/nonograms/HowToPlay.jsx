@@ -11,7 +11,9 @@ export const Rules = () => [
   <p>
     Click a cell to fill it, again to cross it out and again to clear it, right click to step back.
     Crosses are notes for yourself and the win never needs them. Drag to paint along a row or
-    column. On a touch screen, the button beside the face picks whether taps fill or cross.
+    column. On a touch screen, the button beside the face picks whether taps fill or cross. On a
+    keyboard the arrow keys move a cursor, Space steps its cell, X crosses it and Backspace clears
+    it.
   </p>,
   <p>
     The left counter shows the cells still to fill and Ctrl+Z undoes a whole drag, Ctrl+Y redoes it.

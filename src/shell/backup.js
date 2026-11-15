@@ -26,7 +26,7 @@ const plain = [
 export const ours = (key) =>
   plain.includes(key) ||
   /^(minesweeper|takuzu|nonograms|sudoku|2048)\./.test(key) ||
-  /^(beginner|intermediate|expert|extreme)(Hints)?(Name)?$/.test(key)
+  /^(beginner|intermediate|expert|extreme)(Hints)?(Name|Date)?$/.test(key)
 
 export const exportData = (now = new Date()) =>
   JSON.stringify({

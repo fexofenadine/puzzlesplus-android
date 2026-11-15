@@ -1,6 +1,7 @@
 import { load, remove, save } from '../shell/storage'
 import { clearStats, lossesOn, readStats } from '../shell/stats'
 import { winnerActions } from '../shell/records'
+import { dayOf } from '../shell/daily'
 import { sizes } from './rules'
 
 //the best five games per size, kept apart for games that used a hint or undo
@@ -14,6 +15,7 @@ const clean = (entry) => ({
   score: parseInt(entry && entry.score, 10) || 0,
   tile: parseInt(entry && entry.tile, 10) || 0,
   name: String((entry && entry.name) || 'Anonymous'),
+  date: String((entry && entry.date) || ''),
 })
 
 //a score saved before the list existed is its first place
@@ -69,7 +71,8 @@ export const recordActions = {
     ({ winner }, actions) => {
       event.preventDefault()
       const name = winner.name.trim()
-      const list = [...topOf(winner.n, winner.assisted), clean({ ...winner, name })]
+      const entry = clean({ ...winner, name, date: dayOf() })
+      const list = [...topOf(winner.n, winner.assisted), entry]
         .sort((a, b) => b.score - a.score)
         .slice(0, PLACES)
       save(`${winner.key}.top`, JSON.stringify(list))

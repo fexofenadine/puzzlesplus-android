@@ -46,6 +46,9 @@ self.addEventListener('fetch', (event) => {
           event.waitUntil(keep(request, response.clone()).catch(() => {}))
         return response
       })
-      .catch(() => caches.match(request)),
+      //offline: the copy kept, or one the page stored ahead of time without its ?v=
+      .catch(
+        async () => (await caches.match(request)) || caches.match(request, { ignoreSearch: true }),
+      ),
   )
 })

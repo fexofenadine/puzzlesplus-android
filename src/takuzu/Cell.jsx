@@ -18,7 +18,7 @@ const glyphOf = (value, mark) => {
   return ''
 }
 
-const Cell = ({ i, value, given, error, mark, onPress }) => (
+const Cell = ({ i, value, given, error, mark, cursor, onPress }) => (
   <button
     type="button"
     tabindex={-1}
@@ -28,6 +28,7 @@ const Cell = ({ i, value, given, error, mark, onPress }) => (
       error && s.error,
       value === EMPTY && mark && s.ghost,
       mark && hintClass[mark],
+      cursor && s.cursor,
     )}
     onpointerdown={(event) => onPress({ event, i })}
   >

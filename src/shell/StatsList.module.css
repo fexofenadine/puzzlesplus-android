@@ -30,3 +30,21 @@
   font-size: 0.85em;
   opacity: 0.7;
 }
+
+/*the daily puzzle's copy result button with its answer beside it*/
+.share {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0 0;
+}
+
+.button {
+  display: block;
+  padding: 2px 8px;
+}
+
+.copied {
+  font-size: 0.85em;
+  opacity: 0.7;
+}

@@ -1,7 +1,7 @@
 //a board as a link: the page's address with #play=<size>.<level>.<cells>
 //the cells themselves travel, so a link still opens the same board after the dealer changes
 
-const SITE = 'https://fexofenadine.github.io/puzzlesplus/'
+export const SITE = 'https://fexofenadine.github.io/puzzlesplus/'
 
 //cell values below base as one number in base 36
 export const pack = (values, base) => {

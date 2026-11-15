@@ -212,10 +212,12 @@ it('wins and offers a best time, kept apart from hinted games', () => {
   wired.submitBestTime({ preventDefault() {} })
   expect(localStorage.getItem('nonograms.5.0')).toBe(String(game.time))
   expect(localStorage.getItem('nonograms.name')).toBe('Ada')
-  expect(now().bestTime.clean['5.0']).toEqual({ set: true, time: game.time, name: 'Ada' })
-  expect(now().bestTime.hinted['5.0']).toEqual({ set: false, time: 999, name: 'Anonymous' })
+  expect(now().bestTime.clean['5.0']).toMatchObject({ set: true, time: game.time, name: 'Ada' })
+  expect(now().bestTime.hinted['5.0']).toMatchObject({ set: false, time: 999, name: 'Anonymous' })
+  expect(localStorage.getItem('nonograms.5.0.date')).toMatch(/^\d{4}-\d\d-\d\d$/)
   wired.resetBestTime()
   expect(localStorage.getItem('nonograms.5.0')).toBe(null)
+  expect(localStorage.getItem('nonograms.5.0.date')).toBe(null)
 })
 
 it('remembers the rain glyph choice and opens the help boxes', () => {
@@ -367,4 +369,53 @@ it('drops a half done stroke when the game pauses', () => {
   clearTimeout(now().game.raf)
   click(6)
   expect(board()[6]).toBe(FILL)
+})
+
+it('plays from the keyboard: arrows move a cursor, space steps its cell, x crosses it', () => {
+  const key = (keyCode) =>
+    wired.press({ keyCode, target: { tagName: 'BODY' }, preventDefault() {} })
+  key(32)
+  expect(board().every((v) => v === EMPTY)).toBe(true)
+  key(40)
+  expect(now().cursor).toBe(12)
+  key(37)
+  key(38)
+  expect(now().cursor).toBe(6)
+  key(32)
+  expect(board()[6]).toBe(FILL)
+  key(32)
+  expect(board()[6]).toBe(CROSS)
+  key(88)
+  expect(board()[6]).toBe(EMPTY)
+  key(88)
+  expect(board()[6]).toBe(CROSS)
+  key(8)
+  expect(board()[6]).toBe(EMPTY)
+  //each key is its own undo step
+  expect(now().game.history).toHaveLength(5)
+  wired.undo()
+  expect(board()[6]).toBe(CROSS)
+  click(0)
+  expect(now().cursor).toBe(-1)
+  clearTimeout(now().game.raf)
+})
+
+it('marks the row and column under the mouse on the board, without drawing it again', async () => {
+  const container = document.createElement('div')
+  await new Promise((resolve) => {
+    const testView = () => (
+      <div oncreate={resolve}>{view({ ...state, game: dealtGame() }, actions)}</div>
+    )
+    app(state, actions, testView, container)
+  })
+  const cell = container.querySelector('[data-cell="7"]')
+  const field = cell.parentNode
+  const boardEl = field.parentNode
+  cell.dispatchEvent(new Event('pointermove', { bubbles: true }))
+  expect(boardEl.dataset.hover).toBe('')
+  //cell 7 of a 5x5 board is row 1, column 2, and tracks count from 1
+  expect(boardEl.style.getPropertyValue('--hover-row')).toBe('2')
+  expect(boardEl.style.getPropertyValue('--hover-column')).toBe('3')
+  field.dispatchEvent(new Event('pointerleave'))
+  expect(boardEl.dataset.hover).toBeUndefined()
 })

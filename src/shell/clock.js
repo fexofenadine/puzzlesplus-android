@@ -15,6 +15,16 @@ export const nextTick = (tick, start = clock()) =>
 
 export const stopTick = (id) => clearTimeout(id)
 
+//the tab's title says so while the game is paused
+let title = null
+
+export const showPaused = (paused) => {
+  if (typeof document === 'undefined') return
+  title ??= document.title
+  const next = paused ? `Paused · ${title}` : title
+  if (document.title !== next) document.title = next
+}
+
 //pausing stops the clock and hides the board, only while running(game) holds
 //onPause adds the game's own changes, like dropping a half done click
 export const pauseAction =

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { app, h } from 'hyperapp'
 import { state, actions, view, createGame, gameOf, saved, upgradeLadder } from './app'
-import { readDaily } from '../shell/daily'
+import { dayOf, readDaily } from '../shell/daily'
 import { EMPTY } from './rules'
 import { makeGame, random } from './generate'
 
@@ -235,8 +235,19 @@ it('wins on the solution and offers a best time', () => {
   wired.changeWinner({ name: ' Ada ' })
   wired.submitBestTime({ preventDefault() {} })
   expect(localStorage.getItem('takuzu.6.1')).toBe(String(game.time))
-  expect(now().bestTime.clean['6.1']).toEqual({ set: true, time: game.time, name: 'Ada' })
-  expect(now().bestTime.clean['8.1']).toEqual({ set: false, time: 999, name: 'Anonymous' })
+  //the day it was set is kept with it
+  expect(now().bestTime.clean['6.1']).toEqual({
+    set: true,
+    time: game.time,
+    name: 'Ada',
+    date: dayOf(),
+  })
+  expect(now().bestTime.clean['8.1']).toEqual({
+    set: false,
+    time: 999,
+    name: 'Anonymous',
+    date: '',
+  })
 })
 
 it('counts a hint before the first move, and starts the clock', () => {
@@ -389,4 +400,41 @@ it('shares the board as a link that opens the same clues, and keeps no time for 
   expect(now().game.win).toBe(true)
   expect(now().winner).toBe(null)
   expect(now().bestTime).toBe(null)
+})
+
+it('plays from the keyboard: arrows move a cursor, digits fill its cell, space steps it', () => {
+  const key = (keyCode) =>
+    wired.press({ keyCode, target: { tagName: 'BODY' }, preventDefault() {} })
+  //nothing is typed until the arrows have put a cursor down, in the middle
+  key(49)
+  expect([...now().game.board]).toEqual([...now().game.givens])
+  key(39)
+  expect(now().cursor).toBe(21)
+  //walk to an empty cell
+  const target = emptyCell()
+  while (now().cursor % 6 > target % 6) key(37)
+  while (now().cursor % 6 < target % 6) key(39)
+  while (now().cursor > target) key(38)
+  while (now().cursor < target) key(40)
+  expect(now().cursor).toBe(target)
+  key(49)
+  expect(now().game.board[target]).toBe(1)
+  expect(now().game.start).toBeGreaterThanOrEqual(0)
+  key(48)
+  expect(now().game.board[target]).toBe(0)
+  key(32)
+  expect(now().game.board[target]).toBe(1)
+  key(8)
+  expect(now().game.board[target]).toBe(EMPTY)
+  expect(now().game.history).toHaveLength(4)
+  //the edge holds the cursor, a clue stays as it is, and a click puts the cursor away
+  for (let k = 0; k < 9; k++) key(37)
+  expect(now().cursor % 6).toBe(0)
+  const given = now().game.givens.findIndex((v) => v !== EMPTY)
+  start({ game: dealtGame(), cursor: given })
+  key(49)
+  expect([...now().game.board]).toEqual([...now().game.givens])
+  wired.play({ event: left, i: emptyCell() })
+  expect(now().cursor).toBe(-1)
+  clearTimeout(now().game.raf)
 })

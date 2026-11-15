@@ -1,5 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
-import { dayBefore, dayOf, readDaily, seedOf, solveDaily } from './daily'
+import { dailyNote, dayBefore, dayOf, readDaily, resultText, seedOf, solveDaily } from './daily'
+import { showPaused } from './clock'
 import { exportData, importData, ours, readBackup } from './backup'
 import { codeOf, pack, partsOf, unpack } from './share'
 import { load, save } from './storage'
@@ -97,4 +98,33 @@ it('backs up only its own keys and restores them in place of what was there', ()
   //nothing is written after a restore until the page reloads
   save('theme', 'classic')
   expect(load('theme')).toBe('nord')
+})
+
+it('words a solved day to pass on, with the time and streak only when they count', () => {
+  const link = 'https://example.org/takuzu/'
+  expect(resultText('Takuzu', link, { time: 92, streak: 3 }, '2026-11-15')).toBe(
+    'Puzzles Plus Takuzu daily 2026-11-15: solved in 92 s, 3 days in a row\nhttps://example.org/takuzu/',
+  )
+  expect(resultText('Sudoku', link, { time: 0, streak: 1 }, '2026-11-15')).toBe(
+    'Puzzles Plus Sudoku daily 2026-11-15: solved\nhttps://example.org/takuzu/',
+  )
+})
+
+it('notes a solved daily puzzle beside its menu item only while the game menu is open', () => {
+  expect(dailyNote({ game: true }, 'takuzu')).toBeUndefined()
+  //written straight to storage: a restore earlier in this file froze the games' own saves
+  localStorage.setItem('takuzu.daily', JSON.stringify({ last: dayOf(), streak: 1, time: 50 }))
+  expect(dailyNote({ game: true }, 'takuzu')).toBe('Solved')
+  expect(dailyNote(null, 'takuzu')).toBeUndefined()
+  expect(dailyNote({ theme: true }, 'takuzu')).toBeUndefined()
+})
+
+it('says paused in the tab title while a game is paused', () => {
+  document.title = 'Takuzu Plus'
+  showPaused(true)
+  expect(document.title).toBe('Paused · Takuzu Plus')
+  showPaused(true)
+  expect(document.title).toBe('Paused · Takuzu Plus')
+  showPaused(false)
+  expect(document.title).toBe('Takuzu Plus')
 })

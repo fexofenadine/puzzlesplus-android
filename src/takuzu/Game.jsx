@@ -78,6 +78,7 @@ const Game = ({ key, state, actions }) => {
               given={!paused && givens[i] !== EMPTY}
               error={errors && errors.has(i)}
               mark={marks[i]}
+              cursor={!paused && state.cursor === i}
               onPress={actions.play}
             />
           ))}

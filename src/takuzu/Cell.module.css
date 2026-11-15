@@ -120,6 +120,14 @@
   content: '';
 }
 
+/*where the arrow keys are*/
+.cursor {
+  z-index: 1;
+  outline: 2px solid var(--highlight);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 1px var(--highlight-text);
+}
+
 .ghost {
   color: color-mix(in srgb, var(--text) 45%, transparent);
 }

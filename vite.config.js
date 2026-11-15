@@ -34,6 +34,15 @@ const prepaint = () => ({
   },
 })
 
+//assets.json lists every built file under assets/, for the page to keep offline (shell/offline.js)
+const assetList = () => ({
+  name: 'asset-list',
+  generateBundle(options, bundle) {
+    const files = Object.keys(bundle).filter((file) => file.startsWith('assets/'))
+    this.emitFile({ type: 'asset', fileName: 'assets.json', source: JSON.stringify(files) })
+  },
+})
+
 //the website stays readable, the android app is minified since nobody reads its files
 export default defineConfig(({ mode }) => ({
   base: './',
@@ -73,7 +82,7 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
-  plugins: [prepaint(), versionAssets()],
+  plugins: [prepaint(), versionAssets(), assetList()],
   test: {
     environment: 'jsdom',
   },

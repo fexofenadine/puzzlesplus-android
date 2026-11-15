@@ -45,6 +45,7 @@ import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 import { celebrate } from '../shell/fireworks'
+import { arrows, stepCursor } from '../shell/cursor'
 import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
 import { codeOf, partsOf, sharedCode } from '../shell/share'
 import FireworksCanvas from '../shell/FireworksCanvas'
@@ -88,6 +89,7 @@ export const createGame = ({ n, level }) => ({
 export const saved = resumable({
   key: 'takuzu.saved',
   running,
+  fresh: { cursor: -1 },
   label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
   pack: ({
     n,
@@ -205,6 +207,17 @@ const changed = (state, board, history, actions, settled = false) => {
   return { hint: null, prompt: stuck && settled, game: next }
 }
 
+//a value into a cell the player may change, null when nothing changes
+const place = (state, actions, i, to, settled) => {
+  const { game } = state
+  if (game.dealing || game.paused || game.win || game.givens[i] !== EMPTY) return null
+  const from = game.board[i]
+  if (from === to) return null
+  const board = game.board.slice()
+  board[i] = to
+  return changed(state, board, [...game.history, [i, from]], actions, settled)
+}
+
 //tricky arrived between medium and hard on 2026-10-29, so the old times were cleared once
 //and a saved hard or expert choice moved up a place to keep its name
 export const upgradeLadder = () => {
@@ -229,6 +242,8 @@ export const state = {
   ...shellState('takuzu'),
   hint: null,
   prompt: false,
+  //the cell the arrow keys are on, -1 until they are used and again after a click
+  cursor: -1,
   errors: Boolean(load('takuzu.errors')),
   timer: loadTimer('takuzu.timer'),
   rain: Boolean(load('takuzu.rain')),
@@ -247,9 +262,16 @@ export const actions = {
     //a resumed game is already dealt
     if (state.game.dealing) actions.reset()
   },
+  //arrows move a cursor, 0 and 1 fill its cell, space steps it like a click, backspace clears it
   press: (event) => (state, actions) => {
     if (historyKey(event, state, actions)) return
-    gameKey(shortcut(event, state, actions), actions)
+    const key = shortcut(event, state, actions)
+    if (key === null || gameKey(key, actions)) return
+    const typed = { 48: 0, 96: 0, 49: 1, 97: 1, 8: EMPTY, 46: EMPTY, 32: 'next' }[key]
+    if (arrows[key]) actions.move(arrows[key])
+    else if (typed !== undefined) actions.type(typed)
+    else return
+    event.preventDefault()
   },
   //deals a new board, keeping the size and level unless given
   reset:
@@ -276,6 +298,7 @@ export const actions = {
         menu: null,
         hint: null,
         prompt: false,
+        cursor: -1,
         game: { ...createGame({ n, level }), deal: id, daily: day },
       }
     },
@@ -289,16 +312,28 @@ export const actions = {
   play:
     ({ event, i }) =>
     (state, actions) => {
-      const { game } = state
       if (event.button !== 0 && event.button !== 2) return null
-      if (game.dealing || game.paused || game.win || game.givens[i] !== EMPTY) return null
       const back = event.button === 2
-      const from = game.board[i]
-      const board = game.board.slice()
-      board[i] = cycle[(cycle.indexOf(from) + (back ? 2 : 1)) % 3]
-      const settled = board[i] === (back ? 0 : 1)
-      return changed(state, board, [...game.history, [i, from]], actions, settled)
+      const to = cycle[(cycle.indexOf(state.game.board[i]) + (back ? 2 : 1)) % 3]
+      //the pointer takes over from the keyboard's cursor
+      return { cursor: -1, ...place(state, actions, i, to, to === (back ? 0 : 1)) }
     },
+  move:
+    (step) =>
+    ({ game, cursor }) => {
+      if (game.dealing || game.paused || game.win) return null
+      return { cursor: stepCursor(cursor, step, game.n) }
+    },
+  //a typed value goes on the cursor's cell, next steps it on like a click
+  //a typed digit is meant, so a full board asks at once; a step may still be passing through 0
+  type: (to) => (state, actions) => {
+    const { game, cursor } = state
+    if (cursor < 0) return null
+    const next = cycle[(cycle.indexOf(game.board[cursor]) + 1) % 3]
+    return to === 'next'
+      ? place(state, actions, cursor, next, next === 1)
+      : place(state, actions, cursor, to, true)
+  },
   //the delayed question, dropped if the board changed or the game moved on meanwhile
   ask:
     (change) =>

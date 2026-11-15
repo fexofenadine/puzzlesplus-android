@@ -1,4 +1,5 @@
 import { h } from 'hyperapp'
+import { dailyNote } from '../shell/daily'
 import m from '../Menu.module.css'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
 import ThemeMenu from '../shell/ThemeMenu'
@@ -19,6 +20,7 @@ const Menu = ({ state, actions }) => (
       <SubMenuItem name="New" hotKey="F2" onClick={() => actions.newGame()} />
       <SubMenuItem
         name="Daily Puzzle"
+        hotKey={dailyNote(state.menu, 'sudoku')}
         checked={Boolean(state.game.daily)}
         onClick={() => actions.newGame({ daily: true })}
       />

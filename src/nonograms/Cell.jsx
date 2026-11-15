@@ -20,12 +20,17 @@ const classOf = (value, win, mark) => {
 }
 
 //data-cell lets a stroke find the cell under the pointer
-const Cell = ({ i, value, win, mark, style, onPress }) => (
+const Cell = ({ i, value, win, mark, cursor, style, onPress }) => (
   <button
     type="button"
     tabindex={-1}
     data-cell={i}
-    class={cx(classOf(value, win, mark), win && value !== FILL && s.blank, mark && hintClass[mark])}
+    class={cx(
+      classOf(value, win, mark),
+      win && value !== FILL && s.blank,
+      mark && hintClass[mark],
+      cursor && s.cursor,
+    )}
     style={style}
     onpointerdown={(event) => onPress({ event, i })}
   />

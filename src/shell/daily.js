@@ -70,6 +70,15 @@ export const solveDaily = (prefix, day, time = 0) => {
   )
 }
 
+//beside the game menu's daily puzzle, read only while that menu is open
+export const dailyNote = (menu, prefix) =>
+  menu && menu.game && readDaily(prefix).done ? 'Solved' : undefined
+
+//a solved day as a line to pass on: the game, the day, the time when it counted, the streak
+export const resultText = (name, link, { time, streak }, day = dayOf()) =>
+  `Puzzles Plus ${name} daily ${day}: solved${time ? ` in ${time} s` : ''}` +
+  `${streak > 1 ? `, ${streak} days in a row` : ''}\n${link}`
+
 export const clearDaily = (prefix) => {
   remove(keyOf(prefix))
   return readDaily(prefix)

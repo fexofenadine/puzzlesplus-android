@@ -38,6 +38,20 @@ export const tracks = (n) =>
   )
 export const place = (k) => k + Math.floor(k / 5) + 1
 
+//the row and column under a mouse stand out, clues included, so a long line is easy to follow
+//set on the board itself, a pointer move never draws the window again
+const hover = (n) => (event) => {
+  const board = event.currentTarget.parentNode
+  const cell = event.pointerType === 'touch' ? null : event.target.closest('[data-cell]')
+  if (!cell) return delete board.dataset.hover
+  const i = Number(cell.dataset.cell)
+  board.style.setProperty('--hover-row', place(Math.floor(i / n)))
+  board.style.setProperty('--hover-column', place(i % n))
+  board.dataset.hover = ''
+}
+
+const unhover = (event) => delete event.currentTarget.parentNode.dataset.hover
+
 const Clue = ({ clue, done, error, hinted, hidden, style }) => (
   <div class={cx(s.clue, done && s.done, error && s.error, hinted && s.hinted)} style={style}>
     {!hidden &&
@@ -121,15 +135,28 @@ const Game = ({ key, state, actions }) => {
           />
         </div>
         <div class={s.board} style={{ '--tracks': tracks(n) }}>
-          <div class={s.columns}>{lines.slice(n).map((_, x) => clue(n + x))}</div>
-          <div class={s.rows}>{lines.slice(0, n).map((_, y) => clue(y))}</div>
-          <div class={running(game) && !paused ? s.active : s.inactive}>
+          <div class={s.columns}>
+            <div class={s.columnBand} />
+            {lines.slice(n).map((_, x) => clue(n + x))}
+          </div>
+          <div class={s.rows}>
+            <div class={s.rowBand} />
+            {lines.slice(0, n).map((_, y) => clue(y))}
+          </div>
+          <div
+            class={running(game) && !paused ? s.active : s.inactive}
+            onpointermove={hover(n)}
+            onpointerleave={unhover}
+          >
+            <div class={s.rowBand} hidden={hidden || game.win} />
+            <div class={s.columnBand} hidden={hidden || game.win} />
             {[...board].map((value, i) => (
               <Cell
                 i={i}
                 value={paused ? EMPTY : value}
                 win={game.win}
                 mark={marks[i]}
+                cursor={!paused && state.cursor === i}
                 style={{ gridColumn: place(i % n), gridRow: place(Math.floor(i / n)) }}
                 onPress={actions.down}
               />

@@ -46,6 +46,7 @@ import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 import { celebrate } from '../shell/fireworks'
+import { arrows, stepCursor } from '../shell/cursor'
 import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
 import { codeOf, partsOf, sharedCode } from '../shell/share'
 import FireworksCanvas from '../shell/FireworksCanvas'
@@ -93,6 +94,7 @@ export const createGame = ({ n, level }) => ({
 export const saved = resumable({
   key: 'nonograms.saved',
   running,
+  fresh: { cursor: -1 },
   label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
   pack: ({
     n,
@@ -289,6 +291,8 @@ export const state = {
   ...shellState('nonograms'),
   hint: null,
   prompt: false,
+  //the cell the arrow keys are on, -1 until they are used and again after a press
+  cursor: -1,
   errors: Boolean(load('nonograms.errors')),
   timer: loadTimer('nonograms.timer'),
   rain: Boolean(load('nonograms.rain')),
@@ -317,9 +321,16 @@ export const actions = {
     //a resumed game is already dealt
     if (state.game.dealing) actions.reset()
   },
+  //arrows move a cursor, space steps its cell like a click, x crosses it, backspace clears it
   press: (event) => (state, actions) => {
     if (historyKey(event, state, actions)) return
-    gameKey(shortcut(event, state, actions), actions)
+    const key = shortcut(event, state, actions)
+    if (key === null || gameKey(key, actions)) return
+    const typed = { 88: CROSS, 8: EMPTY, 46: EMPTY, 32: 'next' }[key]
+    if (arrows[key]) actions.move(arrows[key])
+    else if (typed !== undefined) actions.type(typed)
+    else return
+    event.preventDefault()
   },
   //deals a new board, keeping the size, level and picture settings unless given
   reset:
@@ -361,6 +372,7 @@ export const actions = {
         menu: null,
         hint: null,
         prompt: false,
+        cursor: -1,
         procedural,
         symmetric,
         game: { ...createGame({ n, level }), deal: id, picked: Boolean(pick), daily: day },
@@ -387,9 +399,32 @@ export const actions = {
       const stroke = { start: i, from, to, axis: null, before: game.board, touch }
       return {
         ...(touch && { touch }),
+        //the pointer takes over from the keyboard's cursor
+        cursor: -1,
         game: { ...startClock(game, actions), stroke, board: paint(stroke, i, game.n) },
       }
     },
+  move:
+    (step) =>
+    ({ game, cursor }) => {
+      if (game.dealing || game.paused || game.win) return null
+      return { cursor: stepCursor(cursor, step, game.n) }
+    },
+  //a key on the cursor's cell, one undo step: next steps it on like a click, a cross typed
+  //on a cross clears it; only a fill made by stepping may still be on its way to a cross
+  type: (to) => (state, actions) => {
+    const { game, cursor } = state
+    if (cursor < 0 || game.dealing || game.paused || game.win || game.stroke) return null
+    const from = game.board[cursor]
+    const next = cycle[(cycle.indexOf(from) + 1) % 3]
+    const value = to === 'next' ? next : to === from ? EMPTY : to
+    if (value === from) return null
+    const board = game.board.slice()
+    board[cursor] = value
+    const history = [...game.history, [[cursor, from]]]
+    const passing = to === 'next' && value === FILL
+    return changed(state, startClock(game, actions), board, history, actions, !passing)
+  },
   //the pointer moved: only a stroke cares which cell is under it
   trace: (event) => (state, actions) => {
     if (!state.game.stroke) return

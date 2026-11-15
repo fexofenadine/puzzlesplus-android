@@ -35,6 +35,7 @@ import {
 import { boardOf, check, resumable } from '../shell/resume'
 import Game, { running } from './Game'
 import { celebrate } from '../shell/fireworks'
+import { arrows, stepCursor } from '../shell/cursor'
 import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
 import { codeOf, partsOf, sharedCode } from '../shell/share'
 import FireworksCanvas from '../shell/FireworksCanvas'
@@ -261,8 +262,6 @@ const digitOf = (event) => {
   return -1
 }
 
-const arrows = { 37: [-1, 0], 38: [0, -1], 39: [1, 0], 40: [0, 1] }
-
 //a board from a link comes first, then the game left in progress
 const opened = saved.open(linkedGame())
 
@@ -375,15 +374,10 @@ export const actions = {
     },
   //the arrows move the selection, from the centre when there is none
   move:
-    ([dx, dy]) =>
+    (step) =>
     ({ game, selected }) => {
       if (!playable(game)) return null
-      const { n } = game
-      if (selected < 0) return { selected: Math.floor((n * n) / 2), picked: 0 }
-      const x = (selected % n) + dx
-      const y = Math.floor(selected / n) + dy
-      if (x < 0 || y < 0 || x >= n || y >= n) return null
-      return { selected: y * n + x, picked: 0 }
+      return { selected: stepCursor(selected, step, game.n), picked: 0 }
     },
   //clears the selected cell's digit, or its notes when it has none
   erase: () => (state, actions) => {
