@@ -24,9 +24,9 @@
   --ng-cross: #8f84b0;
 }
 
-:global(:root[data-theme='everforest']) {
-  --ng-fill: #a7c080;
-  --ng-cross: #56635f;
+:global(:root:is([data-theme='terafox'], [data-theme='terafox-coral'])) {
+  --ng-fill: #7aa4a1;
+  --ng-cross: #587b7b;
 }
 
 :global(:root[data-theme='matrix']) {

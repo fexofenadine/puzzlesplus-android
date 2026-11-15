@@ -317,8 +317,9 @@ it('previews background settings live and only saves them on OK', () => {
   localStorage.clear()
 })
 
-it('has only the window opacity for themes without a background', () => {
-  start({ theme: 'synthwave' })
+it('has only the window opacity for a theme without a background', () => {
+  //every theme has one now, the dialog still copes with none
+  start({ theme: 'plain' })
   wired.toggleBackgroundSettings()
   wired.peek()
   expect(current.backgroundSettings).toEqual({ id: null, draft: {}, opacity: 100 })
@@ -491,7 +492,8 @@ it('calls the window Minesweeper on classic and Minesweeper Plus on the other th
     'solarized',
     'solarized-phosphor',
     'vaporwave',
-    'everforest',
+    'terafox',
+    'terafox-coral',
   ]) {
     expect(await titleOf(theme)).toBe('Minesweeper Plus')
   }
@@ -615,7 +617,8 @@ it('has a hint button by the face on every theme but classic', async () => {
     'solarized',
     'solarized-phosphor',
     'vaporwave',
-    'everforest',
+    'terafox',
+    'terafox-coral',
   ]) {
     expect(await hintButtons(theme)).toBe(1)
   }

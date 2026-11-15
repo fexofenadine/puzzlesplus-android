@@ -59,13 +59,14 @@ looks.vaporwave = {
   gravity: 80,
   size: 3,
 }
-looks.everforest = {
-  colors: ['#a7c080', '#83c092', '#7fbbb3', '#dbbc7f', '#e69875', '#e67e80', '#d699b6'],
+looks.terafox = {
+  colors: ['#5a93aa', '#7aa4a1', '#a1cdd8', '#fda47f', '#e85c51', '#ad5c7c'],
   shape: dot,
   gravity: 50,
   size: 2.5,
   glow: 5,
 }
+looks['terafox-coral'] = looks.terafox
 
 export const lookOf = (theme) => looks[theme] || looks.classic
 

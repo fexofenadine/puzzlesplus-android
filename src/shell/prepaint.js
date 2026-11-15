@@ -1,11 +1,22 @@
 //inlined into each game's page head by vite.config.js, so it runs before first paint
 //apply the saved theme and window size before first paint
 try {
-  document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
-  //assume animated off classic, the script corrects it
-  if (document.documentElement.dataset.theme !== 'classic') {
-    document.documentElement.dataset.background = 'animated'
+  //everforest became terafox coral
+  document.documentElement.dataset.theme = (localStorage.getItem('theme') || 'classic').replace(
+    /^everforest$/,
+    'terafox-coral',
+  )
+  //assume animated off classic, the script corrects it; synthwave's is only on when asked for
+  var theme = document.documentElement.dataset.theme
+  var animated = theme !== 'classic' && theme !== 'synthwave'
+  if (theme === 'synthwave') {
+    try {
+      animated = JSON.parse(localStorage.getItem('backgrounds')).neon.animated === true
+    } catch {
+      //nothing saved, the photo stays
+    }
   }
+  if (animated) document.documentElement.dataset.background = 'animated'
   document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
 } catch {
   //blocked storage keeps the defaults

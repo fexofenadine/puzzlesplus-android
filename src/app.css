@@ -397,54 +397,54 @@
   --fringe-b: rgba(1, 205, 254, 0.85);
 }
 
-:root[data-theme='everforest'] {
-  /*everforest dark, medium contrast*/
+:root:is([data-theme='terafox'], [data-theme='terafox-coral']) {
+  /*terafox from nightfox: deep teal grounds, sea greens and blues*/
   color-scheme: dark;
   --ui-font: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
   --title-font: var(--ui-font);
   --text-font: var(--ui-font);
   --font-size: 12px;
   --font-smoothing: auto;
-  --desktop: #232a2e;
-  --text: #d3c6aa;
-  --face: #343f44;
-  --light: #56635f;
-  --shadow: #272e33;
-  --dark-shadow: #1e2326;
-  --frame: #83c092;
-  --window-frame: #1e2326;
-  --title-start: #3f6b5c;
-  --title-end: #83c092;
-  --title-text: #fffbef;
-  --highlight: #a7c080;
-  --highlight-text: #2d353b;
-  --menu-shadow: rgba(0, 0, 0, 0.45);
-  --input: #2d353b;
-  --input-frame: #1e2326;
-  --panel: #343f44;
-  --cell: #3d484d;
-  --cell-light: #5c6a72;
-  --cell-shadow: #272e33;
-  --cell-open: #2f383d;
-  --lcd: #232a2e;
-  --lcd-on: #e67e80;
-  --lcd-off: rgba(230, 126, 128, 0.18);
-  --num-1: #7fbbb3;
-  --num-2: #a7c080;
-  --num-3: #e67e80;
-  --num-4: #d699b6;
-  --num-5: #e69875;
-  --num-6: #83c092;
-  --num-7: #d3c6aa;
-  --num-8: #859289;
-  --glyph: #d3c6aa;
-  --flag: #e67e80;
-  --mine: #d3c6aa;
-  --mine-shine: #2d353b;
-  --hurt: #e67e80;
-  --wrong: #e67e80;
-  --smiley: #dbbc7f;
-  --smiley-line: #2d353b;
+  --desktop: #0f1c1e;
+  --text: #e6eaea;
+  --face: #1d3337;
+  --light: #2d4f56;
+  --shadow: #152528;
+  --dark-shadow: #0f1c1e;
+  --frame: #5a93aa;
+  --window-frame: #0b1516;
+  --title-start: #254147;
+  --title-end: #5a93aa;
+  --title-text: #eaeeee;
+  --highlight: #7aa4a1;
+  --highlight-text: #0f1c1e;
+  --menu-shadow: rgba(0, 0, 0, 0.5);
+  --input: #152528;
+  --input-frame: #0b1516;
+  --panel: #1d3337;
+  --cell: #254147;
+  --cell-light: #3d6a72;
+  --cell-shadow: #12201f;
+  --cell-open: #18292c;
+  --lcd: #0f1c1e;
+  --lcd-on: #e85c51;
+  --lcd-off: rgba(232, 92, 81, 0.16);
+  --num-1: #5a93aa;
+  --num-2: #7aa4a1;
+  --num-3: #e85c51;
+  --num-4: #ad5c7c;
+  --num-5: #ff8349;
+  --num-6: #a1cdd8;
+  --num-7: #e6eaea;
+  --num-8: #6d7f8b;
+  --glyph: #e6eaea;
+  --flag: #e85c51;
+  --mine: #e6eaea;
+  --mine-shine: #152528;
+  --hurt: #e85c51;
+  --wrong: #e85c51;
+  --smiley: #fda47f;
+  --smiley-line: #152528;
 }
 
 html,
@@ -602,13 +602,20 @@ main::before {
   }
 }
 
-/*the substrate, pipes and coral canvases show through*/
-:root:is([data-theme='nord'], [data-theme='vaporwave'], [data-theme='everforest']) main::before {
+/*the substrate, qix, hex trail and coral canvases show through*/
+:root:is(
+    [data-theme='nord'],
+    [data-theme='vaporwave'],
+    [data-theme='terafox'],
+    [data-theme='terafox-coral']
+  )
+  main::before {
   background: none;
 }
 
-/*tape grain over the pipes*/
-:root[data-theme='vaporwave'] main::before {
+/*tape grain over the bouncing lines, and over synthwave's shader in place of its photo*/
+:root[data-theme='vaporwave'] main::before,
+:root[data-theme='synthwave'][data-background='animated'] main::before {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
   animation: vhs-grain 0.5s steps(1, end) infinite;
 }

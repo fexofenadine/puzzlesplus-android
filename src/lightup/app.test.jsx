@@ -208,3 +208,26 @@ it('deals the daily puzzle at 10 x 10 medium and leaves the saved choice alone',
   expect(localStorage.getItem('lightup.size')).toBe(null)
   expect(typeof now().game.daily).toBe('string')
 })
+
+it('counts a numbered wall down as bulbs go beside it, unless switched off', async () => {
+  const draw = async (shown) => {
+    const container = document.createElement('div')
+    await new Promise((resolve) => {
+      const testView = () => <div oncreate={resolve}>{view(shown, actions)}</div>
+      app(shown, actions, testView, container)
+    })
+    return [...container.querySelectorAll('[class*=wall]')].map((wall) => wall.textContent)
+  }
+  //a 2 in the corner of a small board, with a bulb beside it
+  const layout = Int8Array.from([2, -1, -1, -1, -1, -1, -1, -1, -1])
+  const game = { ...createGame({ n: 3, level: 0 }), layout, dealing: false }
+  expect(state.countdown).toBe(true)
+  expect(await draw({ ...state, game })).toEqual(['2'])
+  const board = game.board.slice()
+  board[1] = BULB
+  expect(await draw({ ...state, game: { ...game, board } })).toEqual(['1'])
+  expect(await draw({ ...state, countdown: false, game: { ...game, board } })).toEqual(['2'])
+  wired.toggleCountdown()
+  expect(now().countdown).toBe(false)
+  expect(localStorage.getItem('lightup.countdown')).toBe('off')
+})

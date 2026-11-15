@@ -42,13 +42,13 @@ const About = ({ key, name, actions, credits }, children) => (
               Kutepov (MIT licence).
             </li>
             <li>
-              Backgrounds are canvas ports of GLMatrix, Substrate, Truchet and Phosphor from
-              xscreensaver, under the xscreensaver licence, and Pipes and Coral written after
-              xscreensaver's.
+              Backgrounds are canvas ports of GLMatrix, Substrate, Truchet, Phosphor and HexTrail
+              from xscreensaver, under the xscreensaver licence, Qix and Coral written after
+              xscreensaver's, and the Neon Triangulator shader by mrange (CC0).
             </li>
             <li>Fonts are under the SIL Open Font License and LGPL 2.1.</li>
             <li>Photos are from Unsplash, and CC0 photos from Wikimedia Commons.</li>
-            <li>Colour schemes: SynthWave '84, Solarized, Nord and Everforest.</li>
+            <li>Colour schemes: SynthWave '84, Solarized, Nord and Terafox.</li>
             <li>Full credits and licences are in the README.</li>
           </ul>
         </details>

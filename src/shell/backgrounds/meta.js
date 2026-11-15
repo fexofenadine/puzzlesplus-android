@@ -332,44 +332,25 @@ export const hill = {
   ],
 }
 
-export const pipes = {
-  name: 'Pipes',
-  credit: 'After Pipes by Marcelo F. Vianna, part of xscreensaver, and the Windows 95 screensaver',
+export const qix = {
+  name: 'Qix',
+  credit:
+    'After Qix by Jamie Zawinski, part of xscreensaver, and the Mystify screensaver of Windows 95',
   ratio: (pixels) => Math.min(pixels, 2),
   options: [
     {
       key: 'speed',
       label: 'Speed',
       type: 'range',
-      min: 2,
-      max: 60,
-      step: 1,
-      value: 10,
-      format: (v) => `${v} steps a second`,
+      min: 0.25,
+      max: 3,
+      step: 0.25,
+      value: 1,
+      format: (v) => `${v}×`,
     },
-    { key: 'count', label: 'Pipes at once', type: 'range', min: 1, max: 6, step: 1, value: 2 },
-    {
-      key: 'pieces',
-      label: 'Restart after',
-      type: 'range',
-      min: 100,
-      max: 3000,
-      step: 100,
-      value: 700,
-      format: (v) => `${v} pieces`,
-    },
-    { key: 'size', label: 'Spacing', type: 'range', min: 24, max: 96, step: 4, value: 44 },
-    {
-      key: 'thickness',
-      label: 'Thickness',
-      type: 'range',
-      min: 8,
-      max: 34,
-      step: 1,
-      value: 20,
-      format: (v) => `${v}%`,
-    },
-    { key: 'joints', label: 'Ball joints', type: 'toggle', value: true },
+    { key: 'count', label: 'Shapes', type: 'range', min: 1, max: 5, step: 1, value: 2 },
+    { key: 'corners', label: 'Corners', type: 'range', min: 2, max: 6, step: 1, value: 4 },
+    { key: 'trail', label: 'Trail', type: 'range', min: 2, max: 40, step: 1, value: 14 },
     {
       key: 'palette',
       label: 'Colours',
@@ -385,10 +366,107 @@ export const pipes = {
       key: 'opacity',
       label: 'Strength',
       type: 'range',
-      min: 30,
+      min: 20,
       max: 100,
       step: 5,
       value: 80,
+      format: (v) => `${v}%`,
+    },
+  ],
+}
+
+export const hextrail = {
+  name: 'Hex Trail',
+  credit: 'Ported from HexTrail by Jamie Zawinski, part of xscreensaver',
+  ratio: (pixels) => Math.min(pixels, 2),
+  options: [
+    {
+      key: 'speed',
+      label: 'Speed',
+      type: 'range',
+      min: 0.25,
+      max: 4,
+      step: 0.25,
+      value: 1,
+      format: (v) => `${v}×`,
+    },
+    { key: 'size', label: 'Hexagon size', type: 'range', min: 12, max: 80, step: 2, value: 28 },
+    {
+      key: 'thickness',
+      label: 'Thickness',
+      type: 'range',
+      min: 5,
+      max: 50,
+      step: 1,
+      value: 15,
+      format: (v) => `${v}%`,
+    },
+    //the original outlines each hexagon as a line reaches it, off here to stay calm
+    { key: 'borders', label: 'Hexagon outlines', type: 'toggle', value: false },
+    {
+      key: 'palette',
+      label: 'Colours',
+      type: 'select',
+      choices: [
+        ['sea', 'Sea greens and blues'],
+        ['teal', 'Teals'],
+        ['ember', 'Embers'],
+      ],
+      value: 'sea',
+    },
+    {
+      key: 'opacity',
+      label: 'Strength',
+      type: 'range',
+      min: 20,
+      max: 100,
+      step: 5,
+      value: 70,
+      format: (v) => `${v}%`,
+    },
+  ],
+}
+
+//a shader, drawn with webgl2 on a canvas of its own
+export const neon = {
+  name: 'Neon Triangulator',
+  credit: 'Neon Triangulator by mrange (CC0, shadertoy.com/view/tXGGRD), as in xscreensaver',
+  gl: true,
+  //turned off, or where the shader is too much for the device, the theme shows its photo
+  wallpaper: true,
+  //it marches rays for every pixel: about 23 ms a draw at 576 x 300 on intel uhd 630 graphics,
+  //too much to be on unasked, so synthwave keeps its photo until this is switched on
+  animated: false,
+  ratio: () => 1,
+  options: [
+    {
+      key: 'speed',
+      label: 'Speed',
+      type: 'range',
+      min: 0.1,
+      max: 2,
+      step: 0.1,
+      value: 0.5,
+      format: (v) => `${v}×`,
+    },
+    {
+      key: 'resolution',
+      label: 'Resolution',
+      type: 'range',
+      min: 20,
+      max: 100,
+      step: 5,
+      value: 35,
+      format: (v) => `${v}%`,
+    },
+    {
+      key: 'brightness',
+      label: 'Brightness',
+      type: 'range',
+      min: 20,
+      max: 100,
+      step: 5,
+      value: 75,
       format: (v) => `${v}%`,
     },
   ],
@@ -420,7 +498,8 @@ export const coral = {
       value: 25,
       format: (v) => `${v}%`,
     },
-    { key: 'grain', label: 'Grain', type: 'range', min: 2, max: 8, step: 1, value: 3 },
+    //2 is as fine as stays quick on a large screen, 1 would be four times the walkers
+    { key: 'grain', label: 'Grain', type: 'range', min: 2, max: 8, step: 1, value: 2 },
     {
       key: 'delay',
       label: 'Rest when grown',
@@ -436,11 +515,11 @@ export const coral = {
       label: 'Colours',
       type: 'select',
       choices: [
-        ['forest', 'Greens and aquas'],
-        ['autumn', 'Autumn'],
+        ['sea', 'Sea greens and blues'],
+        ['ember', 'Embers'],
         ['all', 'All accents'],
       ],
-      value: 'forest',
+      value: 'sea',
     },
     {
       key: 'opacity',

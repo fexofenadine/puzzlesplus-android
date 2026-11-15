@@ -2,15 +2,15 @@ import { coral as meta } from './meta'
 
 //coral as xscreensaver's coral by frederick roeber grows it, written anew for a canvas:
 //walkers wander a grid at random and freeze where they touch a seed or the coral so far
-//the grid is coarser than the screen, so a full hd page has about fifty thousand walkers
+//the grid is coarser than the screen: at a grain of 2 a full hd page has about 130 thousand walkers
 
-const GROUND = [35, 42, 46]
+const GROUND = [15, 28, 30]
 
-//everforest's accents, each list a loop the growth walks round once
+//terafox's accents, each list a loop the growth walks round once
 const palettes = {
-  forest: ['#a7c080', '#83c092', '#7fbbb3', '#5c8a6e', '#a7c080'],
-  autumn: ['#dbbc7f', '#e69875', '#e67e80', '#d699b6', '#dbbc7f'],
-  all: ['#a7c080', '#83c092', '#7fbbb3', '#d699b6', '#e67e80', '#e69875', '#dbbc7f', '#a7c080'],
+  sea: ['#7aa4a1', '#5a93aa', '#a1cdd8', '#3f8f86', '#7aa4a1'],
+  ember: ['#fda47f', '#ff8349', '#e85c51', '#cb7985', '#fda47f'],
+  all: ['#7aa4a1', '#5a93aa', '#a1cdd8', '#ad5c7c', '#e85c51', '#ff8349', '#fda47f', '#7aa4a1'],
 }
 
 const SHADES = 96

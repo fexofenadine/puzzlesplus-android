@@ -4,7 +4,7 @@ import { importData } from './backup'
 import { copy, linkOf } from './share'
 import { load, save } from './storage'
 import { fireworksKey, fireworksOn } from './fireworks'
-import { themes } from './themes'
+import { renamed, themes } from './themes'
 import { closeDialog, leave, listenPhone, pageUrl, phone } from './phone'
 import { games } from './GameLinks'
 import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
@@ -47,7 +47,8 @@ export const windowClear = ({ glass, backgroundSettings }) => {
 export const isGame = (page) => games.some(([id]) => id === page)
 
 const loadTheme = () => {
-  const theme = load('theme')
+  const saved = load('theme')
+  const theme = renamed[saved] || saved
   return themes.some(([id]) => id === theme) ? theme : 'classic'
 }
 

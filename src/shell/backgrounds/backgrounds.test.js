@@ -5,7 +5,9 @@ import truchet from './truchet'
 import phosphor, { loadTexts } from './phosphor'
 import { pixel } from './font6x10'
 import hill, { hillLayout, noise } from './hill'
-import { dirs, lattice, turn } from './pipes'
+import { hueAt, makeShape, stepShape } from './qix'
+import { DONE, EMPTY, FADE, network } from './hextrail'
+import { adapt } from './neon'
 import { ramp, reef } from './coral'
 import { random } from '../random'
 
@@ -17,9 +19,11 @@ it('maps only the animated themes to a background', () => {
   expect(backgroundFor('solarized')).toBe('truchet')
   expect(backgroundFor('solarized-phosphor')).toBe('phosphor')
   expect(backgroundFor('classic')).toBe('hill')
-  expect(backgroundFor('vaporwave')).toBe('pipes')
-  expect(backgroundFor('everforest')).toBe('coral')
-  expect(backgroundFor('synthwave')).toBe(null)
+  expect(backgroundFor('vaporwave')).toBe('qix')
+  expect(backgroundFor('terafox')).toBe('hextrail')
+  expect(backgroundFor('terafox-coral')).toBe('coral')
+  expect(backgroundFor('synthwave')).toBe('neon')
+  expect(backgroundFor('everforest')).toBe(null)
 })
 
 it('keeps the tuned matrix look as its defaults', () => {
@@ -54,7 +58,9 @@ it('stores every background together and repairs bad values', () => {
     'truchet',
     'phosphor',
     'hill',
-    'pipes',
+    'qix',
+    'hextrail',
+    'neon',
     'coral',
   ])
 })
@@ -273,24 +279,66 @@ it('draws substrate as finely as its detail setting asks', () => {
   expect(defaults('substrate').detail).toBe('balanced')
 })
 
-it('grows pipes only through free nodes of the lattice, and ends one that is boxed in', () => {
-  const grid = lattice(4, 4)
+it('bounces a shape inside the screen and keeps a trail no longer than asked', () => {
   const rng = random(3)
-  const pipe = { i: 0, j: 0, z: 0, dir: 0 }
-  grid.taken[grid.at(0, 0, 0)] = 1
-  let steps = 0
-  for (;;) {
-    const dir = turn(grid, pipe, rng)
-    if (dir === null) break
-    const [dx, dy, dz] = dirs[dir]
-    Object.assign(pipe, { i: pipe.i + dx, j: pipe.j + dy, z: pipe.z + dz, dir })
-    expect(grid.free(pipe.i, pipe.j, pipe.z)).toBe(true)
-    grid.taken[grid.at(pipe.i, pipe.j, pipe.z)] = 1
-    steps++
+  const shape = makeShape(4, 200, 100, 7, rng)
+  for (let k = 0; k < 400; k++) {
+    stepShape(shape, 200, 100, 12)
+    for (const p of shape.points) {
+      expect(p.x).toBeGreaterThanOrEqual(0)
+      expect(p.x).toBeLessThanOrEqual(200)
+      expect(p.y).toBeGreaterThanOrEqual(0)
+      expect(p.y).toBeLessThanOrEqual(100)
+    }
   }
-  expect(steps).toBeGreaterThan(3)
-  //every way on from where it stopped is taken or off the lattice
-  expect(dirs.some(([dx, dy, dz]) => grid.free(pipe.i + dx, pipe.j + dy, pipe.z + dz))).toBe(false)
+  expect(shape.trail).toHaveLength(12)
+  //colours run round the palette and meet themselves again
+  const colours = [
+    [0, 0, 0],
+    [100, 200, 50],
+  ]
+  expect(hueAt(colours, 0.5)).toEqual([50, 100, 25])
+  expect(hueAt(colours, 2)).toEqual([0, 0, 0])
+})
+
+it('grows a hex trail arm by arm into empty hexagons, then fades and starts again', () => {
+  const rng = random(11)
+  const { plane, tick } = network(8, 8, 8, rng)
+  let faded = false
+  let most = 0
+  for (let k = 0; k < 20000; k++) {
+    tick(2)
+    //an arm that is done is matched by one in the neighbour it leads to
+    if (k % 50 === 0) {
+      for (const h of plane.hexagons) {
+        h.arms.forEach((arm, j) => {
+          if (arm.state !== DONE) return
+          expect(h.neighbors[j]).toBeTruthy()
+          expect(h.neighbors[j].arms[(j + 3) % 6].state).not.toBe(EMPTY)
+        })
+      }
+      most = Math.max(
+        most,
+        plane.hexagons.filter((h) => h.arms.some((a) => a.state !== EMPTY)).length,
+      )
+    }
+    if (plane.state === FADE) faded = true
+    //after the fade the plane is empty again and a new network begins
+    if (faded && plane.state !== FADE) break
+  }
+  expect(faded).toBe(true)
+  expect(plane.state).not.toBe(FADE)
+  //most of the plane was reached before it ran out of room
+  expect(most).toBeGreaterThan(32)
+})
+
+it('lowers the shader quality while a draw is slow and gives up only at the lowest', () => {
+  expect(adapt(1, 12)).toBe(1)
+  expect(adapt(1, 30)).toBeCloseTo(0.7)
+  expect(adapt(0.4, 30)).toBe(0.3)
+  //at the lowest size a slowish draw is put up with, a hopeless one is not
+  expect(adapt(0.3, 30)).toBe(0.3)
+  expect(adapt(0.3, 60)).toBe(null)
 })
 
 it('grows coral from its seeds: every cell that freezes touches coral, and the walkers run out', () => {
@@ -326,5 +374,5 @@ it('grows coral from its seeds: every cell that freezes touches coral, and the w
 
 it('fades the coral toward the ground as its strength drops', () => {
   expect(ramp(['#ffffff', '#ffffff'], 1, 2)).toEqual(['rgb(255 255 255)', 'rgb(255 255 255)'])
-  expect(ramp(['#ffffff', '#ffffff'], 0, 2)).toEqual(['rgb(35 42 46)', 'rgb(35 42 46)'])
+  expect(ramp(['#ffffff', '#ffffff'], 0, 2)).toEqual(['rgb(15 28 30)', 'rgb(15 28 30)'])
 })

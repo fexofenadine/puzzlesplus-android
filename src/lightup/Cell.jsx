@@ -11,11 +11,19 @@ const hintClass = {
 }
 
 //a wall, numbered or not, or a white cell: dark or lit, with a bulb, a cross or a hint's faint one
-const Cell = ({ i, wall, value, lit, error, mark, cursor, onPress }) => {
+//number is what a numbered wall shows, its clue or the bulbs it still needs
+const Cell = ({ i, wall, number = wall, value, lit, error, mark, cursor, onPress }) => {
   if (wall !== WHITE) {
     return (
-      <div class={cx(s.wall, error && s.wallError, mark && hintClass[mark])}>
-        {wall === BLANK ? '' : wall}
+      <div
+        class={cx(
+          s.wall,
+          wall !== BLANK && number === 0 && wall !== 0 && s.wallDone,
+          (error || number < 0) && s.wallError,
+          mark && hintClass[mark],
+        )}
+      >
+        {wall === BLANK ? '' : number}
       </div>
     )
   }

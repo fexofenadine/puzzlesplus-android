@@ -58,7 +58,7 @@ export const desktopSection = {
       </li>
     </ul>,
     <p>
-      The <b>Theme</b> menu picks one of eight looks, shared by every game and remembered:
+      The <b>Theme</b> menu picks one of nine looks, shared by every game and remembered:
     </p>,
     <ul>
       <li>
@@ -66,7 +66,9 @@ export const desktopSection = {
         Bliss style sky with drifting clouds.
       </li>
       <li>
-        <b>Synthwave</b>, neon over a wireframe landscape with VHS scanlines and tape wobble.
+        <b>Synthwave</b>, neon over a wireframe landscape with VHS scanlines and tape wobble, or,
+        switched on in Background Settings, a flight through glowing triangles (a shader, heavy on
+        modest graphics cards, so it is off at first).
       </li>
       <li>
         <b>Matrix</b>, green on black over falling code rain, ported from xscreensaver's GLMatrix.
@@ -79,17 +81,17 @@ export const desktopSection = {
         glass terminal typing out this game's own source code.
       </li>
       <li>
-        <b>Vaporwave</b>, Windows 95 in pastels with scanlines, over pipes that build themselves
-        like the old screensaver.
+        <b>Vaporwave</b>, Windows 95 in pastels with scanlines, over bouncing lines that leave
+        trails, like the Mystify screensaver.
       </li>
       <li>
-        <b>Everforest</b>, soft greens on a dark ground, over coral that grows from scattered seeds.
+        <b>Terafox Hex Trail</b> and <b>Terafox Coral</b>, deep teals and sea greens, over lines
+        that grow across a honeycomb or coral that grows from scattered seeds.
       </li>
     </ul>,
     <p>
-      Background Settings (in the Theme menu, on every theme but Synthwave) has the options of the
-      xscreensaver originals, previews them live and can switch the animation off for a still
-      picture.
+      Background Settings (in the Theme menu) has the options of the xscreensaver originals,
+      previews them live and can switch the animation off for a still picture.
     </p>,
   ],
 }

@@ -225,6 +225,8 @@ export const state = {
   //the cell the arrow keys are on, -1 until they are used and again after a click
   cursor: -1,
   errors: Boolean(load('lightup.errors')),
+  //numbered walls show the bulbs they still need, on unless switched off
+  countdown: load('lightup.countdown') !== 'off',
   timer: loadTimer('lightup.timer'),
   shelf: saved.list(),
   game: opened || createGame(loadChoice()),
@@ -359,6 +361,7 @@ export const actions = {
     return { prompt: false }
   },
   toggleErrors: toggleAction('errors', 'lightup.errors', 'yes'),
+  toggleCountdown: toggleAction('countdown', 'lightup.countdown', '', 'off'),
   toggleTimer: timerAction('lightup.timer'),
   share: shareAction(shareCode),
   pause: pauseAction(running),

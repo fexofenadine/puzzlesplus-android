@@ -12,7 +12,7 @@ import { watchWindow } from '../shell/zoom'
 import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
-import { EMPTY, WHITE, darkLeft, litOf, violations } from './rules'
+import { BLANK, BULB, EMPTY, WHITE, besideOf, darkLeft, litOf, violations } from './rules'
 import { windowClear } from '../shell/actions'
 import { pageUrl, phone } from '../shell/phone'
 
@@ -28,6 +28,11 @@ const Game = ({ key, state, actions }) => {
   const errors = state.errors && !hidden ? violations(layout, board, n) : null
   const marks = (!paused && hint && hint.marks) || {}
   const lit = litOf(layout, board, n)
+  //counting down, a numbered wall shows the bulbs it still needs: its number less those beside it
+  const shown = (i) => {
+    if (!state.countdown || layout[i] === WHITE || layout[i] === BLANK) return layout[i]
+    return layout[i] - besideOf(n)[i].filter((c) => board[c] === BULB).length
+  }
   return (
     <Dialog
       clear={windowClear(state)}
@@ -76,6 +81,7 @@ const Game = ({ key, state, actions }) => {
             <Cell
               i={i}
               wall={hidden ? WHITE : layout[i]}
+              number={hidden ? null : shown(i)}
               value={hidden ? EMPTY : value}
               lit={!hidden && lit[i]}
               error={errors && errors.has(i)}

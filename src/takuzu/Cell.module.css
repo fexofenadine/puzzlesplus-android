@@ -34,11 +34,11 @@
   --tz-one-text: #1c1038;
 }
 
-:global(:root[data-theme='everforest']) {
-  --tz-zero: #83c092;
-  --tz-zero-text: #2d353b;
-  --tz-one: #e69875;
-  --tz-one-text: #2d353b;
+:global(:root:is([data-theme='terafox'], [data-theme='terafox-coral'])) {
+  --tz-zero: #5a93aa;
+  --tz-zero-text: #0f1c1e;
+  --tz-one: #fda47f;
+  --tz-one-text: #0f1c1e;
 }
 
 /*matrix is all green, so one value is green on black and the other black on green*/

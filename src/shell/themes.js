@@ -7,5 +7,9 @@ export const themes = [
   ['matrix', 'Matrix'],
   ['nord', 'Nord'],
   ['vaporwave', 'Vaporwave'],
-  ['everforest', 'Everforest'],
+  ['terafox', 'Terafox Hex Trail'],
+  ['terafox-coral', 'Terafox Coral'],
 ]
+
+//theme ids that were renamed, so a saved choice still finds its theme
+export const renamed = { everforest: 'terafox-coral' }

@@ -156,24 +156,25 @@ one, else a ramp: each doubling turns the hue a step and shifts the lightness*/
   --t-slot: rgb(255 255 255 / 0.3);
 }
 
-/*everforest's greys, then its accents from green round to red*/
-:global(:root[data-theme='everforest']) {
-  --t-c1: #475258;
-  --t-c2: #56635f;
-  --t-c3: #7a8478;
-  --t-c4: #a7c080;
-  --t-c5: #83c092;
-  --t-c6: #7fbbb3;
-  --t-c7: #d699b6;
-  --t-c8: #dbbc7f;
-  --t-c9: #e69875;
-  --t-c10: #e67e80;
-  --t-c11: #f3ead3;
-  --t-text: #2d353b;
-  --t-f1: #d3c6aa;
-  --t-f2: #d3c6aa;
-  --t-top: #d3c6aa;
-  --t-top-text: #2d353b;
+/*terafox's teals deepening to blue, then its warm accents*/
+:global(:root:is([data-theme='terafox'], [data-theme='terafox-coral'])) {
+  --t-c1: #254147;
+  --t-c2: #2d4f56;
+  --t-c3: #587b7b;
+  --t-c4: #7aa4a1;
+  --t-c5: #a1cdd8;
+  --t-c6: #5a93aa;
+  --t-c7: #ad5c7c;
+  --t-c8: #cb7985;
+  --t-c9: #fda47f;
+  --t-c10: #ff8349;
+  --t-c11: #e85c51;
+  --t-text: #0f1c1e;
+  --t-f1: #e6eaea;
+  --t-f2: #e6eaea;
+  --t-f3: #eaeeee;
+  --t-top: #eaeeee;
+  --t-top-text: #152528;
 }
 
 /*the original's grid: rounded tiles over rounded slots in a rounded tray*/

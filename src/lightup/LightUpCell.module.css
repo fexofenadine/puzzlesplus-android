@@ -11,6 +11,11 @@
   --lu-wall: #145c2a;
 }
 
+/*terafox's darkest tone is its open cells' neighbour, so its walls go darker still*/
+:global(:root:is([data-theme='terafox'], [data-theme='terafox-coral'])) {
+  --lu-wall: #060d0e;
+}
+
 :global(:root[data-theme='vaporwave']) {
   --lu-light: #fffb96;
   --lu-bulb: #ff71ce;
@@ -51,6 +56,11 @@
   color: var(--lu-wall-text);
   background: var(--lu-wall);
   cursor: default;
+}
+
+/*counted down to nothing: the wall has its bulbs*/
+.wallDone {
+  color: color-mix(in srgb, var(--lu-wall-text) 45%, var(--lu-wall));
 }
 
 /*a number with too many bulbs, or no room left for its own*/

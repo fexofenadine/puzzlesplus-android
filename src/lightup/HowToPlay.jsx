@@ -15,9 +15,11 @@ export const Rules = () => [
     Backspace clears it.
   </p>,
   <p>
-    The left counter shows the cells still dark, Ctrl+Z undoes and Ctrl+Y redoes. Show Errors marks
-    bulbs that light each other and walls with too many bulbs or too little room, and Hint explains
-    the next step logic gives. Every board has one solution that needs no guessing.
+    The left counter shows the cells still dark, Ctrl+Z undoes and Ctrl+Y redoes. With Count Down
+    Numbers on (Game menu), a wall shows the bulbs it still needs instead of its number, down to 0.
+    Show Errors marks bulbs that light each other and walls with too many bulbs or too little room,
+    and Hint explains the next step logic gives. Every board has one solution that needs no
+    guessing.
   </p>,
 ]
 

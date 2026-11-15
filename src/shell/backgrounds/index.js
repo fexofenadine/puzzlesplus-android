@@ -11,7 +11,9 @@ const loaders = {
   truchet: () => import('./truchet'),
   phosphor: () => import('./phosphor'),
   hill: () => import('./hill'),
-  pipes: () => import('./pipes'),
+  qix: () => import('./qix'),
+  hextrail: () => import('./hextrail'),
+  neon: () => import('./neon'),
   coral: () => import('./coral'),
 }
 
@@ -22,8 +24,10 @@ const themeBackgrounds = {
   nord: 'substrate',
   solarized: 'truchet',
   'solarized-phosphor': 'phosphor',
-  vaporwave: 'pipes',
-  everforest: 'coral',
+  synthwave: 'neon',
+  vaporwave: 'qix',
+  terafox: 'hextrail',
+  'terafox-coral': 'coral',
 }
 
 export const backgroundFor = (theme) => themeBackgrounds[theme] || null
@@ -81,13 +85,41 @@ export const configure = (id, values) => {
 
 export const startBackgrounds = () => {
   const root = document.documentElement
-  const canvas = document.createElement('canvas')
-  canvas.style.cssText =
-    'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none'
-  document.body.prepend(canvas)
-  const context = canvas.getContext('2d')
+  //one canvas for the 2d backgrounds, and one made when a webgl background first shows
+  const makeCanvas = () => {
+    const canvas = document.createElement('canvas')
+    canvas.style.cssText =
+      'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none'
+    document.body.prepend(canvas)
+    return canvas
+  }
+  const flat = makeCanvas()
+  const surfaces = { flat: { canvas: flat, context: flat.getContext('2d') }, gl: null }
+  //the canvas and context a background draws on; throws where the browser has no webgl2
+  const surfaceOf = (id) => {
+    if (!backgrounds[id].gl) return surfaces.flat
+    if (!surfaces.gl) {
+      const canvas = makeCanvas()
+      const options = { alpha: false, antialias: false, powerPreference: 'low-power' }
+      const context = canvas.getContext('webgl2', options)
+      if (!context) {
+        canvas.remove()
+        throw new Error('no webgl2')
+      }
+      surfaces.gl = { canvas, context }
+    }
+    return surfaces.gl
+  }
+  const show = (id) => {
+    for (const surface of [surfaces.flat, surfaces.gl]) {
+      if (surface) surface.canvas.style.display = 'none'
+    }
+    if (id && instances[id]) surfaceOf(id).canvas.style.display = 'block'
+  }
 
   let active = null
+  //backgrounds that could not run here, shown as their wallpaper for the rest of the visit
+  const gaveUp = new Set()
   //animated, still or wallpaper
   let mode = null
   let frame = null
@@ -106,6 +138,7 @@ export const startBackgrounds = () => {
     const { ratio, filter } = backgrounds[active]
     const pixels = window.devicePixelRatio || 1
     const scale = ratio(pixels, settings[active])
+    const { canvas } = surfaceOf(active)
     canvas.width = Math.round(innerWidth * scale)
     canvas.height = Math.round(innerHeight * scale)
     canvas.style.filter = filter ? filter(pixels) : 'none'
@@ -142,7 +175,7 @@ export const startBackgrounds = () => {
   const update = (changed) => {
     const id = backgroundFor(root.dataset.theme)
     const still = backgrounds[id]?.wallpaper ? 'wallpaper' : 'still'
-    const next = id && (settings[id].animated ? 'animated' : still)
+    const next = id && (settings[id].animated && !gaveUp.has(id) ? 'animated' : still)
     //the css shows a theme's wallpaper unless the canvas covers it
     if (next) root.dataset.background = next
     else delete root.dataset.background
@@ -150,21 +183,28 @@ export const startBackgrounds = () => {
     cancelAnimationFrame(frame)
     active = id
     mode = next
-    canvas.style.display = id && mode !== 'wallpaper' ? 'block' : 'none'
+    show(id && mode !== 'wallpaper' ? id : null)
     //a wallpaper is the theme's css, nothing to load
     if (!id || mode === 'wallpaper') return
     if (instances[id]) return start()
+    //the theme's own wallpaper stays: offline before it was ever shown, no webgl, or a
+    //background that found the device too slow for it
+    const giveUp = () => {
+      gaveUp.add(id)
+      if (active !== id) return
+      cancelAnimationFrame(frame)
+      mode = 'wallpaper'
+      show(null)
+      root.dataset.background = 'wallpaper'
+    }
     loaders[id]()
       .then((loaded) => {
-        instances[id] ??= loaded.default.create(context, settings[id])
-        if (active === id) start()
-      })
-      //offline before it was ever shown: the theme's own wallpaper stays
-      .catch(() => {
+        instances[id] ??= loaded.default.create(surfaceOf(id).context, settings[id], { giveUp })
         if (active !== id) return
-        canvas.style.display = 'none'
-        root.dataset.background = 'wallpaper'
+        show(id)
+        start()
       })
+      .catch(giveUp)
   }
 
   refresh = update
