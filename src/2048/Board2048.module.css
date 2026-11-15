@@ -136,6 +136,46 @@ one, else a ramp: each doubling turns the hue a step and shifts the lightness*/
   --t-top-text: #002b36;
 }
 
+/*the pastels from mint through cyan, purple and pink to a yellow 2048*/
+:global(:root[data-theme='vaporwave']) {
+  --t-c1: #e6fff5;
+  --t-c2: #b8ffe3;
+  --t-c3: #5cf7bf;
+  --t-c4: #5ee6e0;
+  --t-c5: #01cdfe;
+  --t-c6: #6fb1ff;
+  --t-c7: #b967ff;
+  --t-c8: #d77bff;
+  --t-c9: #ff71ce;
+  --t-c10: #ffa3bd;
+  --t-c11: #fffb96;
+  --t-text: #2b1b4a;
+  --t-top: #2b1b4a;
+  --t-top-text: #fffb96;
+  --t-grid: #8f84b0;
+  --t-slot: rgb(255 255 255 / 0.3);
+}
+
+/*everforest's greys, then its accents from green round to red*/
+:global(:root[data-theme='everforest']) {
+  --t-c1: #475258;
+  --t-c2: #56635f;
+  --t-c3: #7a8478;
+  --t-c4: #a7c080;
+  --t-c5: #83c092;
+  --t-c6: #7fbbb3;
+  --t-c7: #d699b6;
+  --t-c8: #dbbc7f;
+  --t-c9: #e69875;
+  --t-c10: #e67e80;
+  --t-c11: #f3ead3;
+  --t-text: #2d353b;
+  --t-f1: #d3c6aa;
+  --t-f2: #d3c6aa;
+  --t-top: #d3c6aa;
+  --t-top-text: #2d353b;
+}
+
 /*the original's grid: rounded tiles over rounded slots in a rounded tray*/
 .board {
   --gap: calc(var(--cell) * 0.14);

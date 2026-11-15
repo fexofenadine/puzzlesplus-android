@@ -43,11 +43,12 @@ const About = ({ key, name, actions, credits }, children) => (
             </li>
             <li>
               Backgrounds are canvas ports of GLMatrix, Substrate, Truchet and Phosphor from
-              xscreensaver, under the xscreensaver licence.
+              xscreensaver, under the xscreensaver licence, and Pipes and Coral written after
+              xscreensaver's.
             </li>
             <li>Fonts are under the SIL Open Font License and LGPL 2.1.</li>
             <li>Photos are from Unsplash, and CC0 photos from Wikimedia Commons.</li>
-            <li>Colour schemes: SynthWave '84, Solarized and Nord.</li>
+            <li>Colour schemes: SynthWave '84, Solarized, Nord and Everforest.</li>
             <li>Full credits and licences are in the README.</li>
           </ul>
         </details>

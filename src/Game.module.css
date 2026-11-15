@@ -57,15 +57,18 @@
   composes: field;
 }
 
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost {
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
+  .fieldLost {
   position: relative;
   animation:
     jitter 2.4s steps(1, end) infinite,
     chroma 3.1s steps(1, end) infinite;
 }
 
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::before,
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::after {
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
+  .fieldLost::before,
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
+  .fieldLost::after {
   position: absolute;
   top: 0;
   right: 0;
@@ -76,7 +79,8 @@
   content: '';
 }
 
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::before {
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
+  .fieldLost::before {
   background: linear-gradient(
       transparent,
       color-mix(in srgb, var(--fringe-b) 40%, transparent) 45%,
@@ -88,7 +92,8 @@
   animation: band 1.7s linear infinite;
 }
 
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::after {
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
+  .fieldLost::after {
   background: repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.3) 2px 3px);
   animation: flicker 0.15s steps(2) infinite;
 }

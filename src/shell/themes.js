@@ -6,4 +6,6 @@ export const themes = [
   ['solarized-phosphor', 'Solarized Phosphor'],
   ['matrix', 'Matrix'],
   ['nord', 'Nord'],
+  ['vaporwave', 'Vaporwave'],
+  ['everforest', 'Everforest'],
 ]

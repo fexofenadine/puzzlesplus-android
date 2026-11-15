@@ -19,6 +19,16 @@
   --ng-cross: #4c566a;
 }
 
+:global(:root[data-theme='vaporwave']) {
+  --ng-fill: #7b3fe4;
+  --ng-cross: #8f84b0;
+}
+
+:global(:root[data-theme='everforest']) {
+  --ng-fill: #a7c080;
+  --ng-cross: #56635f;
+}
+
 :global(:root[data-theme='matrix']) {
   --ng-fill: #39d26b;
   --ng-cross: #1d6b37;

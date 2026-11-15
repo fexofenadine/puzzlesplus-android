@@ -42,11 +42,12 @@
 }
 
 /*neon theme counter glitch and scanlines*/
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .root {
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave'])) .root {
   animation: lcdGlitch 5.3s steps(1, end) infinite;
 }
 
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .root::after {
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
+  .root::after {
   position: absolute;
   top: 0;
   right: 0;

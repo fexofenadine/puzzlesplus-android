@@ -27,6 +27,20 @@
   --tz-one-text: #2e3440;
 }
 
+:global(:root[data-theme='vaporwave']) {
+  --tz-zero: #01cdfe;
+  --tz-zero-text: #1c1038;
+  --tz-one: #ff71ce;
+  --tz-one-text: #1c1038;
+}
+
+:global(:root[data-theme='everforest']) {
+  --tz-zero: #83c092;
+  --tz-zero-text: #2d353b;
+  --tz-one: #e69875;
+  --tz-one-text: #2d353b;
+}
+
 /*matrix is all green, so one value is green on black and the other black on green*/
 :global(:root[data-theme='matrix']) {
   --tz-zero: #020a04;

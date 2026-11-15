@@ -484,7 +484,15 @@ it('calls the window Minesweeper on classic and Minesweeper Plus on the other th
       app({ ...state, theme }, actions, testView, container)
     })
   expect(await titleOf('classic')).toBe('Minesweeper')
-  for (const theme of ['synthwave', 'matrix', 'nord', 'solarized', 'solarized-phosphor']) {
+  for (const theme of [
+    'synthwave',
+    'matrix',
+    'nord',
+    'solarized',
+    'solarized-phosphor',
+    'vaporwave',
+    'everforest',
+  ]) {
     expect(await titleOf(theme)).toBe('Minesweeper Plus')
   }
 })
@@ -600,7 +608,15 @@ it('has a hint button by the face on every theme but classic', async () => {
       app({ ...state, theme }, actions, testView, container)
     })
   expect(await hintButtons('classic')).toBe(0)
-  for (const theme of ['synthwave', 'matrix', 'nord', 'solarized', 'solarized-phosphor']) {
+  for (const theme of [
+    'synthwave',
+    'matrix',
+    'nord',
+    'solarized',
+    'solarized-phosphor',
+    'vaporwave',
+    'everforest',
+  ]) {
     expect(await hintButtons(theme)).toBe(1)
   }
 })

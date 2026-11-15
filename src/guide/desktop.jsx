@@ -58,7 +58,7 @@ export const desktopSection = {
       </li>
     </ul>,
     <p>
-      The <b>Theme</b> menu picks one of six looks, shared by every game and remembered:
+      The <b>Theme</b> menu picks one of eight looks, shared by every game and remembered:
     </p>,
     <ul>
       <li>
@@ -77,6 +77,13 @@ export const desktopSection = {
       <li>
         <b>Solarized Truchet</b> and <b>Solarized Phosphor</b>, over winding Truchet tiles or a
         glass terminal typing out this game's own source code.
+      </li>
+      <li>
+        <b>Vaporwave</b>, Windows 95 in pastels with scanlines, over pipes that build themselves
+        like the old screensaver.
+      </li>
+      <li>
+        <b>Everforest</b>, soft greens on a dark ground, over coral that grows from scattered seeds.
       </li>
     </ul>,
     <p>

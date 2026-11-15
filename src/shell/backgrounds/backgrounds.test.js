@@ -5,6 +5,9 @@ import truchet from './truchet'
 import phosphor, { loadTexts } from './phosphor'
 import { pixel } from './font6x10'
 import hill, { hillLayout, noise } from './hill'
+import { dirs, lattice, turn } from './pipes'
+import { ramp, reef } from './coral'
+import { random } from '../random'
 
 beforeEach(() => localStorage.clear())
 
@@ -14,6 +17,8 @@ it('maps only the animated themes to a background', () => {
   expect(backgroundFor('solarized')).toBe('truchet')
   expect(backgroundFor('solarized-phosphor')).toBe('phosphor')
   expect(backgroundFor('classic')).toBe('hill')
+  expect(backgroundFor('vaporwave')).toBe('pipes')
+  expect(backgroundFor('everforest')).toBe('coral')
   expect(backgroundFor('synthwave')).toBe(null)
 })
 
@@ -49,6 +54,8 @@ it('stores every background together and repairs bad values', () => {
     'truchet',
     'phosphor',
     'hill',
+    'pipes',
+    'coral',
   ])
 })
 
@@ -264,4 +271,60 @@ it('draws substrate as finely as its detail setting asks', () => {
   expect(substrate.ratio(1.25, { detail: 'balanced' })).toBe(1.25)
   expect(substrate.ratio(2, { detail: 'sharp' })).toBe(2)
   expect(defaults('substrate').detail).toBe('balanced')
+})
+
+it('grows pipes only through free nodes of the lattice, and ends one that is boxed in', () => {
+  const grid = lattice(4, 4)
+  const rng = random(3)
+  const pipe = { i: 0, j: 0, z: 0, dir: 0 }
+  grid.taken[grid.at(0, 0, 0)] = 1
+  let steps = 0
+  for (;;) {
+    const dir = turn(grid, pipe, rng)
+    if (dir === null) break
+    const [dx, dy, dz] = dirs[dir]
+    Object.assign(pipe, { i: pipe.i + dx, j: pipe.j + dy, z: pipe.z + dz, dir })
+    expect(grid.free(pipe.i, pipe.j, pipe.z)).toBe(true)
+    grid.taken[grid.at(pipe.i, pipe.j, pipe.z)] = 1
+    steps++
+  }
+  expect(steps).toBeGreaterThan(3)
+  //every way on from where it stopped is taken or off the lattice
+  expect(dirs.some(([dx, dy, dz]) => grid.free(pipe.i + dx, pipe.j + dy, pipe.z + dz))).toBe(false)
+})
+
+it('grows coral from its seeds: every cell that freezes touches coral, and the walkers run out', () => {
+  const cols = 40
+  const rows = 30
+  const set = new Set()
+  const plots = []
+  const growth = reef(cols, rows, { seeds: 3, density: 25 }, random(7), (x, y, shade) => {
+    plots.push([x, y, shade])
+    set.add(y * cols + x)
+  })
+  const seeds = plots.length
+  expect(seeds).toBeGreaterThan(0)
+  expect(growth.total).toBe(300)
+  let steps = 0
+  while (growth.step() && steps++ < 20000);
+  expect(growth.left()).toBe(0)
+  //nothing freezes twice, and all but the seeds joined something already there
+  expect(set.size).toBe(plots.length)
+  const seen = new Set()
+  plots.forEach(([x, y], k) => {
+    if (k >= seeds) {
+      const near = [-1, 0, 1].some((dy) =>
+        [-1, 0, 1].some((dx) => (dx || dy) && seen.has((y + dy) * cols + x + dx)),
+      )
+      expect(near).toBe(true)
+    }
+    seen.add(y * cols + x)
+  })
+  //shades only move forward as it grows
+  expect(plots.every(([, , shade], k) => k === 0 || shade >= plots[k - 1][2])).toBe(true)
+})
+
+it('fades the coral toward the ground as its strength drops', () => {
+  expect(ramp(['#ffffff', '#ffffff'], 1, 2)).toEqual(['rgb(255 255 255)', 'rgb(255 255 255)'])
+  expect(ramp(['#ffffff', '#ffffff'], 0, 2)).toEqual(['rgb(35 42 46)', 'rgb(35 42 46)'])
 })

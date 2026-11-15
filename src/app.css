@@ -68,6 +68,13 @@
   src: url(./fonts/jetbrains-mono-bold.woff2) format('woff2');
 }
 
+@font-face {
+  font-family: 'Figtree';
+  font-weight: 300 900;
+  font-display: swap;
+  src: url(./fonts/figtree.woff2) format('woff2');
+}
+
 :root {
   --pixel-font: 'Wine MS Sans Serif Pixel', Tahoma, Geneva, sans-serif;
   --ui-font: var(--pixel-font);
@@ -341,6 +348,105 @@
   --smiley-line: #2e3440;
 }
 
+:root[data-theme='vaporwave'] {
+  /*windows 95 in the vaporwave pastels: pink, cyan, mint, purple and yellow on lavender grey*/
+  color-scheme: light;
+  --title-glow: 1px 1px 0 #b967ff;
+  --desktop: #008080;
+  --text: #2b1b4a;
+  --face: #d6cfe6;
+  --light: #fff;
+  --shadow: #8f84b0;
+  --dark-shadow: #4a3f73;
+  --frame: #2b1b4a;
+  --window-frame: #2b1b4a;
+  --title-start: #ff71ce;
+  --title-end: #01cdfe;
+  --title-text: #fff;
+  --highlight: #b967ff;
+  --highlight-text: #fff;
+  --menu-shadow: rgba(43, 27, 74, 0.45);
+  --input: #fff;
+  --input-frame: #2b1b4a;
+  --panel: #cbc3e0;
+  --cell: #c9c0e2;
+  --cell-light: #fff;
+  --cell-shadow: #8676b3;
+  --cell-open: #ddd6ee;
+  --lcd: #1c1038;
+  --lcd-on: #05ffa1;
+  --lcd-off: rgba(5, 255, 161, 0.14);
+  /*the pastels deepened until they read on lavender*/
+  --num-1: #0086c9;
+  --num-2: #00996b;
+  --num-3: #ff2e97;
+  --num-4: #7b3fe4;
+  --num-5: #c2247a;
+  --num-6: #008080;
+  --num-7: #2b1b4a;
+  --num-8: #8676b3;
+  --glyph: #2b1b4a;
+  --flag: #ff2e97;
+  --mine: #2b1b4a;
+  --mine-shine: #fff;
+  --hurt: #ff71ce;
+  --wrong: #ff2e97;
+  --smiley: #fffb96;
+  --smiley-line: #2b1b4a;
+  --fringe-a: rgba(255, 113, 206, 0.85);
+  --fringe-b: rgba(1, 205, 254, 0.85);
+}
+
+:root[data-theme='everforest'] {
+  /*everforest dark, medium contrast*/
+  color-scheme: dark;
+  --ui-font: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --title-font: var(--ui-font);
+  --text-font: var(--ui-font);
+  --font-size: 12px;
+  --font-smoothing: auto;
+  --desktop: #232a2e;
+  --text: #d3c6aa;
+  --face: #343f44;
+  --light: #56635f;
+  --shadow: #272e33;
+  --dark-shadow: #1e2326;
+  --frame: #83c092;
+  --window-frame: #1e2326;
+  --title-start: #3f6b5c;
+  --title-end: #83c092;
+  --title-text: #fffbef;
+  --highlight: #a7c080;
+  --highlight-text: #2d353b;
+  --menu-shadow: rgba(0, 0, 0, 0.45);
+  --input: #2d353b;
+  --input-frame: #1e2326;
+  --panel: #343f44;
+  --cell: #3d484d;
+  --cell-light: #5c6a72;
+  --cell-shadow: #272e33;
+  --cell-open: #2f383d;
+  --lcd: #232a2e;
+  --lcd-on: #e67e80;
+  --lcd-off: rgba(230, 126, 128, 0.18);
+  --num-1: #7fbbb3;
+  --num-2: #a7c080;
+  --num-3: #e67e80;
+  --num-4: #d699b6;
+  --num-5: #e69875;
+  --num-6: #83c092;
+  --num-7: #d3c6aa;
+  --num-8: #859289;
+  --glyph: #d3c6aa;
+  --flag: #e67e80;
+  --mine: #d3c6aa;
+  --mine-shine: #2d353b;
+  --hurt: #e67e80;
+  --wrong: #e67e80;
+  --smiley: #dbbc7f;
+  --smiley-line: #2d353b;
+}
+
 html,
 body,
 #app {
@@ -496,9 +602,34 @@ main::before {
   }
 }
 
-/*the substrate canvas shows through*/
-:root[data-theme='nord'] main::before {
+/*the substrate, pipes and coral canvases show through*/
+:root:is([data-theme='nord'], [data-theme='vaporwave'], [data-theme='everforest']) main::before {
   background: none;
+}
+
+/*tape grain over the pipes*/
+:root[data-theme='vaporwave'] main::before {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+  animation: vhs-grain 0.5s steps(1, end) infinite;
+}
+
+/*a softer tracking band, scanlines and vignette than synthwave's*/
+:root[data-theme='vaporwave'] main::after {
+  background:
+    linear-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.05) 30%,
+        rgba(1, 205, 254, 0.16) 48%,
+        rgba(255, 113, 206, 0.16) 52%,
+        rgba(255, 255, 255, 0.05) 70%,
+        transparent
+      )
+      0 -30% / 100% 10% no-repeat,
+    repeating-linear-gradient(rgba(28, 16, 56, 0.16) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 60%, rgba(28, 16, 56, 0.4));
+  animation:
+    vhs-roll 8s linear infinite,
+    vhs-flicker 0.12s steps(2) infinite;
 }
 
 /*markus spiske's cc0 photo, shown when the rain is off*/

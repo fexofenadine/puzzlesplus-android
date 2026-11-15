@@ -11,6 +11,8 @@ const loaders = {
   truchet: () => import('./truchet'),
   phosphor: () => import('./phosphor'),
   hill: () => import('./hill'),
+  pipes: () => import('./pipes'),
+  coral: () => import('./coral'),
 }
 
 //which theme shows which background
@@ -20,6 +22,8 @@ const themeBackgrounds = {
   nord: 'substrate',
   solarized: 'truchet',
   'solarized-phosphor': 'phosphor',
+  vaporwave: 'pipes',
+  everforest: 'coral',
 }
 
 export const backgroundFor = (theme) => themeBackgrounds[theme] || null

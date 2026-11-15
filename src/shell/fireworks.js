@@ -53,6 +53,19 @@ const looks = {
   },
 }
 looks['solarized-phosphor'] = looks.solarized
+looks.vaporwave = {
+  colors: ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff', '#fffb96'],
+  shape: square,
+  gravity: 80,
+  size: 3,
+}
+looks.everforest = {
+  colors: ['#a7c080', '#83c092', '#7fbbb3', '#dbbc7f', '#e69875', '#e67e80', '#d699b6'],
+  shape: dot,
+  gravity: 50,
+  size: 2.5,
+  glow: 5,
+}
 
 export const lookOf = (theme) => looks[theme] || looks.classic
 
