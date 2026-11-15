@@ -351,3 +351,20 @@ it('shares the picture as a link that opens the same clues', () => {
   expect(opened.shared).toBe(true)
   expect(gameOf('5.0.0')).toBe(null)
 })
+
+it('drops a half done stroke when the game pauses', () => {
+  click(0)
+  const before = board()
+  wired.down({ event: left, i: 6 })
+  wired.drag(8)
+  expect(board()).not.toEqual(before)
+  wired.pause(true)
+  expect(now().game.stroke).toBe(null)
+  expect(board()).toEqual(before)
+  //the release that follows changes nothing, and play goes on after
+  wired.up()
+  wired.pause(false)
+  clearTimeout(now().game.raf)
+  click(6)
+  expect(board()[6]).toBe(FILL)
+})

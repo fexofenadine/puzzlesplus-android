@@ -70,3 +70,25 @@ describe('games in play', () => {
     vi.useRealTimers()
   })
 })
+
+describe('keeping', () => {
+  it('packs a game once however often the page draws it', () => {
+    let packs = 0
+    const saved = resumable({
+      key: 'test.saved',
+      running: (game) => game.start >= 0,
+      pack: ({ n }) => (packs++, { n }),
+      unpack: ({ n }) => ({ n }),
+    })
+    const game = playing(4)
+    saved.keep(game)
+    saved.keep(game)
+    saved.keep(game)
+    expect(packs).toBe(1)
+    saved.keep({ ...game, n: 5 })
+    expect(packs).toBe(2)
+    //the page going still writes the latest time
+    saved.keep(game, true)
+    expect(packs).toBe(3)
+  })
+})

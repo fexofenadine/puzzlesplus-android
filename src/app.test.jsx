@@ -643,3 +643,16 @@ it('forgets the saved game once it is lost, and keeps no best time with the time
   expect(current.game.win).toBe(true)
   expect(current.winner).toBe(null)
 })
+
+it('acts once on a held shortcut key', () => {
+  start({ game: chordGame() })
+  const key = (keyCode, extra) => wired.press({ keyCode, target: { tagName: 'BODY' }, ...extra })
+  key(72, { repeat: true })
+  expect(current.hint).toBe(null)
+  key(27, { repeat: true })
+  wired.peek()
+  expect(current.boss).toBe(null)
+  key(72)
+  wired.peek()
+  expect(current.hint).not.toBe(null)
+})

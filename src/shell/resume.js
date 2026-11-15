@@ -9,6 +9,8 @@ const SHELF = 3
 //label names a game in the resume list, fresh is the state a resumed game starts from
 export const resumable = ({ key, running, pack, unpack, label = () => '', fresh = {} }) => {
   let last = null
+  //the game object and pause last looked at, a render that left them alone has nothing new
+  let looked = null
   const shelfKey = `${key}.shelf`
 
   const elapsedOf = (game) =>
@@ -16,6 +18,8 @@ export const resumable = ({ key, running, pack, unpack, label = () => '', fresh 
 
   //writes only when the parts or the pause changed, or when forced as the page goes
   const keep = (game, force = false) => {
+    if (game === looked && !force) return
+    looked = game
     if (!running(game)) {
       if (last !== '') remove(key)
       last = ''

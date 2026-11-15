@@ -498,7 +498,10 @@ export const actions = {
   },
   //a half done stroke is kept as it is
   share: shareAction(shareCode),
-  pause: pauseAction(running),
+  //a half done stroke is dropped when the game pauses, its release may never arrive
+  pause: pauseAction(running, ({ stroke }) =>
+    stroke ? { stroke: null, board: stroke.before } : {},
+  ),
   tick: tickAction,
   ...recordActions,
   ...saved.actions,

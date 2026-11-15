@@ -220,3 +220,22 @@ it('drops a save that does not fit, or a board with no move left', () => {
   )
   expect(saved.restore()).toBe(null)
 })
+
+it('leaves the time a lost game sat for out of its clock, and counts the loss once', () => {
+  const almost = [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 8, 2, 64, 64]
+  localStorage.setItem('losses', 'on')
+  start({ game: gameOf(almost, { score: 500 }) })
+  setRandom(() => 0.5)
+  wired.slide('left')
+  const { start: began, overAt } = now().game
+  expect(now().game.over).toBe(true)
+  //the player looks at the lost board for a minute, then takes the move back
+  now().game.overAt = overAt - 60000
+  wired.undo()
+  expect(now().game.start).toBeGreaterThanOrEqual(began + 60000)
+  clearTimeout(now().game.raf)
+  wired.slide('left')
+  expect(now().game.over).toBe(true)
+  wired.toggleBestTime()
+  expect(now().bestTime.stats).toMatchObject({ lost: 1 })
+})
