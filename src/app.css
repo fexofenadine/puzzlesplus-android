@@ -821,21 +821,21 @@ main::before {
   --md-switch-off: #d6cfe6;
 }
 
-/*sainnhe's everforest dark: bg0 to bg3, fg, green #a7c080 and aqua #83c092*/
-:root[data-phone][data-theme='everforest'] {
-  --md-bar: #343f44;
-  --md-panel: #343f44;
-  --md-high: #3d484d;
-  --md-card: rgba(45, 53, 59, 0.86);
-  --md-outline: #7a8478;
-  --md-outline-variant: #475258;
-  --md-on: #d3c6aa;
-  --md-on-variant: #9da9a0;
-  --md-primary: #a7c080;
-  --md-on-primary: #2d353b;
-  --md-sec-cont: #3f6b5c;
-  --md-on-sec-cont: #f3ead3;
-  --md-switch-off: #3d484d;
+/*edeneast's terafox: bg0 to bg3, fg1, blue #5a93aa and green #7aa4a1*/
+:root[data-phone]:is([data-theme='terafox'], [data-theme='terafox-coral']) {
+  --md-bar: #1d3337;
+  --md-panel: #1d3337;
+  --md-high: #254147;
+  --md-card: rgba(21, 37, 40, 0.86);
+  --md-outline: #587b7b;
+  --md-outline-variant: #2d4f56;
+  --md-on: #e6eaea;
+  --md-on-variant: #a1cdd8;
+  --md-primary: #7aa4a1;
+  --md-on-primary: #0f1c1e;
+  --md-sec-cont: #2d4f56;
+  --md-on-sec-cont: #eaeeee;
+  --md-switch-off: #254147;
 }
 
 /*material dialogs on the phone: everything that opens over the game, every theme but classic*/

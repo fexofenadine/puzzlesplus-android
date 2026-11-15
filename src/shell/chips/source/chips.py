@@ -16,7 +16,8 @@ themes = [
     'solarized',
     'solarized-phosphor',
     'vaporwave',
-    'everforest',
+    'terafox',
+    'terafox-coral',
 ]
 #name themes to render only those, the rest keep their files
 themes = sys.argv[1:] or themes
