@@ -72,8 +72,10 @@ export const lookOf = (theme) => looks[theme] || looks.classic
 
 const SPARKS = 70
 const TRAIL = 5
-//rockets go up until a press or key, or this many seconds, whichever is first
-const LIMIT = 120
+//rockets go up until a new game starts, or for this many seconds
+const LIMIT = 300
+//the longest step in seconds: slow frames, as under a heavy shader, still keep time
+const STEP = 0.25
 
 //the next rocket: where it bursts as fractions of the screen, and the wait after it in seconds
 export const launch = (rng) => ({
@@ -123,6 +125,11 @@ const calm = () => !globalThis.matchMedia || matchMedia('(prefers-reduced-motion
 
 let canvas = null
 let running = false
+//ends the launching of the show playing, the rockets and bursts in the air finish
+let finish = () => {}
+
+//a new game ends the show
+export const stopFireworks = () => finish()
 
 //the page's own canvas sits in main, over its wallpaper and under the windows
 //without one a canvas goes after the background's
@@ -149,8 +156,7 @@ export const fireworksOn = (page, theme) =>
     : load('minesweeper.fireworks') === 'on'
 
 //a show for a win, unless they are off, the tab is hidden, the boss key is up or motion is reduced
-//it keeps launching until the next press or key (not one that came before it, nor a held key
-//repeating) or two minutes, then the rockets and bursts in the air finish
+//it keeps launching until a new game or five minutes, then the rockets and bursts in the air finish
 export const celebrate = (page, theme = document.documentElement.dataset.theme) => {
   if (running || !fireworksOn(page, theme) || document.hidden || calm()) return
   const root = document.documentElement
@@ -166,7 +172,6 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
   target.height = Math.round(height * scale)
   target.style.display = 'block'
   context.setTransform(scale, 0, 0, scale, 0, 0)
-  const started = performance.now()
   let open = true
   let wait = 0
   let alive = []
@@ -175,15 +180,12 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
   let last = null
   running = true
 
-  //only a press or key after the show began ends the launching
-  const interrupt = (event) => {
-    if (event.timeStamp > started && !event.repeat) open = false
+  finish = () => {
+    open = false
   }
-  const listening = ['pointerdown', 'keydown']
-  for (const name of listening) window.addEventListener(name, interrupt, true)
 
   const stop = () => {
-    for (const name of listening) window.removeEventListener(name, interrupt, true)
+    finish = () => {}
     running = false
     context.setTransform(1, 0, 0, 1, 0, 0)
     context.clearRect(0, 0, target.width, target.height)
@@ -191,8 +193,8 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
   }
 
   const frame = (now) => {
-    //a long gap, such as a hidden tab, would fling the sparks, so steps are capped
-    const dt = last === null ? 0 : Math.min(Math.max((now - last) / 1000, 0), 0.05)
+    //a long gap would fling the sparks, so steps are capped
+    const dt = last === null ? 0 : Math.min(Math.max((now - last) / 1000, 0), STEP)
     last = now
     clock += dt
     if (root.dataset.boss || document.hidden) return stop()

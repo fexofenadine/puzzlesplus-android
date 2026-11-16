@@ -1,3 +1,5 @@
+import { app } from '../platform'
+
 //what the host and the settings dialog need to know about each background without loading it
 //{ name, credit, options, ratio(dpr, settings), filter?(dpr), wallpaper?, animated? }
 
@@ -249,7 +251,7 @@ export const phosphor = {
   wallpaper: true,
   ratio: (pixels) => pixels,
   options: [
-    { key: 'scale', label: 'Scale', type: 'range', min: 2, max: 12, step: 1, value: 6 },
+    { key: 'scale', label: 'Scale', type: 'range', min: 2, max: 12, step: 1, value: 2 },
     { key: 'ticks', label: 'Fade', type: 'range', min: 4, max: 40, step: 1, value: 20 },
     {
       key: 'delay',
@@ -296,39 +298,6 @@ export const phosphor = {
       value: 20,
       format: (v) => `${v}%`,
     },
-  ],
-}
-
-export const hill = {
-  name: 'Hill',
-  credit:
-    'Hill from a CC0 photo of Cattle Hill, Roedean by Hassocks5489, colour matched to Bliss, under a sky drawn live',
-  wallpaper: true,
-  //classic looks like the original game unless this is turned on
-  animated: false,
-  ratio: (pixels) => pixels,
-  options: [
-    {
-      key: 'wind',
-      label: 'Wind speed',
-      type: 'range',
-      min: 0.25,
-      max: 4,
-      step: 0.25,
-      value: 1,
-      format: (v) => `${v}×`,
-    },
-    {
-      key: 'cover',
-      label: 'Cloud cover',
-      type: 'range',
-      min: 0,
-      max: 100,
-      step: 5,
-      value: 35,
-      format: (v) => `${v}%`,
-    },
-    { key: 'shadows', label: 'Cloud shadows', type: 'toggle', value: true },
   ],
 }
 
@@ -390,7 +359,7 @@ export const hextrail = {
       value: 1,
       format: (v) => `${v}×`,
     },
-    { key: 'size', label: 'Hexagon size', type: 'range', min: 12, max: 80, step: 2, value: 28 },
+    { key: 'size', label: 'Hexagon size', type: 'range', min: 12, max: 80, step: 1, value: 15 },
     {
       key: 'thickness',
       label: 'Thickness',
@@ -398,11 +367,11 @@ export const hextrail = {
       min: 5,
       max: 50,
       step: 1,
-      value: 15,
+      value: 10,
       format: (v) => `${v}%`,
     },
-    //the original outlines each hexagon as a line reaches it, off here to stay calm
-    { key: 'borders', label: 'Hexagon outlines', type: 'toggle', value: false },
+    //the original outlines each hexagon as a line reaches it
+    { key: 'borders', label: 'Hexagon outlines', type: 'toggle', value: true },
     {
       key: 'palette',
       label: 'Colours',
@@ -427,38 +396,40 @@ export const hextrail = {
   ],
 }
 
-//a shader, drawn with webgl2 on a canvas of its own
+//the shaders draw with webgl2 on a canvas of their own, at full size in the app and below it on
+//the web, where a draw also has to keep up or the theme falls back to its photo
+const resolution = (web) => ({
+  key: 'resolution',
+  label: 'Resolution',
+  type: 'range',
+  min: 20,
+  max: 100,
+  step: 5,
+  value: app ? 100 : web,
+  format: (v) => `${v}%`,
+})
+
+const speed = (value) => ({
+  key: 'speed',
+  label: 'Speed',
+  type: 'range',
+  min: 0.1,
+  max: 2,
+  step: 0.1,
+  value,
+  format: (v) => `${v}×`,
+})
+
 export const neon = {
   name: 'Neon Triangulator',
   credit: 'Neon Triangulator by mrange (CC0, shadertoy.com/view/tXGGRD), as in xscreensaver',
   gl: true,
   //turned off, or where the shader is too much for the device, the theme shows its photo
   wallpaper: true,
-  //it marches rays for every pixel: about 23 ms a draw at 576 x 300 on intel uhd 630 graphics,
-  //too much to be on unasked, so synthwave keeps its photo until this is switched on
-  animated: false,
   ratio: () => 1,
   options: [
-    {
-      key: 'speed',
-      label: 'Speed',
-      type: 'range',
-      min: 0.1,
-      max: 2,
-      step: 0.1,
-      value: 0.5,
-      format: (v) => `${v}×`,
-    },
-    {
-      key: 'resolution',
-      label: 'Resolution',
-      type: 'range',
-      min: 20,
-      max: 100,
-      step: 5,
-      value: 35,
-      format: (v) => `${v}%`,
-    },
+    speed(0.2),
+    resolution(65),
     {
       key: 'brightness',
       label: 'Brightness',
@@ -470,6 +441,18 @@ export const neon = {
       format: (v) => `${v}%`,
     },
   ],
+}
+
+//classic's opt-in sky, over the original photo until it is switched on
+export const driftclouds = {
+  name: 'Drift Clouds',
+  credit:
+    '2D Clouds by drift (shadertoy.com/view/4tdSWr, free to use), as Drift Clouds in xscreensaver',
+  gl: true,
+  wallpaper: true,
+  animated: false,
+  ratio: () => 1,
+  options: [speed(1), resolution(50)],
 }
 
 export const coral = {

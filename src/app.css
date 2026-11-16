@@ -496,7 +496,7 @@ main::before {
   background: url(./background.jpg) 50% 50% / cover;
 }
 
-/*the optional animated hill replaces the photo*/
+/*the optional drift clouds replace the photo*/
 :root[data-theme='classic'][data-background='animated'] main::before {
   background: none;
 }
@@ -674,6 +674,17 @@ main::before {
 :root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])[data-background='animated']
   main::before {
   background: none;
+}
+
+/*the paused screen's screensaver: only the background and any fireworks, no pointer*/
+:root[data-screensaver] main > :not(#fireworks),
+:root[data-screensaver] body > :not(canvas, main) {
+  visibility: hidden;
+}
+
+:root[data-screensaver],
+:root[data-screensaver] * {
+  cursor: none !important;
 }
 
 /*the android app: a top bar instead of the taskbar, the game window filling the rest*/

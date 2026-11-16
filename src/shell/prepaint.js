@@ -6,14 +6,16 @@ try {
     /^everforest$/,
     'terafox-coral',
   )
-  //assume animated off classic, the script corrects it; synthwave's is only on when asked for
+  //assume animated off classic, the script corrects it; synthwave's is on unless switched off
+  //since its default changed (settings version 1)
   var theme = document.documentElement.dataset.theme
-  var animated = theme !== 'classic' && theme !== 'synthwave'
+  var animated = theme !== 'classic'
   if (theme === 'synthwave') {
     try {
-      animated = JSON.parse(localStorage.getItem('backgrounds')).neon.animated === true
+      var saved = JSON.parse(localStorage.getItem('backgrounds'))
+      animated = !(saved.version >= 1 && saved.neon.animated === false)
     } catch {
-      //nothing saved, the photo stays
+      //nothing saved, the shader is on
     }
   }
   if (animated) document.documentElement.dataset.background = 'animated'

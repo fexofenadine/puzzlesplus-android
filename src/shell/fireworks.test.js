@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { advance, celebrate, fireworksOn, launch, lookOf, sparks } from './fireworks'
+import { advance, celebrate, fireworksOn, launch, lookOf, sparks, stopFireworks } from './fireworks'
 import { themes } from './themes'
 import { random } from './random'
 
@@ -70,60 +70,63 @@ it('flings sparks out and lets them fall and fade away', () => {
 })
 
 //a press or key that happens after the show began
-const press = (type, props = {}) => {
+const press = (type) => {
   const event = new Event(type)
   Object.defineProperty(event, 'timeStamp', { value: performance.now() + 50 })
-  for (const [name, value] of Object.entries(props)) Object.defineProperty(event, name, { value })
   window.dispatchEvent(event)
 }
 
 //thousands of frames are stepped through, slow when other tests share the machine
-it('keeps launching until a press, then lets what is in the air finish', { timeout: 60000 }, () => {
+it(
+  'keeps launching through presses and keys until a new game, then lets the air clear',
+  { timeout: 60000 },
+  () => {
+    celebrate()
+    const canvas = document.body.querySelectorAll('canvas')[1]
+    expect(canvas.style.display).toBe('block')
+    step(200)
+    //typing a name in the best times box or clicking ok goes on with the show
+    press('pointerdown')
+    press('keydown')
+    step(1250)
+    expect(frames.length).toBe(1)
+    stopFireworks()
+    //the rockets and sparks in flight take a few seconds to finish, nothing new goes up
+    expect(step(400)).toBeGreaterThan(0)
+    expect(frames.length).toBe(0)
+    expect(canvas.style.display).toBe('none')
+    //with no show playing a new game does nothing
+    stopFireworks()
+  },
+)
+
+it('stops launching after five minutes by itself', { timeout: 60000 }, () => {
   celebrate()
-  const canvas = document.body.querySelectorAll('canvas')[1]
-  expect(canvas.style.display).toBe('block')
-  //well past the old few seconds, still going
-  step(1250)
-  expect(frames.length).toBe(1)
-  press('pointerdown')
-  //the rockets and sparks in flight take a few seconds to finish, nothing new goes up
-  expect(step(400)).toBeGreaterThan(0)
+  for (let k = 0; k < 3000 && frames.length; k++) frames.shift()((time += 250))
   expect(frames.length).toBe(0)
-  expect(canvas.style.display).toBe('none')
+  expect(time).toBeGreaterThan(300000)
+  expect(time).toBeLessThan(320000)
 })
 
-it('ends on a key too, but not on one held down or one from before the show', () => {
+it('keeps time on slow frames, as under a heavy shader', () => {
   celebrate()
-  step(100)
-  press('keydown', { repeat: true })
-  const early = new Event('pointerdown')
-  Object.defineProperty(early, 'timeStamp', { value: 0 })
-  window.dispatchEvent(early)
-  window.dispatchEvent(new Event('mousemove'))
-  step(300)
+  //ten frames a second for three seconds are enough for bursts to be in the air
+  for (let k = 0; k < 30; k++) frames.shift()((time += 100))
   expect(frames.length).toBe(1)
-  press('keydown')
-  step(400)
+  stopFireworks()
+  for (let k = 0; k < 100 && frames.length; k++) frames.shift()((time += 100))
   expect(frames.length).toBe(0)
-})
-
-it('stops launching after two minutes by itself', { timeout: 60000 }, () => {
-  celebrate()
-  //50ms steps are the longest the show takes, so two minutes need fewer frames
-  for (let k = 0; k < 3000 && frames.length; k++) frames.shift()((time += 50))
-  expect(frames.length).toBe(0)
-  expect(time).toBeGreaterThan(120000)
 })
 
 it('does not stack shows, and a new one can start after one ends', () => {
   celebrate()
   celebrate()
   expect(frames.length).toBe(1)
-  press('pointerdown')
+  stopFireworks()
   step(400)
   celebrate()
   expect(frames.length).toBe(1)
-  press('pointerdown')
+  stopFireworks()
   step(400)
 })
 

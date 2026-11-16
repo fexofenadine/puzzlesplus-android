@@ -10,7 +10,7 @@ const loaders = {
   substrate: () => import('./substrate'),
   truchet: () => import('./truchet'),
   phosphor: () => import('./phosphor'),
-  hill: () => import('./hill'),
+  driftclouds: () => import('./driftclouds'),
   qix: () => import('./qix'),
   hextrail: () => import('./hextrail'),
   neon: () => import('./neon'),
@@ -19,7 +19,7 @@ const loaders = {
 
 //which theme shows which background
 const themeBackgrounds = {
-  classic: 'hill',
+  classic: 'driftclouds',
   matrix: 'matrix',
   nord: 'substrate',
   solarized: 'truchet',
@@ -52,6 +52,28 @@ const clean = (option, value) => {
   return Math.min(option.max, Math.max(option.min, number))
 }
 
+//settings whose defaults changed, dropped once from saved settings so everyone gets the new ones
+//version 1: synthwave's shader on at 0.2x, hex trail outlined, finer phosphor
+//version 2: hex trail back at its own speed
+const VERSION = 2
+const upgrades = {
+  1: {
+    neon: ['animated', 'speed', 'resolution'],
+    hextrail: ['speed', 'size', 'thickness', 'borders'],
+    phosphor: ['scale'],
+  },
+  2: { hextrail: ['speed'] },
+}
+
+export const upgrade = (stored) => {
+  for (let version = (stored.version || 0) + 1; version <= VERSION; version++) {
+    for (const [id, keys] of Object.entries(upgrades[version])) {
+      for (const key of keys) delete stored[id]?.[key]
+    }
+  }
+  return stored
+}
+
 //every background's settings live together under one key, used or not
 export const loadSettings = () => {
   let stored = {}
@@ -60,7 +82,9 @@ export const loadSettings = () => {
   } catch {
     //unreadable settings fall back to the defaults
   }
-  return Object.fromEntries(
+  const old = Object.keys(stored).length && (stored.version || 0) < VERSION
+  if (old) upgrade(stored)
+  const loaded = Object.fromEntries(
     Object.keys(backgrounds).map((id) => [
       id,
       Object.fromEntries(
@@ -68,9 +92,12 @@ export const loadSettings = () => {
       ),
     ]),
   )
+  if (old) saveSettings(loaded)
+  return loaded
 }
 
-export const saveSettings = (settings) => save('backgrounds', JSON.stringify(settings))
+export const saveSettings = (settings) =>
+  save('backgrounds', JSON.stringify({ ...settings, version: VERSION }))
 
 let settings = loadSettings()
 const instances = {}

@@ -40,7 +40,7 @@ import { hold, letGo } from './motion'
 import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
-import { celebrate } from '../shell/fireworks'
+import { celebrate, stopFireworks } from '../shell/fireworks'
 import FireworksCanvas from '../shell/FireworksCanvas'
 
 //the saved size, 4x4 when missing or out of range
@@ -192,6 +192,7 @@ export const actions = {
     (payload) =>
     ({ game, switching }) => {
       stopTick(game.raf)
+      stopFireworks()
       const n = (payload && payload.n) || game.n
       save('2048.size', n)
       swipe = null

@@ -4,10 +4,9 @@ import substrate from './substrate'
 import truchet from './truchet'
 import phosphor, { loadTexts } from './phosphor'
 import { pixel } from './font6x10'
-import hill, { hillLayout, noise } from './hill'
 import { hueAt, makeShape, stepShape } from './qix'
 import { DONE, EMPTY, FADE, network } from './hextrail'
-import { adapt } from './neon'
+import { adapt, frameRate, shaderBackground, tooSlow } from './shader'
 import { ramp, reef } from './coral'
 import { random } from '../random'
 
@@ -18,7 +17,7 @@ it('maps only the animated themes to a background', () => {
   expect(backgroundFor('nord')).toBe('substrate')
   expect(backgroundFor('solarized')).toBe('truchet')
   expect(backgroundFor('solarized-phosphor')).toBe('phosphor')
-  expect(backgroundFor('classic')).toBe('hill')
+  expect(backgroundFor('classic')).toBe('driftclouds')
   expect(backgroundFor('vaporwave')).toBe('qix')
   expect(backgroundFor('terafox')).toBe('hextrail')
   expect(backgroundFor('terafox-coral')).toBe('coral')
@@ -57,11 +56,12 @@ it('stores every background together and repairs bad values', () => {
     'substrate',
     'truchet',
     'phosphor',
-    'hill',
     'qix',
     'hextrail',
     'neon',
+    'driftclouds',
     'coral',
+    'version',
   ])
 })
 
@@ -145,8 +145,11 @@ it('runs more cycles on a finer canvas, in proportion to its scale', () => {
 it('gives every background an animated switch, on by default except classic', () => {
   for (const id of ['matrix', 'substrate', 'truchet', 'phosphor'])
     expect(defaults(id).animated).toBe(true)
-  //classic keeps the original game's look unless the hill is turned on
-  expect(defaults('hill').animated).toBe(false)
+  //classic keeps the original game's look unless its clouds are turned on
+  expect(defaults('driftclouds').animated).toBe(false)
+  //synthwave's shader is on, slowly, below the screen's size on the web
+  expect(defaults('neon')).toMatchObject({ animated: true, speed: 0.2, resolution: 65 })
+  expect(defaults('driftclouds').resolution).toBe(50)
 })
 
 //a canvas context that only counts what is drawn
@@ -238,37 +241,6 @@ it('grows a whole substrate picture for the still background, then stops', () =>
   const puts = context.counts.putImageData
   expect(instance.still(performance.now())).toBe(true)
   expect(context.counts.putImageData).toBe(puts)
-})
-
-it('puts the hill ridge where bliss has it and keeps the grass to the bottom', () => {
-  for (const [w, h] of [
-    [1920, 1080],
-    [1280, 1024],
-    [390, 844],
-    [3840, 1200],
-  ]) {
-    const { x, y, w: hw, h: hh } = hillLayout(w, h)
-    expect(y / h).toBeCloseTo(0.53)
-    expect(y + hh).toBeGreaterThanOrEqual(h - 1)
-    expect(hw).toBeGreaterThanOrEqual(w - 1)
-    expect(x).toBeLessThanOrEqual(0)
-  }
-})
-
-it('makes smooth noise between 0 and 1', () => {
-  const values = Array.from({ length: 200 }, (_, i) => noise(i * 0.37, i * 0.11, 3))
-  expect(Math.min(...values)).toBeGreaterThanOrEqual(0)
-  expect(Math.max(...values)).toBeLessThanOrEqual(1)
-  expect(Math.abs(noise(1.5, 2.5, 1) - noise(1.501, 2.5, 1))).toBeLessThan(0.01)
-})
-
-it('draws the sky every frame and drifts the clouds', () => {
-  const context = counter()
-  const instance = hill.create(context, { ...defaults('hill'), animated: true })
-  instance.resize(800, 600, 1)
-  let now = performance.now()
-  for (let n = 0; n < 30; n++) instance.frame((now += 16))
-  expect(context.counts.fillRect).toBeGreaterThanOrEqual(31)
 })
 
 it('draws substrate as finely as its detail setting asks', () => {
@@ -375,4 +347,90 @@ it('grows coral from its seeds: every cell that freezes touches coral, and the w
 it('fades the coral toward the ground as its strength drops', () => {
   expect(ramp(['#ffffff', '#ffffff'], 1, 2)).toEqual(['rgb(255 255 255)', 'rgb(255 255 255)'])
   expect(ramp(['#ffffff', '#ffffff'], 0, 2)).toEqual(['rgb(15 28 30)', 'rgb(15 28 30)'])
+})
+
+it('gives the new defaults once to settings saved before them, then keeps what is chosen', () => {
+  localStorage.setItem(
+    'backgrounds',
+    JSON.stringify({
+      neon: { animated: false, speed: 1, resolution: 35, brightness: 50 },
+      hextrail: { size: 28, borders: false, palette: 'ember' },
+      phosphor: { scale: 6, colour: 'green' },
+    }),
+  )
+  const settings = loadSettings()
+  expect(settings.neon).toMatchObject({
+    animated: true,
+    speed: 0.2,
+    resolution: 65,
+    brightness: 50,
+  })
+  expect(settings.hextrail).toMatchObject({ size: 15, thickness: 10, speed: 1, borders: true })
+  expect(settings.hextrail.palette).toBe('ember')
+  expect(settings.phosphor).toMatchObject({ scale: 2, colour: 'green' })
+  //the upgrade is saved, so switching the shader off again sticks
+  saveSettings({ ...settings, neon: { ...settings.neon, animated: false } })
+  expect(loadSettings().neon.animated).toBe(false)
+})
+
+it('puts hex trail back at its own speed for settings saved while it was halved', () => {
+  localStorage.setItem(
+    'backgrounds',
+    JSON.stringify({ version: 1, hextrail: { speed: 0.5, size: 20 }, neon: { speed: 0.4 } }),
+  )
+  const settings = loadSettings()
+  expect(settings.hextrail).toMatchObject({ speed: 1, size: 20 })
+  expect(settings.neon.speed).toBe(0.4)
+  saveSettings({ ...settings, hextrail: { ...settings.hextrail, speed: 0.5 } })
+  expect(loadSettings().hextrail.speed).toBe(0.5)
+})
+
+it('draws each shader with its own program on the context they share', () => {
+  let made = 0
+  let current = null
+  const drawn = []
+  const gl = new Proxy(
+    {
+      canvas: { addEventListener: () => {}, dataset: {} },
+      createProgram: () => ++made,
+      useProgram: (program) => (current = program),
+      getShaderParameter: () => true,
+      getProgramParameter: () => true,
+      drawArrays: () => drawn.push(current),
+    },
+    { get: (target, key) => target[key] ?? (() => 0) },
+  )
+  const make = () => shaderBackground({}, '').create(gl, { speed: 1, resolution: 50 }, {})
+  const first = make()
+  const second = make()
+  //shown again after the other was made
+  first.resize(800, 600)
+  first.frame(100)
+  second.resize(800, 600)
+  second.frame(200)
+  expect(drawn).toEqual([1, 2])
+})
+
+it('gives up on a shader on the web when its first frames come slower than ten a second', () => {
+  const steady = (gap) => {
+    const rate = frameRate()
+    let fps = null
+    for (let k = 1; k <= 400 && fps === null; k++) fps = rate(k * gap)
+    return fps
+  }
+  expect(steady(16)).toBeCloseTo(62.5)
+  expect(tooSlow(steady(16))).toBe(false)
+  expect(tooSlow(steady(60))).toBe(false)
+  expect(tooSlow(steady(120))).toBe(true)
+  //a stall now and then, as when a draw is timed or the page starts, does not count
+  const stalling = frameRate()
+  let fps = null
+  for (let k = 1, now = 0; fps === null; k++) fps = stalling((now += k % 5 ? 20 : 400))
+  expect(tooSlow(fps)).toBe(false)
+  //a hidden tab's long gap starts the count again
+  const rate = frameRate()
+  let now = 0
+  for (let k = 0; k < 15; k++) rate((now += 16))
+  rate((now += 5000))
+  expect(rate(now + 16)).toBe(null)
 })

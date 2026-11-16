@@ -45,7 +45,7 @@ import Pictures from './Pictures'
 import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
-import { celebrate } from '../shell/fireworks'
+import { celebrate, stopFireworks } from '../shell/fireworks'
 import { arrows, stepCursor } from '../shell/cursor'
 import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
 import { codeOf, partsOf, sharedCode } from '../shell/share'
@@ -337,6 +337,7 @@ export const actions = {
     (payload) =>
     ({ game, ...state }, actions) => {
       stopTick(game.raf)
+      stopFireworks()
       const setting = (name) =>
         payload && payload[name] !== undefined ? payload[name] : state[name]
       const procedural = setting('procedural')

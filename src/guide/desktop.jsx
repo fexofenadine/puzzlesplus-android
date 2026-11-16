@@ -62,13 +62,13 @@ export const desktopSection = {
     </p>,
     <ul>
       <li>
-        <b>Classic</b>, the Windows look, over a hill photo or, from Background Settings, a live
-        Bliss style sky with drifting clouds.
+        <b>Classic</b>, the Windows look, over a hill photo or, from Background Settings, a blue sky
+        of drifting clouds.
       </li>
       <li>
-        <b>Synthwave</b>, neon over a wireframe landscape with VHS scanlines and tape wobble, or,
-        switched on in Background Settings, a flight through glowing triangles (a shader, heavy on
-        modest graphics cards, so it is off at first).
+        <b>Synthwave</b>, a slow flight through glowing neon triangles with VHS scanlines, or, where
+        the graphics card can't keep up or with it switched off in Background Settings, neon over a
+        wireframe landscape with tape wobble.
       </li>
       <li>
         <b>Matrix</b>, green on black over falling code rain, ported from xscreensaver's GLMatrix.

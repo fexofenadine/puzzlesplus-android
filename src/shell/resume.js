@@ -1,3 +1,4 @@
+import { stopFireworks } from './fireworks'
 import { load, remove, save } from './storage'
 import { clock, showPaused, stopTick } from './clock'
 
@@ -138,6 +139,7 @@ export const resumable = ({ key, running, pack, unpack, label = () => '', fresh 
           return { menu: null, shelf: list() }
         }
         stopTick(game.raf)
+        stopFireworks()
         if (running(game)) park(game)
         return { menu: null, hint: null, prompt: false, ...fresh, game: back, shelf: list() }
       },

@@ -30,7 +30,7 @@ import {
   timerAction,
 } from './shell/clock'
 import { check, resumable } from './shell/resume'
-import { celebrate } from './shell/fireworks'
+import { celebrate, stopFireworks } from './shell/fireworks'
 import { dayOf } from './shell/daily'
 import { capital } from './shell/grid'
 import FireworksCanvas from './shell/FireworksCanvas'
@@ -294,6 +294,7 @@ export const actions = {
     (payload) =>
     ({ game }) => {
       stopTick(game.raf)
+      stopFireworks()
       const params = (payload && levels[payload.level]) || payload || game
       save(
         'level',

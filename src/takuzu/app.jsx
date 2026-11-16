@@ -44,7 +44,7 @@ import { showRain } from '../shell/rain'
 import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
-import { celebrate } from '../shell/fireworks'
+import { celebrate, stopFireworks } from '../shell/fireworks'
 import { arrows, stepCursor } from '../shell/cursor'
 import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
 import { codeOf, partsOf, sharedCode } from '../shell/share'
@@ -278,6 +278,7 @@ export const actions = {
     (payload) =>
     ({ game }, actions) => {
       stopTick(game.raf)
+      stopFireworks()
       //the day's board is one size and level for everyone and leaves the saved choice alone,
       //and after it or a board from a link the next game goes back to that choice
       const day = payload && payload.daily ? dayOf() : null
