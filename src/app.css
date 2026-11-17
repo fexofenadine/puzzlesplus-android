@@ -501,7 +501,7 @@ main::before {
   background: none;
 }
 
-/*neeqolah creative works on unsplash, with grain and wobble*/
+/*neeqolah creative works on unsplash, with grain and glitching jumps*/
 :root[data-theme='synthwave'] main::before {
   top: -12px;
   right: -12px;
@@ -513,30 +513,7 @@ main::before {
   filter: blur(0.4px) saturate(1.15);
   animation:
     vhs-grain 0.5s steps(1, end) infinite,
-    vhs-wobble 7s steps(1, end) infinite;
-}
-
-/*tracking band, scanlines and vignette*/
-:root[data-theme='synthwave'] main::after {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background:
-    linear-gradient(
-        transparent,
-        rgba(255, 255, 255, 0.06) 30%,
-        rgba(148, 218, 234, 0.22) 48%,
-        rgba(240, 80, 138, 0.18) 52%,
-        rgba(255, 255, 255, 0.06) 70%,
-        transparent
-      )
-      0 -30% / 100% 10% no-repeat,
-    repeating-linear-gradient(rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5));
-  animation:
-    vhs-roll 6s linear infinite,
-    vhs-flicker 0.12s steps(2) infinite;
+    synth-jump 7s steps(1, end) infinite;
 }
 
 @keyframes vhs-grain {
@@ -559,31 +536,6 @@ main::before {
     background-position:
       -30px -110px,
       50% 50%;
-  }
-}
-
-@keyframes vhs-wobble {
-  0% {
-    transform: none;
-  }
-  41% {
-    transform: translateX(-4px) skewX(1.5deg);
-    filter: blur(0.6px) saturate(1.4) hue-rotate(-12deg);
-  }
-  42% {
-    transform: translateX(3px);
-  }
-  43% {
-    transform: none;
-    filter: blur(0.4px) saturate(1.15);
-  }
-  82% {
-    transform: translateY(2px) translateX(2px);
-    filter: blur(0.8px) saturate(1.3) brightness(1.15);
-  }
-  83% {
-    transform: none;
-    filter: blur(0.4px) saturate(1.15);
   }
 }
 
@@ -613,27 +565,284 @@ main::before {
   background: none;
 }
 
-/*tape grain over the bouncing lines, and over synthwave's shader in place of its photo*/
-:root[data-theme='vaporwave'] main::before,
+/*tape grain over synthwave's shader in place of its photo*/
 :root[data-theme='synthwave'][data-background='animated'] main::before {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
   animation: vhs-grain 0.5s steps(1, end) infinite;
 }
 
-/*a softer tracking band, scanlines and vignette than synthwave's*/
-:root[data-theme='vaporwave'] main::after {
+/*synthwave glitches harder: jumps with hue swings, torn bands and bursts of static*/
+/*the photo jumps where it shows, the shader's canvas where that plays*/
+:root[data-theme='synthwave'][data-background='animated'] body > canvas {
+  animation: synth-jump-canvas 7s steps(1, end) infinite;
+}
+
+@keyframes synth-jump-canvas {
+  0% {
+    transform: none;
+    filter: none;
+  }
+  41% {
+    transform: translateX(-14px) skewX(3deg) scale(1.04);
+    filter: saturate(1.6) hue-rotate(-35deg);
+  }
+  42% {
+    transform: translateX(10px) scale(1.04);
+    filter: hue-rotate(25deg) brightness(1.3);
+  }
+  43% {
+    transform: none;
+    filter: none;
+  }
+  82% {
+    transform: translateY(5px) scale(1.04);
+    filter: brightness(1.5) saturate(0.4);
+  }
+  83% {
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes synth-jump {
+  0% {
+    transform: none;
+    filter: blur(0.4px) saturate(1.15);
+  }
+  41% {
+    transform: translateX(-14px) skewX(3deg) scale(1.04);
+    filter: blur(0.8px) saturate(1.8) hue-rotate(-35deg);
+  }
+  42% {
+    transform: translateX(10px) scale(1.04);
+    filter: blur(0.4px) saturate(1.5) hue-rotate(25deg) brightness(1.3);
+  }
+  43% {
+    transform: none;
+    filter: blur(0.4px) saturate(1.15);
+  }
+  82% {
+    transform: translateY(5px) scale(1.04);
+    filter: blur(1px) brightness(1.5) saturate(0.4);
+  }
+  83% {
+    transform: none;
+    filter: blur(0.4px) saturate(1.15);
+  }
+}
+
+/*bands of the shader's picture tear into other colours, over the canvas and under the windows*/
+:root[data-theme='synthwave'][data-background='animated'] body::after {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  visibility: hidden;
+  backdrop-filter: hue-rotate(150deg) saturate(2.2) contrast(1.3);
+  pointer-events: none;
+  content: '';
+  animation: synth-tear 9s steps(1, end) infinite;
+}
+
+@keyframes synth-tear {
+  0% {
+    visibility: hidden;
+  }
+  20% {
+    visibility: visible;
+    clip-path: polygon(0 22%, 100% 22%, 100% 28%, 0 28%, 0 35%, 100% 35%, 100% 37%, 0 37%);
+  }
+  22% {
+    visibility: visible;
+    clip-path: polygon(0 61%, 100% 61%, 100% 67%, 0 67%, 0 78%, 100% 78%, 100% 80%, 0 80%);
+  }
+  24% {
+    visibility: hidden;
+  }
+  71% {
+    visibility: visible;
+    clip-path: polygon(0 40%, 100% 40%, 100% 46%, 0 46%, 0 15%, 100% 15%, 100% 17%, 0 17%);
+  }
+  73% {
+    visibility: visible;
+    clip-path: polygon(0 52%, 100% 52%, 100% 54%, 0 54%, 0 86%, 100% 86%, 100% 90%, 0 90%);
+  }
+  74% {
+    visibility: hidden;
+  }
+}
+
+/*static comes in bursts over the scanlines*/
+:root[data-theme='synthwave'] main::after {
   background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")
+      0 0 / 0 0,
     linear-gradient(
         transparent,
-        rgba(255, 255, 255, 0.05) 30%,
-        rgba(1, 205, 254, 0.16) 48%,
-        rgba(255, 113, 206, 0.16) 52%,
-        rgba(255, 255, 255, 0.05) 70%,
+        rgba(255, 255, 255, 0.06) 30%,
+        rgba(148, 218, 234, 0.22) 48%,
+        rgba(240, 80, 138, 0.18) 52%,
+        rgba(255, 255, 255, 0.06) 70%,
         transparent
       )
       0 -30% / 100% 10% no-repeat,
-    repeating-linear-gradient(rgba(28, 16, 56, 0.16) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, transparent 60%, rgba(28, 16, 56, 0.4));
+    repeating-linear-gradient(rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5));
+  animation:
+    synth-roll 6s linear infinite,
+    synth-burst 11s steps(1, end) infinite,
+    vhs-flicker 0.12s steps(2) infinite;
+}
+
+@keyframes synth-roll {
+  to {
+    background-position:
+      90px 140px,
+      0 130%,
+      0 240px,
+      0 0;
+  }
+}
+
+@keyframes synth-burst {
+  0% {
+    background-size:
+      0 0,
+      100% 10%,
+      auto,
+      auto;
+  }
+  63% {
+    background-size:
+      180px 180px,
+      100% 10%,
+      auto,
+      auto;
+  }
+  66% {
+    background-size:
+      0 0,
+      100% 10%,
+      auto,
+      auto;
+  }
+}
+
+/*vaporwave is a worn tape: a pastel day under the bouncing lines, with a vcr's marks over it*/
+:root[data-theme='vaporwave'] body {
+  background: url(./vaporwave.webp) 50% 60% / cover fixed var(--desktop);
+  animation: vape-jolt-wall 11s steps(1, end) infinite;
+}
+
+/*the lines jolt sideways with the picture now and then*/
+:root[data-theme='vaporwave'] body > canvas {
+  animation: vape-jolt 11s steps(1, end) infinite;
+}
+
+@keyframes vape-jolt {
+  0% {
+    transform: none;
+  }
+  46% {
+    transform: translateX(7px) skewX(-0.6deg);
+  }
+  47% {
+    transform: translateX(-4px);
+  }
+  48% {
+    transform: none;
+  }
+}
+
+@keyframes vape-jolt-wall {
+  0% {
+    background-position: 50% 60%;
+  }
+  46% {
+    background-position: calc(50% + 7px) 60%;
+  }
+  47% {
+    background-position: calc(50% - 4px) 60%;
+  }
+  48% {
+    background-position: 50% 60%;
+  }
+}
+
+/*what the vcr writes on the picture, top left and bottom left*/
+:root[data-theme='vaporwave'] main::before,
+:root[data-theme='vaporwave'] main::after {
+  box-sizing: border-box;
+  padding: calc(var(--phone-bar, 0px) + 20px) 26px calc(var(--taskbar) + 50px);
+  color: #fff;
+  font: 700 22px / 1 var(--pixel-font);
+  letter-spacing: 2px;
+  white-space: pre;
+  text-shadow:
+    2px 0 #01cdfe,
+    -2px 0 #ff71ce,
+    2px 2px 0 rgba(43, 27, 74, 0.7),
+    0 0 6px rgba(43, 27, 74, 0.5);
+}
+
+/*play while the lines move, pause when they are switched off*/
+/*tape grain, and a strip of head switching static along the bottom*/
+:root[data-theme='vaporwave'] main::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E")
+      0 calc(100% - var(--taskbar)) / 180px 30px repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.14'/%3E%3C/svg%3E");
+  content: 'PAUSE \275A\275A';
+  animation: vape-grain 0.5s steps(1, end) infinite;
+}
+
+:root[data-theme='vaporwave'][data-background='animated'] main::before {
+  content: 'PLAY \25B6\FE0E';
+}
+
+@keyframes vape-grain {
+  0% {
+    background-position:
+      0 calc(100% - var(--taskbar)),
+      0 0;
+  }
+  25% {
+    background-position:
+      70px calc(100% - var(--taskbar)),
+      -60px 40px;
+  }
+  50% {
+    background-position:
+      -40px calc(100% - var(--taskbar)),
+      90px -70px;
+  }
+  75% {
+    background-position:
+      110px calc(100% - var(--taskbar)),
+      -30px -110px;
+  }
+}
+
+/*the tape counter the lines keep, over a bright tracking band, scanlines and a vignette*/
+:root[data-theme='vaporwave'] main::after {
+  display: flex;
+  align-items: flex-end;
+  background:
+    linear-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.1) 30%,
+        rgba(1, 205, 254, 0.3) 46%,
+        rgba(255, 255, 255, 0.45) 50%,
+        rgba(255, 113, 206, 0.3) 54%,
+        rgba(255, 255, 255, 0.1) 70%,
+        transparent
+      )
+      0 -30% / 100% 9% no-repeat,
+    repeating-linear-gradient(rgba(28, 16, 56, 0.2) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 60%, rgba(28, 16, 56, 0.45));
+  content: var(--tape, 'SP  0:00:00');
   animation:
     vhs-roll 8s linear infinite,
     vhs-flicker 0.12s steps(2) infinite;

@@ -89,6 +89,11 @@
   fill: currentColor;
 }
 
+/*off classic a greyed title button dims its glyph: the shadow colour vanished on dark faces*/
+:global(:root:not([data-theme='classic'])) .controls button:disabled {
+  color: color-mix(in srgb, var(--text) 40%, var(--face));
+}
+
 /*a game window faded so the background shows: frame, title bar and face mix toward clear*/
 /*its cells, outlines, buttons and counters keep their own colours*/
 .clear {

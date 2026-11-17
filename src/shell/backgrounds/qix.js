@@ -1,15 +1,26 @@
 import { qix as meta } from './meta'
 
 //bouncing polygons that leave fading trails, after xscreensaver's qix and the mystify
-//screensaver of windows 95; written anew for a canvas, in the vaporwave pastels on a dusk sky
+//screensaver of windows 95; written anew for a canvas
+//only the lines are drawn, the theme's wallpaper shows under them like a tape playing
 
-//the dusk behind the lines, top and bottom
-const SKY = ['#00545c', '#3b2c70']
-
+//the vaporwave pastels deepened until they read on the wallpaper's pale sky and floor
 const palettes = {
-  pastel: ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff', '#fffb96'],
-  sunset: ['#ff71ce', '#b967ff', '#fffb96', '#ff9e7a'],
-  sea: ['#01cdfe', '#05ffa1', '#7ee8fa', '#b8ffe3'],
+  pastel: ['#ff2e97', '#0096d6', '#00a878', '#8a3ffc', '#ff7a3d'],
+  sunset: ['#ff2e97', '#8a3ffc', '#ff7a3d', '#d6246e'],
+  sea: ['#0096d6', '#00a878', '#3a6ff2', '#00b3c4'],
+}
+
+//a worn tape's colour bleed: a pink ghost to the left of each line and a cyan one to the right
+const GHOSTS = [
+  [-1, '#ff71ce'],
+  [1, '#01cdfe'],
+]
+
+//the tape counter the theme shows in a corner, from seconds played
+export const tape = (seconds) => {
+  const two = (value) => String(value).padStart(2, '0')
+  return `${Math.floor(seconds / 3600)}:${two(Math.floor(seconds / 60) % 60)}:${two(seconds % 60)}`
 }
 
 const rgb = (hex) => [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16))
@@ -64,9 +75,28 @@ export default {
     let shapes = []
     let last = 0
     let owed = 0
-    //the sky is made once a size, the palette once a setting
-    let sky = null
+    //the palette is made once a setting
     let colours = palettes[options.palette].map(rgb)
+    //milliseconds played, shown by the theme's styles as a tape counter
+    let played = 0
+    let shown = -1
+
+    const count = (passed) => {
+      played += passed
+      const seconds = Math.floor(played / 1000)
+      if (seconds === shown) return
+      shown = seconds
+      document.documentElement.style.setProperty('--tape', `'SP  ${tape(seconds)}'`)
+    }
+
+    const outline = (points, shift) => {
+      context.beginPath()
+      points.forEach(([x, y], n) =>
+        n ? context.lineTo(x + shift, y) : context.moveTo(x + shift, y),
+      )
+      context.closePath()
+      context.stroke()
+    }
 
     const build = () => {
       shapes = Array.from({ length: options.count }, () =>
@@ -80,20 +110,24 @@ export default {
     }
 
     const draw = () => {
-      context.globalAlpha = 1
-      context.fillStyle = sky
-      context.fillRect(0, 0, width, height)
+      context.clearRect(0, 0, width, height)
       context.lineWidth = Math.max(1, 1.5 * pixels)
       context.lineJoin = 'round'
+      const bleed = options.bleed * pixels
       for (const shape of shapes) {
         shape.trail.forEach(({ hue, points }, k) => {
           //older outlines are fainter
-          context.globalAlpha = ((k + 1) / shape.trail.length) * (options.opacity / 100)
+          const alpha = ((k + 1) / shape.trail.length) * (options.opacity / 100)
+          if (bleed) {
+            context.globalAlpha = alpha * 0.45
+            for (const [side, colour] of GHOSTS) {
+              context.strokeStyle = colour
+              outline(points, side * bleed)
+            }
+          }
+          context.globalAlpha = alpha
           context.strokeStyle = `rgb(${hueAt(colours, hue).join(' ')})`
-          context.beginPath()
-          points.forEach(([x, y], n) => (n ? context.lineTo(x, y) : context.moveTo(x, y)))
-          context.closePath()
-          context.stroke()
+          outline(points, 0)
         })
       }
       context.globalAlpha = 1
@@ -111,24 +145,16 @@ export default {
         height = h
         pixels = scale
         last = performance.now()
-        sky = context.createLinearGradient(0, 0, 0, height)
-        sky.addColorStop(0, SKY[0])
-        sky.addColorStop(1, SKY[1])
         build()
       },
       frame: (now) => {
         const passed = Math.min(250, now - last)
         last = now
+        count(passed)
         owed = Math.min(4, owed + (passed * options.speed) / 30)
         if (owed < 1) return
         for (; owed >= 1; owed--) step()
         draw()
-      },
-      //a full trail, stopped
-      still: () => {
-        for (let k = 0; k < options.trail * 3; k++) step()
-        draw()
-        return true
       },
     }
   },

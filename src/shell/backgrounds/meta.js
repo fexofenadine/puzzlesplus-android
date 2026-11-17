@@ -305,6 +305,8 @@ export const qix = {
   name: 'Qix',
   credit:
     'After Qix by Jamie Zawinski, part of xscreensaver, and the Mystify screensaver of Windows 95',
+  //the lines play over the theme's wallpaper, which stays when they are switched off
+  wallpaper: true,
   ratio: (pixels) => Math.min(pixels, 2),
   options: [
     {
@@ -330,6 +332,16 @@ export const qix = {
         ['sea', 'Sea'],
       ],
       value: 'pastel',
+    },
+    {
+      key: 'bleed',
+      label: 'Colour bleed',
+      type: 'range',
+      min: 0,
+      max: 8,
+      step: 1,
+      value: 3,
+      format: (v) => (v ? `${v} px` : 'none'),
     },
     {
       key: 'opacity',

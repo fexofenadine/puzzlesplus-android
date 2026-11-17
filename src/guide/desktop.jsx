@@ -62,13 +62,13 @@ export const desktopSection = {
     </p>,
     <ul>
       <li>
-        <b>Classic</b>, the Windows look, over a hill photo or, from Background Settings, a blue sky
-        of drifting clouds.
+        <b>Classic</b>, the Windows look, over a hill photo or, with Animated switched on in the
+        Theme menu, a blue sky of drifting clouds.
       </li>
       <li>
-        <b>Synthwave</b>, a slow flight through glowing neon triangles with VHS scanlines, or, where
-        the graphics card can't keep up or with it switched off in Background Settings, neon over a
-        wireframe landscape with tape wobble.
+        <b>Synthwave</b>, a slow flight through glowing neon triangles with VHS scanlines and
+        glitches that tear and jump, or, where the graphics card can't keep up or with Animated
+        switched off, neon over a wireframe landscape.
       </li>
       <li>
         <b>Matrix</b>, green on black over falling code rain, ported from xscreensaver's GLMatrix.
@@ -81,8 +81,8 @@ export const desktopSection = {
         glass terminal typing out this game's own source code.
       </li>
       <li>
-        <b>Vaporwave</b>, Windows 95 in pastels with scanlines, over bouncing lines that leave
-        trails, like the Mystify screensaver.
+        <b>Vaporwave</b>, Windows 95 in pastels over a worn VHS tape: a pastel day on a checkerboard
+        floor, with bouncing lines that leave trails, like the Mystify screensaver, playing over it.
       </li>
       <li>
         <b>Terafox Hex Trail</b> and <b>Terafox Coral</b>, deep teals and sea greens, over lines

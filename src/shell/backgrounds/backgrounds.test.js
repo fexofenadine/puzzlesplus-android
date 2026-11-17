@@ -1,10 +1,10 @@
 import { beforeEach, expect, it } from 'vitest'
-import { backgroundFor, defaults, loadSettings, saveSettings } from '.'
+import { backgroundFor, backgrounds, defaults, loadSettings, saveSettings } from '.'
 import substrate from './substrate'
 import truchet from './truchet'
 import phosphor, { loadTexts } from './phosphor'
 import { pixel } from './font6x10'
-import { hueAt, makeShape, stepShape } from './qix'
+import qix, { hueAt, makeShape, stepShape, tape } from './qix'
 import { DONE, EMPTY, FADE, network } from './hextrail'
 import { adapt, frameRate, shaderBackground, tooSlow } from './shader'
 import { ramp, reef } from './coral'
@@ -271,6 +271,39 @@ it('bounces a shape inside the screen and keeps a trail no longer than asked', (
   ]
   expect(hueAt(colours, 0.5)).toEqual([50, 100, 25])
   expect(hueAt(colours, 2)).toEqual([0, 0, 0])
+})
+
+it('draws only qix lines over the wallpaper, each with its two ghosts of colour bleed', () => {
+  expect(backgrounds.qix.wallpaper).toBe(true)
+  expect(defaults('qix')).toMatchObject({ animated: true, bleed: 3 })
+  const strokes = (bleed) => {
+    const context = counter()
+    const instance = qix.create(context, { ...defaults('qix'), count: 2, trail: 5, bleed })
+    instance.resize(400, 300, 1)
+    //five steps fill the trails, the fifth is the one counted
+    let counts = {}
+    for (let k = 1; k <= 5; k++) {
+      counts = { ...context.counts }
+      instance.frame(performance.now() + k * 31)
+    }
+    expect(context.counts.fillRect).toBe(undefined)
+    expect(context.counts.clearRect).toBeGreaterThan(0)
+    return context.counts.stroke - (counts.stroke || 0)
+  }
+  expect(strokes(0)).toBe(2 * 5)
+  expect(strokes(3)).toBe(2 * 5 * 3)
+})
+
+it('keeps a tape counter of the time qix has played', () => {
+  expect(tape(0)).toBe('0:00:00')
+  expect(tape(767)).toBe('0:12:47')
+  expect(tape(3725)).toBe('1:02:05')
+  const root = document.documentElement
+  const instance = qix.create(counter(), defaults('qix'))
+  instance.resize(400, 300, 1)
+  const start = performance.now()
+  for (let k = 1; k <= 30; k++) instance.frame(start + k * 100)
+  expect(root.style.getPropertyValue('--tape')).toBe("'SP  0:00:03'")
 })
 
 it('grows a hex trail arm by arm into empty hexagons, then fades and starts again', () => {
