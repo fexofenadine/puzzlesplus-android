@@ -1,7 +1,7 @@
 //tile movement on the elements themselves, outside the render
 //slides start from wherever a tile is on screen, so quick moves never jump
 
-const still = () => !globalThis.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches
+import { reduced as still } from '../shell/motion'
 
 //one cell and gap in the tile's own pixels
 const stepOf = (element) => {

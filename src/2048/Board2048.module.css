@@ -358,13 +358,23 @@ theme's --t-glow*/
   }
 }
 
+/*reduced motion as the system asks, unless the theme menu says otherwise*/
 @media (prefers-reduced-motion: reduce) {
-  .fresh,
-  .merged {
+  :global(:root:not([data-motion])) .fresh,
+  :global(:root:not([data-motion])) .merged {
     animation: none;
   }
 
-  .gone {
+  :global(:root:not([data-motion])) .gone {
     animation-delay: 0s;
   }
+}
+
+:global(:root[data-motion='reduce']) .fresh,
+:global(:root[data-motion='reduce']) .merged {
+  animation: none;
+}
+
+:global(:root[data-motion='reduce']) .gone {
+  animation-delay: 0s;
 }

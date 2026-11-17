@@ -11,6 +11,7 @@ const plain = [
   'windowOpacity',
   'windowHidden',
   'fireworks',
+  'motion',
   'lastGame',
   'losses',
   'level',

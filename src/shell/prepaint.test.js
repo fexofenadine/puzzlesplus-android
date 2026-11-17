@@ -46,3 +46,17 @@ it('treats synthwave as on when it was off only by its old default', () => {
   expect(paint('synthwave', { version: 1, neon: { animated: false } })).toBe(undefined)
   expect(paint('synthwave', '{oops')).toBe('animated')
 })
+
+it('marks a saved motion choice before the first paint', () => {
+  for (const [saved, shown] of [
+    ['reduce', 'reduce'],
+    ['full', 'full'],
+    ['wild', undefined],
+  ]) {
+    delete root.dataset.motion
+    localStorage.setItem('motion', saved)
+    new Function(script)()
+    expect(root.dataset.motion).toBe(shown)
+  }
+  delete root.dataset.motion
+})

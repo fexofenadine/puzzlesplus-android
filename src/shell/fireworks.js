@@ -1,4 +1,5 @@
 import { load } from './storage'
+import { reduced } from './motion'
 
 //fireworks over the background and behind the game window, in the theme's own colours
 //one canvas that exists only while they play
@@ -121,7 +122,7 @@ export const advance = (list, dt, look) =>
     return true
   })
 
-const calm = () => !globalThis.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches
+const calm = reduced
 
 let canvas = null
 let running = false

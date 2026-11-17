@@ -3,6 +3,7 @@ import { MenuItem, Separator, SubMenuItem } from '../Menu'
 import { backgroundFor } from './backgrounds'
 import { themes } from './themes'
 import { isGame } from './actions'
+import { motions } from './motion'
 
 //the theme menu every game shares, a game's own theme options go after it
 const ThemeMenu = ({ state, actions }, children) => (
@@ -40,6 +41,14 @@ const ThemeMenu = ({ state, actions }, children) => (
       <SubMenuItem name="Fireworks" checked={state.fireworks} onClick={actions.toggleFireworks} />
     )}
     {children}
+    <Separator />
+    {motions.map(([motion, name]) => (
+      <SubMenuItem
+        name={name}
+        checked={state.motion === motion}
+        onClick={() => actions.setMotion(motion)}
+      />
+    ))}
   </MenuItem>
 )
 
