@@ -6,16 +6,27 @@ try {
     /^everforest$/,
     'terafox-coral',
   )
-  //assume animated off classic, the script corrects it; synthwave's is on unless switched off
-  //since its default changed (settings version 1)
+  //animated off classic unless it was switched off, the script corrects the rest
+  //synthwave's only counts as off since its default changed (settings version 1)
   var theme = document.documentElement.dataset.theme
   var animated = theme !== 'classic'
-  if (theme === 'synthwave') {
+  var ids = {
+    synthwave: 'neon',
+    matrix: 'matrix',
+    nord: 'substrate',
+    solarized: 'truchet',
+    'solarized-phosphor': 'phosphor',
+    vaporwave: 'qix',
+    terafox: 'hextrail',
+    'terafox-coral': 'coral',
+  }
+  if (ids[theme]) {
     try {
       var saved = JSON.parse(localStorage.getItem('backgrounds'))
-      animated = !(saved.version >= 1 && saved.neon.animated === false)
+      var off = saved[ids[theme]].animated === false
+      animated = !(off && (theme !== 'synthwave' || saved.version >= 1))
     } catch {
-      //nothing saved, the shader is on
+      //nothing saved, the background moves
     }
   }
   if (animated) document.documentElement.dataset.background = 'animated'

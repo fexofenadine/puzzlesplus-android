@@ -8,7 +8,11 @@ What is planned for Puzzles Plus, the website and the [Android app](https://gith
 
 ### Planned
 
-- [ ] _nothing agreed yet_
+- [ ] A home page that lists every game, in place of the redirect to the last one played
+- [ ] Statistics for every game: games played, won, streaks and average times
+- [ ] A calendar of past daily puzzles to go back and play
+- [ ] Bridges (Hashi), an eighth game, offered before Futoshiki and not picked then
+- [ ] Accessibility: colour-blind friendly palettes, a high contrast option and screen reader labels for boards and cells
 
 ### To review
 
@@ -24,7 +28,6 @@ Suggestions, none of them agreed. An idea moves up to Planned once it is picked.
 
 **Games**
 
-- [ ] Bridges (Hashi), offered before Futoshiki and not picked then
 - [ ] Another new game: Slitherlink, Kakuro, Hitori or Tents
 - [ ] Sudoku variants on the existing board: X (diagonals), Killer (cages), 12 × 12 and 16 × 16
 - [ ] Nonograms in colour, and more pictures for the art pool
@@ -32,8 +35,6 @@ Suggestions, none of them agreed. An idea moves up to Planned once it is picked.
 
 **Across every game**
 
-- [ ] Statistics: games played, won, streaks and average times
-- [ ] A calendar of past daily puzzles to go back and play
 - [ ] A game number to type in, beside Copy Link
 - [ ] Guided lessons: a guide example that can be played through step by step
 - [ ] Printable puzzles
@@ -41,10 +42,7 @@ Suggestions, none of them agreed. An idea moves up to Planned once it is picked.
 
 **Desktop and themes**
 
-- [ ] A home page that lists every game, in place of the redirect to the last one played
 - [ ] One installable web app for the whole site instead of one per game
-- [ ] Colour-blind friendly palettes and a high contrast option
-- [ ] Screen reader labels for boards and cells
 - [ ] Translations
 - [ ] More themes or backgrounds
 

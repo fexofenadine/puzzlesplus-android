@@ -126,7 +126,7 @@ export const shaderBackground = (meta, shader) => ({
 
     gl.canvas.addEventListener('webglcontextlost', () => {
       lost = true
-      giveUp()
+      giveUp(true)
     })
 
     return {

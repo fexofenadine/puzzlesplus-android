@@ -22,6 +22,13 @@ const ThemeMenu = ({ state, actions }, children) => (
         <SubMenuItem name="Window Settings..." onClick={actions.toggleBackgroundSettings} />
       )
     )}
+    {backgroundFor(state.theme) && (
+      <SubMenuItem
+        name="Animated"
+        checked={state.backgrounds[backgroundFor(state.theme)].animated}
+        onClick={actions.toggleAnimated}
+      />
+    )}
     {isGame(state.page) && (
       <SubMenuItem
         name="Hide Window"

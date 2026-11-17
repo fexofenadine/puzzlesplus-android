@@ -64,6 +64,9 @@ export default {
     let shapes = []
     let last = 0
     let owed = 0
+    //the sky is made once a size, the palette once a setting
+    let sky = null
+    let colours = palettes[options.palette].map(rgb)
 
     const build = () => {
       shapes = Array.from({ length: options.count }, () =>
@@ -77,13 +80,9 @@ export default {
     }
 
     const draw = () => {
-      const sky = context.createLinearGradient(0, 0, 0, height)
-      sky.addColorStop(0, SKY[0])
-      sky.addColorStop(1, SKY[1])
       context.globalAlpha = 1
       context.fillStyle = sky
       context.fillRect(0, 0, width, height)
-      const colours = palettes[options.palette].map(rgb)
       context.lineWidth = Math.max(1, 1.5 * pixels)
       context.lineJoin = 'round'
       for (const shape of shapes) {
@@ -104,6 +103,7 @@ export default {
       configure: (next) => {
         const rebuild = next.count !== options.count || next.corners !== options.corners
         options = next
+        colours = palettes[options.palette].map(rgb)
         if (width && rebuild) build()
       },
       resize: (w, h, scale = 1) => {
@@ -111,6 +111,9 @@ export default {
         height = h
         pixels = scale
         last = performance.now()
+        sky = context.createLinearGradient(0, 0, 0, height)
+        sky.addColorStop(0, SKY[0])
+        sky.addColorStop(1, SKY[1])
         build()
       },
       frame: (now) => {

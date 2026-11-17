@@ -55,6 +55,9 @@ const opacityOption = {
   format: (value) => `${value}%`,
 }
 
+//a background's own options, animated is switched from the theme menu
+export const own = (id) => (id ? optionsOf(id).filter((option) => option.key !== 'animated') : [])
+
 const BackgroundSettings = ({ key, state, actions }) => {
   const background = state.id && backgrounds[state.id]
   return (
@@ -77,7 +80,7 @@ const BackgroundSettings = ({ key, state, actions }) => {
               />
             </label>
           )}
-          {(state.id ? optionsOf(state.id) : []).map((option) => (
+          {own(state.id).map((option) => (
             <label class={s.row}>
               <span class={s.name}>{option.label}:</span>
               <Control

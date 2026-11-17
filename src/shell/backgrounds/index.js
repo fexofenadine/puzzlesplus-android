@@ -102,9 +102,14 @@ export const saveSettings = (settings) =>
 let settings = loadSettings()
 const instances = {}
 let refresh = () => {}
+//backgrounds that could not run here, shown as their wallpaper for the rest of the visit
+//switching one on again gives it another try, unless its drawing context is gone for good
+const gaveUp = new Set()
+const dead = new Set()
 
 //apply settings now, for previews and after saving
 export const configure = (id, values) => {
+  if (values.animated && !settings[id].animated && !dead.has(id)) gaveUp.delete(id)
   settings = { ...settings, [id]: values }
   instances[id]?.configure(values)
   refresh(id)
@@ -145,8 +150,6 @@ export const startBackgrounds = () => {
   }
 
   let active = null
-  //backgrounds that could not run here, shown as their wallpaper for the rest of the visit
-  const gaveUp = new Set()
   //animated, still or wallpaper
   let mode = null
   let frame = null
@@ -216,8 +219,9 @@ export const startBackgrounds = () => {
     if (instances[id]) return start()
     //the theme's own wallpaper stays: offline before it was ever shown, no webgl, or a
     //background that found the device too slow for it
-    const giveUp = () => {
+    const giveUp = (forGood) => {
       gaveUp.add(id)
+      if (forGood === true) dead.add(id)
       if (active !== id) return
       cancelAnimationFrame(frame)
       mode = 'wallpaper'

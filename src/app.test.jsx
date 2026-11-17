@@ -4,6 +4,9 @@ import { state, actions, view, saved } from './app'
 import { solvable } from './mines'
 import { clock } from './shell/clock'
 import { windowClear } from './shell/actions'
+import { own } from './shell/BackgroundSettings'
+import { optionsOf } from './shell/backgrounds'
+import WindowControls, { windowProps } from './shell/WindowControls'
 
 it('renders without crashing', async () => {
   const container = document.createElement('div')
@@ -347,6 +350,83 @@ it('fades the game window as a preview, keeps it on ok and hides it whole', () =
   wired.toggleHideWindow()
   wired.peek()
   expect(windowClear(current)).toBe(40)
+})
+
+it('switches a background between moving and still from the theme menu, saved at once', () => {
+  localStorage.clear()
+  start({ theme: 'nord', menu: 'theme' })
+  wired.toggleAnimated()
+  wired.peek()
+  expect(current.menu).toBe(null)
+  expect(current.backgrounds.substrate.animated).toBe(false)
+  expect(JSON.parse(localStorage.getItem('backgrounds')).substrate.animated).toBe(false)
+  //the dialog no longer has it, and its defaults leave it as it is
+  expect(own('substrate').map((option) => option.key)).not.toContain('animated')
+  expect(own('substrate')).toHaveLength(optionsOf('substrate').length - 1)
+  expect(own(null)).toEqual([])
+  wired.toggleBackgroundSettings()
+  wired.changeBackgroundSettings({ maxCracks: 50 })
+  wired.resetBackgroundSettings()
+  wired.peek()
+  expect(current.backgroundSettings.draft).toMatchObject({ maxCracks: 100, animated: false })
+  wired.toggleBackgroundSettings()
+  wired.toggleAnimated()
+  wired.peek()
+  expect(current.backgrounds.substrate.animated).toBe(true)
+  expect(JSON.parse(localStorage.getItem('backgrounds')).substrate.animated).toBe(true)
+  //a theme without a background has nothing to switch
+  start({ theme: 'plain' })
+  wired.toggleAnimated()
+  wired.peek()
+  expect(current.backgrounds.substrate.animated).toBe(true)
+  localStorage.clear()
+})
+
+it('pauses the game and shows only the background from the title bar, until a key', async () => {
+  const root = document.documentElement
+  expect(game().paused).toBeFalsy()
+  wired.screensaver()
+  expect(game().paused).toBe(true)
+  expect('screensaver' in root.dataset).toBe(true)
+  //listening starts after the click that opened it
+  await new Promise((resolve) => setTimeout(resolve, 5))
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }))
+  expect('screensaver' in root.dataset).toBe(false)
+  //the game stays paused under it
+  expect(game().paused).toBe(true)
+})
+
+it('puts the background button after pause on the title bar, neither on the original', () => {
+  const titles = (props) =>
+    WindowControls({ ...windowProps(current, wired, false, true), ...props })
+      .filter(Boolean)
+      .map((button) => button.attributes.title)
+  wired.peek()
+  expect(titles({})).toEqual(['Pause (P)', 'Show only the background', 'Minimise', 'Maximise'])
+  expect(titles({ original: true })).toEqual(['Minimise', null])
+  expect(titles({ narrow: true })).toEqual(['Pause (P)', 'Minimise', 'Maximise'])
+})
+
+it('leaves the background button off boards under 13 columns, which it would widen', () => {
+  const has = (level, portrait = false) => {
+    start({ theme: 'nord', portrait })
+    wired.reset({ level })
+    wired.peek()
+    const titled = (node) =>
+      Boolean(node) &&
+      (typeof node === 'function'
+        ? titled(node(current, wired))
+        : Array.isArray(node)
+          ? node.some(titled)
+          : node.attributes?.title === 'Show only the background' ||
+            (node.children || []).some(titled))
+    return titled(view(current, wired))
+  }
+  expect(has('beginner')).toBe(false)
+  expect(has('intermediate')).toBe(true)
+  expect(has('expert')).toBe(true)
+  //on its side expert shows 16 columns
+  expect(has('expert', true)).toBe(true)
 })
 
 it('has an extreme level at expert density, 30% wider and taller', () => {

@@ -8,6 +8,7 @@ import { renamed, themes } from './themes'
 import { closeDialog, leave, listenPhone, pageUrl, phone } from './phone'
 import { games } from './GameLinks'
 import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
+import { showScreensaver } from './screensaver'
 import {
   applyZoom,
   fitZoom,
@@ -322,10 +323,31 @@ export const shellActions = {
   changeOpacity:
     (opacity) =>
     ({ backgroundSettings }) => ({ backgroundSettings: { ...backgroundSettings, opacity } }),
+  //animated is the theme menu's, so the defaults leave it alone
   resetBackgroundSettings: () => (state, actions) => {
-    const { id, opacity } = state.backgroundSettings
+    const { id, draft, opacity } = state.backgroundSettings
     if (opacity !== undefined) actions.changeOpacity(100)
-    if (id) actions.changeBackgroundSettings(defaults(id))
+    if (id) actions.changeBackgroundSettings({ ...defaults(id), animated: draft.animated })
+  },
+  //the theme menu's switch between the moving background and its still picture, saved at once
+  toggleAnimated:
+    () =>
+    ({ theme, backgrounds }) => {
+      const id = backgroundFor(theme)
+      if (!id) return { menu: null }
+      const next = {
+        ...backgrounds,
+        [id]: { ...backgrounds[id], animated: !backgrounds[id].animated },
+      }
+      saveSettings(next)
+      configure(id, next[id])
+      return { menu: null, backgrounds: next }
+    },
+  //only the background until a press or key, with the game paused under it
+  screensaver: () => (state, actions) => {
+    actions.pause(true)
+    showScreensaver()
+    return { menu: null }
   },
   submitBackgroundSettings:
     (event) =>

@@ -1,0 +1,48 @@
+import { readFileSync } from 'node:fs'
+import { beforeEach, expect, it } from 'vitest'
+import { backgroundFor } from './backgrounds'
+import { themes } from './themes'
+
+const script = readFileSync('src/shell/prepaint.js', 'utf8')
+const root = document.documentElement
+
+//the page's first paint for a saved theme and background settings
+const paint = (theme, backgrounds) => {
+  localStorage.clear()
+  delete root.dataset.background
+  if (theme) localStorage.setItem('theme', theme)
+  if (backgrounds) localStorage.setItem('backgrounds', JSON.stringify(backgrounds))
+  new Function(script)()
+  return root.dataset.background
+}
+
+beforeEach(() => localStorage.clear())
+
+it('paints every theme but classic as animated until told otherwise', () => {
+  expect(paint(null)).toBe(undefined)
+  expect(root.dataset.theme).toBe('classic')
+  for (const [theme] of themes) {
+    expect(paint(theme)).toBe(theme === 'classic' ? undefined : 'animated')
+  }
+  expect(paint('everforest')).toBe('animated')
+  expect(root.dataset.theme).toBe('terafox-coral')
+})
+
+it('keeps the wallpaper for a background that was switched off', () => {
+  for (const [theme] of themes) {
+    if (theme === 'classic') continue
+    const id = backgroundFor(theme)
+    expect(paint(theme, { version: 2, [id]: { animated: false } })).toBe(undefined)
+    expect(paint(theme, { version: 2, [id]: { animated: true } })).toBe('animated')
+    //another background's switch says nothing about this one
+    expect(paint(theme, { version: 2, other: { animated: false } })).toBe('animated')
+  }
+  //classic waits for the script either way, its photo never flashes away
+  expect(paint('classic', { version: 2, driftclouds: { animated: true } })).toBe(undefined)
+})
+
+it('treats synthwave as on when it was off only by its old default', () => {
+  expect(paint('synthwave', { neon: { animated: false } })).toBe('animated')
+  expect(paint('synthwave', { version: 1, neon: { animated: false } })).toBe(undefined)
+  expect(paint('synthwave', '{oops')).toBe('animated')
+})
