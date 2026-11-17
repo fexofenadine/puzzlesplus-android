@@ -16,3 +16,5 @@ www
 
 #screenshots from tools/droid.py
 tools/droid-shots/
+#python's compiled cache from tools/droid.py
+__pycache__/
