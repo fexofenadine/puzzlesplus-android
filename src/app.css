@@ -1279,9 +1279,13 @@ main::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root[data-phone] [class*='Overlay_root'] [class*='Dialog_dialog'] {
+  :root[data-phone]:not([data-motion]) [class*='Overlay_root'] [class*='Dialog_dialog'] {
     animation: none;
   }
+}
+
+:root[data-phone][data-motion='reduce'] [class*='Overlay_root'] [class*='Dialog_dialog'] {
+  animation: none;
 }
 
 /*the board without its windows 95 frame, on a card that the window slider still fades*/

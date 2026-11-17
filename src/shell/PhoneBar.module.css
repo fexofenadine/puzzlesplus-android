@@ -714,12 +714,19 @@
   }
 }
 
+/*reduced motion as the system asks, unless the options say otherwise*/
 @media (prefers-reduced-motion: reduce) {
-  .shade,
-  .drawer,
-  .sheet {
+  :global(:root:not([data-motion])) .shade,
+  :global(:root:not([data-motion])) .drawer,
+  :global(:root:not([data-motion])) .sheet {
     animation: none !important;
   }
+}
+
+:global(:root[data-motion='reduce']) .shade,
+:global(:root[data-motion='reduce']) .drawer,
+:global(:root[data-motion='reduce']) .sheet {
+  animation: none !important;
 }
 
 /*a game's bar is two halves round its title, in one row while the phone is upright:*/

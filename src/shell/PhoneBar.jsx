@@ -3,6 +3,7 @@ import s from './PhoneBar.module.css'
 import { games } from './GameLinks'
 import { book, help, icons } from './Taskbar'
 import { backgroundFor } from './backgrounds'
+import { motions } from './motion'
 import avatar from './avatar.png'
 import { fontScale, pageUrl } from './phone'
 import { clockText } from './ResumeItems'
@@ -362,6 +363,14 @@ const PhoneBar = (
             />
             {look}
             <Check name="Fireworks" checked={state.fireworks} onToggle={actions.toggleFireworks} />
+            <Chips
+              label="Motion"
+              kind="segments"
+              options={motions.map(([id, motionName]) => [id, motionName.split(' ')[0]])}
+              value={state.motion}
+              onPick={actions.setMotion}
+              actions={actions}
+            />
             <Range
               name="Window"
               value={state.glass.opacity}
