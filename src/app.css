@@ -899,7 +899,16 @@ main::before {
 /*the android app: a top bar instead of the taskbar, the game window filling the rest*/
 :root[data-phone] {
   --taskbar: 0px;
-  --phone-bar: calc(52px + env(safe-area-inset-top));
+  /*taller when a big system font size makes the title taller*/
+  --phone-bar: calc(max(52px, 24px * var(--title-scale, 1) + 12px) + env(safe-area-inset-top));
+}
+
+/*upright, a game's actions have a bar at the bottom, which takes the taskbar's room*/
+@media (orientation: portrait) {
+  :root[data-phone][data-sides] {
+    --phone-bottom: calc(56px + env(safe-area-inset-bottom));
+    --taskbar: var(--phone-bottom);
+  }
 }
 
 :root[data-phone] main {
@@ -947,10 +956,25 @@ main::before {
   padding: 2px 3px;
 }
 
-/*dialogs open below the top bar*/
+/*background settings' rows tall enough to hit with a finger, narrower values so the dialog*/
+/*keeps more of its zoom on a phone's width*/
+:root[data-phone] [class*='BackgroundSettings_row'] {
+  min-height: 34px;
+}
+
+:root[data-phone] [class*='BackgroundSettings_value'] {
+  min-width: 52px;
+}
+
+:root[data-phone] [class*='BackgroundSettings_check'] {
+  width: 18px;
+  height: 18px;
+}
+
+/*dialogs open between the top bar and the bottom one*/
 :root[data-phone] [class*='Overlay_root'] {
   top: var(--phone-bar);
-  height: calc(100% - var(--phone-bar));
+  height: calc(100% - var(--phone-bar) - var(--taskbar));
 }
 
 /*material colours for the phone's chrome, from each theme's own published palette; classic stays windows 95*/
@@ -1152,9 +1176,32 @@ main::before {
   background: var(--md-primary);
 }
 
+/*actions at the end, wrapping when they don't fit: save, discard and cancel ran off the left*/
+/*material puts the main action last, where windows puts it first, so the row runs backwards*/
 :root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='_footer'] {
-  justify-content: flex-end;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   gap: 8px;
+}
+
+/*best times already end with ok*/
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='BestTime_footer'] {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+/*the custom field's stand beside its fields, ok on top*/
+:root[data-phone]:not([data-theme='classic'])
+  [class*='Overlay_root']
+  [class*='CustomField_footer'] {
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+/*room for three actions in a row*/
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] [class*='Prompt_root'] {
+  max-width: 290px;
 }
 
 /*the close button an icon button*/
@@ -1194,6 +1241,12 @@ main::before {
   background: none;
   border: 0;
   accent-color: var(--md-primary);
+}
+
+/*text fields tall enough for a finger, the custom field's three were 14px*/
+:root[data-phone]:not([data-theme='classic']) [class*='Overlay_root'] input[type='text'] {
+  min-height: 28px;
+  padding: 0 6px;
 }
 
 /*best times' tabs with an indicator under the open one*/
@@ -1307,6 +1360,42 @@ main::before {
     padding: 2px;
     border-width: 0;
   }
+}
+
+/*a board zoomed by a pinch: the page itself never scrolls with it, and a chip takes it back*/
+:root[data-pinched],
+:root[data-pinched] body {
+  overflow: hidden;
+}
+
+.pinch-fit {
+  position: fixed;
+  right: calc(16px + var(--phone-right, 0px));
+  bottom: calc(16px + var(--taskbar));
+  z-index: 1;
+  min-height: 40px;
+  padding: 0 20px;
+  color: var(--md-on-sec-cont, var(--text));
+  font: 500 calc(14px * var(--font-scale, 1)) var(--ui-font);
+  background: var(--md-sec-cont, var(--face));
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*a windows 95 button on classic*/
+:root[data-theme='classic'] .pinch-fit {
+  border: 1px solid;
+  border-color: var(--light) var(--dark-shadow) var(--dark-shadow) var(--light);
+  border-radius: 0;
+  box-shadow: inset -1px -1px var(--shadow);
+}
+
+/*a dialog, the side panel or the sheet covers it*/
+.pinch-fit[hidden],
+:root:has([class*='Overlay_root'], [class*='PhoneBar_shade']) .pinch-fit {
+  display: none;
 }
 
 /*the phone's own bar has pause, so the scoreboard keeps its width*/

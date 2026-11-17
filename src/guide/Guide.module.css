@@ -163,3 +163,21 @@
 :global(:root[data-phone]) .body {
   height: calc(100dvh - var(--phone-bar) - 2 * var(--gap) - 12px);
 }
+
+/*the text follows the system font size, the example boards keep theirs*/
+:global(:root[data-phone]) .article {
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+:global(:root[data-phone]) .contents {
+  font-size: calc(var(--font-size) * var(--font-scale, 1));
+  line-height: 1.3;
+}
+
+:global(:root[data-phone]) .partTitle {
+  font-size: calc(18px * var(--title-scale, 1));
+}
+
+:global(:root[data-phone]) .title {
+  font-size: calc(14px * var(--font-scale, 1));
+}

@@ -192,6 +192,18 @@ def draw(background=True):
     return im
 
 
+#one colour for android 13's themed icons: the piece with the plus cut out, the system tints it
+def silhouette():
+    im = Image.new('RGBA', (N, N), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    outline = piece_outline()
+    cx, cy, _ = enclosing_circle(outline)
+    dx, dy = N / 2 - cx, N / 2 - cy
+    d.polygon([(x + dx, y + dy) for x, y in outline], fill=(255, 255, 255, 255))
+    d.polygon([(x + dx, y + dy) for x, y in plus_outline()], fill=(0, 0, 0, 0))
+    return im
+
+
 def sized(im, size):
     return im.resize((size, size), Image.LANCZOS)
 
@@ -222,14 +234,16 @@ def site(root, icon):
 #splashes keep the icon small
 def android(res, icon):
     fg = draw(background=False)
+    mono = silhouette()
     radius = enclosing_circle(piece_outline())[2]
     densities = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
     for name, scale in densities.items():
         canvas = round(108 * scale)
-        layer = Image.new('RGBA', (canvas, canvas), (0, 0, 0, 0))
-        whole = sized(fg, round(N * 31 * scale / radius))
-        layer.paste(whole, ((canvas - whole.width) // 2, (canvas - whole.height) // 2), whole)
-        layer.save(res / f'mipmap-{name}' / 'ic_launcher_foreground.png')
+        for source, file in ((fg, 'ic_launcher_foreground'), (mono, 'ic_launcher_monochrome')):
+            layer = Image.new('RGBA', (canvas, canvas), (0, 0, 0, 0))
+            whole = sized(source, round(N * 31 * scale / radius))
+            layer.paste(whole, ((canvas - whole.width) // 2, (canvas - whole.height) // 2), whole)
+            layer.save(res / f'mipmap-{name}' / f'{file}.png')
         legacy = round(48 * scale)
         sized(icon, legacy).convert('RGB').save(res / f'mipmap-{name}' / 'ic_launcher.png')
         mask = Image.new('L', (legacy * 4, legacy * 4), 0)

@@ -34,6 +34,8 @@ export const applyZoom = (scale) => root.style.setProperty('--scale', scale)
 export const saveZoom = (scale) => save('scale', scale)
 
 let gameWindow = null
+//the game's window, for the phone's pinch zoom
+export const boardWindow = () => gameWindow
 //unzoomed pixels of explanation panel below the board, left out of layout and fitting
 let hanging = 0
 

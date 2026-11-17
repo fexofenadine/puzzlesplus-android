@@ -11,7 +11,7 @@ import HowToPlay from './HowToPlay'
 import Boss from './shell/Boss'
 import Taskbar from './shell/Taskbar'
 import PhoneBar from './shell/PhoneBar'
-import { phone } from './shell/phone'
+import { holdTime, longPress, phone } from './shell/phone'
 import PhoneMenu from './PhoneMenu'
 import OpenGames from './shell/OpenGames'
 import { placeMines } from './mines'
@@ -333,7 +333,10 @@ export const actions = {
       const cell = event.currentTarget
       const on = ({ clientX, clientY }) =>
         cell.contains(document.elementFromPoint(clientX, clientY))
-      const timer = setTimeout(actions.flag, 600)
+      const timer = setTimeout(() => {
+        longPress()
+        actions.flag()
+      }, holdTime())
       const move = ({ touches }) => {
         if (!touches || touches.length !== 1 || !on(touches[0])) {
           clearTimeout(timer)

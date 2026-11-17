@@ -315,7 +315,7 @@ export const actions = {
     window.addEventListener('keydown', actions.press)
     window.addEventListener('pointermove', actions.trace)
     window.addEventListener('pointerup', () => actions.up())
-    window.addEventListener('pointercancel', () => actions.up())
+    window.addEventListener('pointercancel', () => actions.drop())
     listen(actions)
     showRain(state.rain)
     //a resumed game is already dealt
@@ -456,6 +456,11 @@ export const actions = {
       step.length === 1 && stroke.from === EMPTY && stroke.to === FILL && !stroke.touch
     return changed(state, { ...game, stroke: null }, board, history, actions, !passing)
   },
+  //a stroke called off (a phone's second finger starting a pinch) leaves the board as it was
+  drop:
+    () =>
+    ({ game }) =>
+      game.stroke ? { game: { ...game, stroke: null, board: game.stroke.before } } : null,
   undo: () => (state, actions) => {
     const { game } = state
     if (!game.history.length || game.win || game.paused || game.dealing || game.stroke) {

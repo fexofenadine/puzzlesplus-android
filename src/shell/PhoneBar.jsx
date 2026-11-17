@@ -4,7 +4,7 @@ import { games } from './GameLinks'
 import { book, help, icons } from './Taskbar'
 import { backgroundFor } from './backgrounds'
 import avatar from './avatar.png'
-import { pageUrl } from './phone'
+import { fontScale, pageUrl } from './phone'
 import { clockText } from './ResumeItems'
 import Backup from './BackupBox'
 import Share from './ShareBox'
@@ -25,8 +25,9 @@ const PAUSE = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'
 const PLAY = 'M8 5v14l11-7z'
 const NEW =
   'M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'
+//a lightbulb: on android a question mark in a circle reads as help
 const HINT =
-  'M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z'
+  'M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z'
 const TUNE =
   'M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z'
 const CHECK = 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'
@@ -62,16 +63,79 @@ const SAVE =
   'M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z'
 
 const Icon = ({ d, class: name }) => (
-  <svg class={name} width="24" height="24" viewBox="0 0 24 24">
+  <svg class={name} width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
     <path d={d} />
   </svg>
 )
 
-const BarButton = ({ title, d, disabled, onClick }) => (
-  <button type="button" class={s.button} title={title} disabled={disabled} onclick={onClick}>
+//aria-label as well as title: talkback reads the label, a long press shows nothing on android
+//place puts a game action in the bottom bar while the phone is upright, counted from the left
+const BarButton = ({ title, d, disabled, onClick, place }) => (
+  <button
+    type="button"
+    class={place === undefined ? s.button : s.act}
+    style={place === undefined ? {} : { '--place': place }}
+    title={title}
+    aria-label={title}
+    disabled={disabled}
+    onclick={onClick}
+  >
     <Icon d={d} />
   </button>
 )
+
+//the sheet follows a finger down and the side panel one to the left, and either goes once
+//pulled a quarter of the way (120px at most); a shorter pull springs back
+//the sheet only starts while scrolled to its top, so dragging down still scrolls its list back
+const swipeAway = (axis, close) => (el) => {
+  let start = null
+  let pulled = 0
+  el.addEventListener(
+    'touchstart',
+    (event) => {
+      const [touch] = event.touches
+      start = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY, on: null } : null
+      pulled = 0
+    },
+    { passive: true },
+  )
+  el.addEventListener(
+    'touchmove',
+    (event) => {
+      if (!start) return
+      const [touch] = event.touches
+      const along = axis === 'y' ? touch.clientY - start.y : start.x - touch.clientX
+      const across = Math.abs(axis === 'y' ? touch.clientX - start.x : touch.clientY - start.y)
+      if (start.on === null) {
+        if (Math.abs(along) < 8 && across < 8) return
+        start.on = along > across && (axis === 'x' || el.scrollTop <= 0)
+        if (!start.on) {
+          start = null
+          return
+        }
+        el.style.animation = 'none'
+        el.style.transition = 'none'
+      }
+      pulled = Math.max(0, along)
+      el.style.transform = axis === 'y' ? `translateY(${pulled}px)` : `translateX(${-pulled}px)`
+      event.preventDefault()
+    },
+    { passive: false },
+  )
+  const end = () => {
+    if (start && start.on) {
+      const size = axis === 'y' ? el.offsetHeight : el.offsetWidth
+      if (pulled > Math.min(120, size / 4)) close()
+      else {
+        el.style.transition = 'transform 0.2s'
+        el.style.transform = ''
+      }
+    }
+    start = null
+  }
+  el.addEventListener('touchend', end)
+  el.addEventListener('touchcancel', end)
+}
 
 //a group of the side panel or sheet, its label optional
 export const Section = ({ label }, children) => (
@@ -162,6 +226,18 @@ const Range = ({ name, value, onInput }) => (
 
 const go = (href) => () => location.assign(pageUrl(href))
 
+//a title too long for its room shrinks to three quarters before it is cut short; measured
+//again only when its text, the screen's width or the font size change
+const fitTitle = (el) => {
+  const seen = `${el.textContent}|${innerWidth}|${fontScale()}`
+  if (el.dataset.seen === seen) return
+  el.dataset.seen = seen
+  el.style.fontSize = ''
+  if (el.scrollWidth <= el.clientWidth) return
+  const size = parseFloat(getComputedStyle(el).fontSize)
+  el.style.fontSize = `${size * Math.max(0.75, el.clientWidth / el.scrollWidth)}px`
+}
+
 //a phone's top bar, with the side panel of places behind its menu button and the options
 //sheet behind its tune button (the game's own sections are children, then the look);
 //back makes it a page's bar instead, with only a back arrow
@@ -180,27 +256,37 @@ const PhoneBar = (
     >
       {back ? (
         <header class={s.bar}>
-          <a class={s.button} href={pageUrl(back)} title="Back">
+          <a class={s.button} href={pageUrl(back)} title="Back" aria-label="Back">
             <Icon d={BACK} />
           </a>
           <span class={s.title}>{title}</span>
         </header>
       ) : (
+        //upright the top bar keeps menu, title and options and the game's actions go to a bar
+        //along the bottom, within a thumb's reach; sideways all six stand down the two sides
         <header class={s.split}>
           <div class={s.side}>
             <BarButton title="Menu" d={MENU} onClick={() => actions.toggleDrawer()} />
-            <BarButton title="New game" d={NEW} onClick={() => actions.newGame()} />
-            <BarButton title="Hint" d={HINT} onClick={() => actions.hint()} />
+            <BarButton title="New game" d={NEW} onClick={() => actions.newGame()} place={0} />
+            <BarButton title="Hint" d={HINT} onClick={() => actions.hint()} place={1} />
           </div>
           {/*the side panel says puzzles plus, so the bar has room for the game's own name*/}
-          <span class={s.title}>{(title || '').replace(/ Plus$/, '')}</span>
+          <span class={s.title} oncreate={fitTitle} onupdate={fitTitle}>
+            {(title || '').replace(/ Plus$/, '')}
+          </span>
           <div class={s.side}>
-            <BarButton title="Best times" d={TROPHY} onClick={() => actions.toggleBestTime()} />
+            <BarButton
+              title="Best times"
+              d={TROPHY}
+              onClick={() => actions.toggleBestTime()}
+              place={2}
+            />
             <BarButton
               title={paused ? 'Resume' : 'Pause'}
               d={paused ? PLAY : PAUSE}
               disabled={!canPause}
               onClick={() => actions.pause()}
+              place={3}
             />
             <BarButton title="Options" d={TUNE} onClick={() => actions.toggleSheet()} />
           </div>
@@ -210,7 +296,11 @@ const PhoneBar = (
         <div class={s.shade} onclick={() => actions.closeDrawer()} />
       )}
       {state.drawer && (
-        <nav class={s.drawer}>
+        <nav
+          class={s.drawer}
+          aria-label="Puzzles Plus"
+          oncreate={swipeAway('x', actions.closeDrawer)}
+        >
           <div class={s.head}>
             <img src={avatar} alt="" width="36" height="36" />
             Puzzles Plus
@@ -253,7 +343,12 @@ const PhoneBar = (
         </nav>
       )}
       {state.sheet && (
-        <div class={s.sheet}>
+        <div
+          class={s.sheet}
+          role="dialog"
+          aria-label={`${name} options`}
+          oncreate={swipeAway('y', actions.closeDrawer)}
+        >
           <div class={s.handle} />
           <div class={s.sheetTitle}>{name} options</div>
           {children}

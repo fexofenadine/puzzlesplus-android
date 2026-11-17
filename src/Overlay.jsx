@@ -2,7 +2,7 @@ import { h } from 'hyperapp'
 import s from './Overlay.module.css'
 import d from './Dialog.module.css'
 import { loadZoom } from './shell/zoom'
-import { phone } from './shell/phone'
+import { fontScale, phone } from './shell/phone'
 
 //esc closes the dialog, so it never reaches the boss key
 const keyDown = (onKeyDown) => (event) => {
@@ -50,8 +50,23 @@ export const fitDialog = (el) => {
   const scale = phone ? PHONE_SCALE : Math.max(shown, loadZoom())
   //at 100% the dialog is as wide as its text wants, up to the room
   el.style.setProperty('--scale', 1)
+  dialog.style.maxWidth = ''
   const fit = Math.floor((room / dialog.offsetWidth) * 100) / 100
-  const best = fit >= scale ? scale : Math.max(MIN_SCALE, fit)
+  let best = fit >= scale ? scale : Math.max(MIN_SCALE, fit)
+  //a big system font size grows a phone's dialog by as much again, its text wrapping shorter
+  //as far as what can't wrap (a table, a field, a long link) still fits
+  const grow = phone ? fontScale() : 1
+  if (grow > 1) {
+    dialog.style.width = 'min-content'
+    //tables measure a few pixels short at their least, so 3% is left spare
+    const most = Math.floor((room / dialog.offsetWidth) * 97) / 100
+    dialog.style.width = ''
+    const bigger = Math.min(best * grow, Math.max(most, fit))
+    if (bigger > best) {
+      best = Math.floor(bigger * 100) / 100
+      if (best > fit) dialog.style.maxWidth = `${Math.floor(room / best)}px`
+    }
+  }
   if (best === shown) el.style.removeProperty('--scale')
   else el.style.setProperty('--scale', best)
 }

@@ -13,3 +13,6 @@ coverage/
 Thumbs.db
 *.code-workspace
 www
+
+#screenshots from tools/droid.py
+tools/droid-shots/

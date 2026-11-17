@@ -3,6 +3,6 @@
   "appName": "Puzzles Plus",
   "webDir": "www",
   "android": {
-    "adjustMarginsForEdgeToEdge": "auto"
+    "adjustMarginsForEdgeToEdge": "disable"
   }
 }
