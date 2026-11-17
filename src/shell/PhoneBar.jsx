@@ -272,6 +272,13 @@ const PhoneBar = (
               value={state.glass.opacity}
               onInput={(opacity) => actions.setOpacity(opacity)}
             />
+            {backgroundFor(state.theme) && (
+              <Check
+                name="Animated background"
+                checked={state.backgrounds[backgroundFor(state.theme)].animated}
+                onToggle={actions.toggleAnimated}
+              />
+            )}
             <Check
               name="Hide window"
               checked={state.glass.hidden}

@@ -22,7 +22,7 @@ Android 6 or later. Each release lists its APK's SHA-256, so you can check the d
 
 - **The game fills the screen** under a top bar in the theme's colours with new game, hint, pause and options. Wide boards turn on their side in portrait.
 - **The menu** (the button at the top left) lists the seven games, any games you saved to resume later, each game's guide, how to play and About.
-- **Options** (the button at the top right) hold the game's difficulty, size and options (Nonograms adds Procedural, Symmetric and Choose picture), then the nine themes, **Fireworks**, a slider for the window's opacity, Hide window, Board without frame and the background settings. The look follows the theme: Windows 95 on Classic, material design on the others.
+- **Options** (the button at the top right) hold the game's difficulty, size and options (Nonograms adds Procedural, Symmetric and Choose picture), then the nine themes, **Fireworks**, a slider for the window's opacity, Animated background, Hide window, Board without frame and the background settings. The look follows the theme: Windows 95 on Classic, material design on the others.
 - **Fireworks** in the theme's colours go up when you win, until the next game starts.
 - **The back button** closes the menu or a dialog first, then leaves the app; a guide's back goes to its game.
 - The phone's status and navigation bars take the theme's colour, and the system font size leaves the games' pixel layout alone.
