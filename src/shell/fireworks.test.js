@@ -135,9 +135,12 @@ it('stays quiet when off, hidden, reduced or under the boss key', () => {
   celebrate()
   expect(frames.length).toBe(0)
   localStorage.clear()
+  //the system's reduced motion counts only when chosen, full motion is the default
   vi.stubGlobal('matchMedia', () => ({ matches: true }))
+  localStorage.setItem('motion', 'system')
   celebrate()
   expect(frames.length).toBe(0)
+  localStorage.removeItem('motion')
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
   document.documentElement.dataset.boss = 'on'
   celebrate()

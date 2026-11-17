@@ -47,14 +47,17 @@ it('treats synthwave as on when it was off only by its old default', () => {
   expect(paint('synthwave', '{oops')).toBe('animated')
 })
 
-it('marks a saved motion choice before the first paint', () => {
+it('marks full motion, or the saved choice, before the first paint', () => {
   for (const [saved, shown] of [
     ['reduce', 'reduce'],
     ['full', 'full'],
-    ['wild', undefined],
+    ['system', undefined],
+    ['wild', 'full'],
+    [null, 'full'],
   ]) {
     delete root.dataset.motion
-    localStorage.setItem('motion', saved)
+    if (saved) localStorage.setItem('motion', saved)
+    else localStorage.removeItem('motion')
     new Function(script)()
     expect(root.dataset.motion).toBe(shown)
   }

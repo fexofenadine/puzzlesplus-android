@@ -30,9 +30,10 @@ try {
     }
   }
   if (animated) document.documentElement.dataset.background = 'animated'
-  //a motion choice overrules the system's from the first paint
+  //full motion unless reduced or the system's was chosen, from the first paint
   var motion = localStorage.getItem('motion')
-  if (motion === 'reduce' || motion === 'full') document.documentElement.dataset.motion = motion
+  if (motion !== 'system')
+    document.documentElement.dataset.motion = motion === 'reduce' ? 'reduce' : 'full'
   document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
 } catch {
   //blocked storage keeps the defaults
