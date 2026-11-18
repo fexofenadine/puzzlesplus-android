@@ -1376,7 +1376,7 @@ main::before {
   position: fixed;
   right: calc(16px + var(--phone-right, 0px));
   bottom: calc(16px + var(--taskbar));
-  z-index: 1;
+  z-index: 4;
   min-height: 40px;
   padding: 0 20px;
   color: var(--md-on-sec-cont, var(--text));
