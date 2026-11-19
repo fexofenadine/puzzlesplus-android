@@ -12,9 +12,13 @@ const keyDown = (state, actions) => (event) => {
   const at = games.findIndex(([id]) => id === state.openGames)
   if (event.keyCode === 27) actions.openGame(state.page)
   else if (event.keyCode === 13) actions.openGame(state.openGames)
-  else if (event.keyCode === 38 || event.keyCode === 40) {
+  else if (event.keyCode >= 37 && event.keyCode <= 40) {
     event.preventDefault()
-    const next = (at + (event.keyCode === 40 ? 1 : -1) + games.length) % games.length
+    const step = { 37: -1, 39: 1, 38: -4, 40: 4 }[event.keyCode]
+    const row = Math.abs(step) === 4
+    const next = row
+      ? Math.min(Math.max(at + step, at % 4), games.length - 1)
+      : (at + step + games.length) % games.length
     actions.selectGame(games[next][0])
   }
 }

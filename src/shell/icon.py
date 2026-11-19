@@ -1,11 +1,11 @@
 #draws the puzzles plus icon: a raised jigsaw piece with a raised plus, in the nord colours
-#writes the site's icons, readme header and social preview; with --android <res folder> also the
+#writes the site's icons and readme header (the social preview is docs/banner's); with --android <res folder> also the
 #app's launcher icons and splash screens. needs python with pillow and numpy
 import argparse
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 N = 768
 #nord, no white: a frost blue piece with a light frost plus on polar night slate
@@ -14,8 +14,6 @@ SNOW = (216, 222, 233)
 BACKGROUND = (76, 86, 106)
 PIECE = (94, 129, 172)
 PLUS = (136, 192, 208)
-LIGHT = (236, 239, 244)
-FROST = (136, 192, 208)
 
 
 def mix(a, b, t):
@@ -214,19 +212,6 @@ def site(root, icon):
     sized(icon, 512).save(public / 'icon-512.png')
     sized(icon, 48).save(public / 'favicon.ico', sizes=[(16, 16), (32, 32), (48, 48)])
     sized(icon, 160).save(root / 'docs' / 'puzzlesplus.png')
-    #github's social preview, 1280x640: the icon and the name on polar night
-    preview = Image.new('RGB', (1280, 640), BACKGROUND)
-    preview.paste(sized(icon, 400), (110, 120), sized(icon, 400))
-    d = ImageDraw.Draw(preview)
-    font = ImageFont.truetype('arialbd.ttf', 96)
-    small = ImageFont.truetype('arial.ttf', 40)
-    d.text((560, 190), 'Puzzles Plus', fill=LIGHT, font=font)
-    d.text((564, 320), 'Minesweeper, Takuzu, Nonograms,', fill=FROST, font=small)
-    d.text((564, 375), 'Sudoku and 2048, Windows style,', fill=FROST, font=small)
-    d.text((564, 430), 'with hints that explain', fill=FROST, font=small)
-    preview.save(root / 'docs' / 'social-preview.png')
-    #the same picture is the root page's link preview
-    preview.save(public / 'preview.png')
 
 
 #launcher icons per density: the adaptive foreground with the piece's circle 31dp across the 33dp

@@ -1,5 +1,5 @@
 .root {
-  width: 260px;
+  width: 352px;
   padding: 10px 12px 12px;
   outline: 0;
 }
@@ -10,8 +10,9 @@
 
 /*a sunken list box, like a file dialog's*/
 .list {
-  display: flex;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(4, 76px);
+  gap: 8px 4px;
   justify-content: space-around;
   margin: 0 0 10px;
   padding: 8px 4px;
