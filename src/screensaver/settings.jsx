@@ -240,7 +240,10 @@ const view = (state, actions) => (
   >
     <div id="looks" />
     <div class={s.room} oncreate={grow}>
-      <Dialog title="Puzzles Plus Screensaver" onClose={close}>
+      <Dialog
+        title={android() ? 'Puzzles Plus Wallpaper' : 'Puzzles Plus Screensaver'}
+        onClose={close}
+      >
         <form class={`${b.root} ${s.form}`} autocomplete="off" onsubmit={(e) => e.preventDefault()}>
           <ThemePart state={state} actions={actions} />
           <BackgroundPart state={state} actions={actions} />
@@ -248,7 +251,7 @@ const view = (state, actions) => (
           <div class={b.footer}>
             {android() && (
               <Button type="button" onClick={() => android().apply()}>
-                <span class={b.button}>Set Wallpaper</span>
+                <span class={b.button}>Apply</span>
               </Button>
             )}
             {tauri() && (
