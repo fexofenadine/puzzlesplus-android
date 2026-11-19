@@ -834,6 +834,14 @@ main::before {
   visibility: hidden;
 }
 
+/*main sits in the app's own div, hidden above, so what stays shows itself again*/
+:root[data-screensaver] main::before,
+:root[data-screensaver] main::after,
+:root[data-screensaver] #fireworks,
+:root[data-screensaver] #looks {
+  visibility: visible;
+}
+
 :root[data-screensaver],
 :root[data-screensaver] * {
   cursor: none !important;
