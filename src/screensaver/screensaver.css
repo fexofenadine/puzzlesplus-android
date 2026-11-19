@@ -1,0 +1,49 @@
+/*no taskbar to make room for, and no pointer*/
+:root {
+  --taskbar: 0px;
+  cursor: none;
+}
+
+:root[data-preview] {
+  overflow: hidden;
+}
+
+/*the vcr's words grow with the screen, as a real vcr's fill a television*/
+:root:not([data-preview]) main::before,
+:root:not([data-preview]) main::after {
+  padding: 5vmin 6vmin;
+  font-size: clamp(22px, 4.5vmin, 72px);
+  letter-spacing: 0.1em;
+  text-shadow:
+    0.09em 0 #01cdfe,
+    -0.09em 0 #ff71ce,
+    0.09em 0.09em 0 rgba(43, 27, 74, 0.7),
+    0 0 0.3em rgba(43, 27, 74, 0.5);
+}
+
+/*on a phone's home screen they keep clear of the status bar and the navigation*/
+:root[data-wallpaper] main::before,
+:root[data-wallpaper] main::after {
+  padding: calc(5vmin + 32px) 6vmin calc(5vmin + 56px);
+}
+
+/*and shrink to the settings' little monitor*/
+:root[data-preview] main::before,
+:root[data-preview] main::after {
+  padding: 6px 8px;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+
+/*the wallpaper slides a little as the home screens do (--drift from -1 to 1, set by show.js)*/
+/*the picture is drawn a tenth larger so its edges never show*/
+:root[data-wallpaper] body > canvas,
+:root[data-wallpaper]:not([data-theme='vaporwave']) main::before {
+  scale: 1.1;
+  translate: calc(var(--drift, 0) * 4vw) 0;
+  transition: translate 0.15s linear;
+}
+
+:root[data-wallpaper][data-theme='vaporwave'] body {
+  background-position: calc(50% + var(--drift, 0) * 4vw) 60%;
+}

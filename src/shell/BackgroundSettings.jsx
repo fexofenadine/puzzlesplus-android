@@ -6,7 +6,7 @@ import Button from '../Button'
 import { backgrounds, optionsOf } from './backgrounds'
 
 //a control per option type, built from each background's options
-const Control = ({ option, value, onChange }) => {
+export const Control = ({ option, value, onChange }) => {
   if (option.type === 'toggle') {
     return (
       <input

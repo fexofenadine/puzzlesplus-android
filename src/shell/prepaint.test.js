@@ -74,3 +74,18 @@ it('marks the screen effects switched off before the first paint', () => {
   new Function(script)()
   expect(root.dataset.effectsOff).toBe('drop')
 })
+
+it('spaces the scanlines a whole number of screen pixels apart at any pixel ratio', () => {
+  const periods = {}
+  for (const ratio of [1, 1.25, 1.5, 2, 2.625, 3]) {
+    window.devicePixelRatio = ratio
+    paint('synthwave')
+    const period = parseFloat(root.style.getPropertyValue('--scan-period'))
+    periods[ratio] = period
+    expect(Math.abs(period * ratio - Math.round(period * ratio))).toBeLessThan(1e-9)
+    expect(period).toBeGreaterThan(2)
+    expect(period).toBeLessThan(4)
+  }
+  expect(periods[1]).toBe(3)
+  window.devicePixelRatio = 1
+})

@@ -116,6 +116,13 @@ export const configure = (id, values) => {
   refresh(id)
 }
 
+//the least time between frames, for the wallpaper's frame rate; 0 draws every frame the screen gives
+//a little under the frame's length, so a 60 a second cap on a 60 hz screen skips none
+let gap = 0
+export const setFrameCap = (fps) => {
+  gap = fps ? 1000 / fps - 3 : 0
+}
+
 export const startBackgrounds = () => {
   startGlitches()
   const root = document.documentElement
@@ -156,8 +163,11 @@ export const startBackgrounds = () => {
   let mode = null
   let frame = null
 
+  let drawn = 0
   const loop = (now) => {
     frame = requestAnimationFrame(loop)
+    if (gap && now - drawn < gap) return
+    drawn = now
     instances[active].frame(now)
   }
 

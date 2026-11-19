@@ -51,6 +51,18 @@ try {
 } catch {
   //blocked storage keeps the defaults
 }
+//scanlines about 3 css pixels apart, but always a whole number of the screen's own pixels, so
+//every line comes out alike; again whenever the pixel ratio changes (zoom, another screen)
+var scanPeriod = function () {
+  var ratio = window.devicePixelRatio || 1
+  var period = Math.max(2, Math.round(3 * ratio)) / ratio
+  document.documentElement.style.setProperty('--scan-period', period + 'px')
+  if (window.matchMedia)
+    matchMedia('(resolution: ' + ratio + 'dppx)').addEventListener('change', scanPeriod, {
+      once: true,
+    })
+}
+scanPeriod()
 //if the game fails to start, show why instead of an empty desktop
 addEventListener('error', (event) => {
   if (document.querySelector('main *')) return

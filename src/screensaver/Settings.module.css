@@ -1,0 +1,33 @@
+/*the settings window over the live background, clear of the screen's look like any dialog*/
+.room {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: auto;
+}
+
+.form {
+  min-width: 340px;
+}
+
+/*a heading over each part*/
+.group {
+  margin: 14px 0 6px;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+:global(:root) {
+  --taskbar: 0px;
+}
