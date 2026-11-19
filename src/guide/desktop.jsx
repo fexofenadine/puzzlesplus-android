@@ -71,7 +71,8 @@ export const desktopSection = {
         switched off, neon over a wireframe landscape.
       </li>
       <li>
-        <b>Matrix</b>, green on black over falling code rain, ported from xscreensaver's GLMatrix.
+        <b>Matrix</b>, green on black over falling code rain, ported from xscreensaver's GLMatrix,
+        behind CRT scanlines, with bands that tear and columns that garble now and then.
       </li>
       <li>
         <b>Nord</b>, over xscreensaver's Substrate, which grows cracks across the screen.
@@ -92,6 +93,11 @@ export const desktopSection = {
     <p>
       Background Settings (in the Theme menu) has the options of the xscreensaver originals,
       previews them live and can switch the animation off for a still picture.
+    </p>,
+    <p>
+      On Synthwave, Vaporwave and Matrix, View → Glitches switches each screen effect on or off: the
+      glitches that come now and then at random, and the scanlines, grain and flicker that stay.
+      Signal drops on Matrix start off. Nothing glitches under Reduced Motion.
     </p>,
   ],
 }

@@ -118,6 +118,20 @@ it('keeps time on slow frames, as under a heavy shader', () => {
   expect(frames.length).toBe(0)
 })
 
+it('follows the screen when a phone is turned', () => {
+  const [w, h] = [innerWidth, innerHeight]
+  celebrate()
+  const canvas = document.body.querySelectorAll('canvas')[1]
+  step(10)
+  expect(canvas.width / canvas.height).toBeCloseTo(w / h, 1)
+  vi.stubGlobal('innerWidth', h)
+  vi.stubGlobal('innerHeight', w)
+  step(1)
+  expect(canvas.width / canvas.height).toBeCloseTo(h / w, 1)
+  stopFireworks()
+  step(400)
+})
+
 it('does not stack shows, and a new one can start after one ends', () => {
   celebrate()
   celebrate()

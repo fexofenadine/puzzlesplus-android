@@ -63,3 +63,14 @@ it('marks full motion, or the saved choice, before the first paint', () => {
   }
   delete root.dataset.motion
 })
+
+it('marks the screen effects switched off before the first paint', () => {
+  paint('synthwave')
+  expect(root.dataset.effectsOff).toBe('drop')
+  localStorage.setItem('effects', JSON.stringify({ drop: true, scanlines: false }))
+  new Function(script)()
+  expect(root.dataset.effectsOff).toBe('scanlines')
+  localStorage.setItem('effects', '{oops')
+  new Function(script)()
+  expect(root.dataset.effectsOff).toBe('drop')
+})

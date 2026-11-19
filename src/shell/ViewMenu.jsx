@@ -2,8 +2,9 @@ import { h } from 'hyperapp'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
 import { steps } from './zoom'
 import { phone } from './phone'
+import { effectsOf } from './glitches'
 
-//zoom and maximise, the same in every game
+//zoom and maximise, the same in every game, and the retro themes' glitches
 const ViewMenu = ({ state, actions }) => {
   //a phone's window always fills the screen
   if (phone) return null
@@ -29,6 +30,10 @@ const ViewMenu = ({ state, actions }) => {
       />
       <Separator />
       <SubMenuItem name="Maximise" checked={maximised} onClick={() => actions.maximise()} />
+      {effectsOf(state.theme).length > 0 && <Separator />}
+      {effectsOf(state.theme).length > 0 && (
+        <SubMenuItem name="Glitches..." onClick={actions.toggleGlitches} />
+      )}
     </MenuItem>
   )
 }

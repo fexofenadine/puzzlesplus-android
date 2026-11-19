@@ -3,6 +3,7 @@ import s from './Taskbar.module.css'
 import { games } from './GameLinks'
 import Backup from './BackupBox'
 import Share from './ShareBox'
+import GlitchSettings from './GlitchSettings'
 import avatar from './avatar.png'
 import minesweeper from './icons/minesweeper.png'
 import takuzu from './icons/takuzu.png'
@@ -143,6 +144,7 @@ const Taskbar = ({ key, name, own, state, actions }) => {
     </footer>,
     state.share && <Share key="share" state={state.share} actions={actions} />,
     state.backup && <Backup key="backup" state={state.backup} actions={actions} />,
+    state.glitches && <GlitchSettings key="glitches" state={state} actions={actions} />,
   ]
 }
 

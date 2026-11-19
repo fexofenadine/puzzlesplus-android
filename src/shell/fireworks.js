@@ -1,7 +1,7 @@
 import { load } from './storage'
 import { reduced } from './motion'
 
-//fireworks over the background and behind the game window, in the theme's own colours
+//fireworks over the background and the game window, under menus and dialogs, in the theme's own colours
 //one canvas that exists only while they play
 
 const square = 'square'
@@ -132,7 +132,7 @@ let finish = () => {}
 //a new game ends the show
 export const stopFireworks = () => finish()
 
-//the page's own canvas sits in main, over its wallpaper and under the windows
+//the page's own canvas sits in main, over its wallpaper and the game window
 //without one a canvas goes after the background's
 const place = () => {
   const page = document.getElementById('fireworks')
@@ -166,13 +166,9 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
   const context = target.getContext?.('2d')
   if (!context) return
   const look = lookOf(theme)
-  const scale = Math.min(window.devicePixelRatio || 1, 2)
-  const width = innerWidth
-  const height = innerHeight
-  target.width = Math.round(width * scale)
-  target.height = Math.round(height * scale)
+  let width = 0
+  let height = 0
   target.style.display = 'block'
-  context.setTransform(scale, 0, 0, scale, 0, 0)
   let open = true
   let wait = 0
   let alive = []
@@ -184,6 +180,32 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
   finish = () => {
     open = false
   }
+
+  //the canvas follows the screen, a turned phone keeps the show where it was on it
+  const fit = () => {
+    if (innerWidth === width && innerHeight === height) return
+    if (width && height) {
+      const sx = innerWidth / width
+      const sy = innerHeight / height
+      const move = (p) => {
+        p.x *= sx
+        p.y *= sy
+        p.trail = p.trail.map(([x, y]) => [x * sx, y * sy])
+      }
+      rockets.forEach((r) => {
+        move(r)
+        r.top *= sy
+      })
+      alive.forEach(move)
+    }
+    width = innerWidth
+    height = innerHeight
+    const scale = Math.min(window.devicePixelRatio || 1, 2)
+    target.width = Math.round(width * scale)
+    target.height = Math.round(height * scale)
+    context.setTransform(scale, 0, 0, scale, 0, 0)
+  }
+  fit()
 
   const stop = () => {
     finish = () => {}
@@ -199,6 +221,7 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
     last = now
     clock += dt
     if (root.dataset.boss || document.hidden) return stop()
+    fit()
     if (clock > LIMIT) open = false
     wait -= dt
     while (open && wait <= 0) {

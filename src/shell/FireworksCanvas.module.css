@@ -1,16 +1,11 @@
-/*over main's wallpaper layers, under everything else in the page*/
+/*over main's wallpaper layers and the game window (whose parts stop at 2), under menus, dialogs and bars*/
 .canvas {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: -1;
+  z-index: 3;
   display: none;
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-/*a phone's window fills the screen, so the show goes over it instead*/
-:global(:root[data-phone]) .canvas {
-  z-index: 20;
 }

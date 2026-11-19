@@ -1,5 +1,6 @@
 import { load, save } from '../storage'
 import * as backgrounds from './meta'
+import { startGlitches } from '../glitches'
 
 //each background is described in meta.js and drawn by its own file, loaded when first shown
 //its create(context, settings) returns { configure, resize(w, h, scale), frame(now), still?(now) }
@@ -116,6 +117,7 @@ export const configure = (id, values) => {
 }
 
 export const startBackgrounds = () => {
+  startGlitches()
   const root = document.documentElement
   //one canvas for the 2d backgrounds, and one made when a webgl background first shows
   const makeCanvas = () => {

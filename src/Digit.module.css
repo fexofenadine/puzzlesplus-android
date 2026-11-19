@@ -41,9 +41,17 @@
   fill: var(--lcd-off);
 }
 
-/*neon theme counter glitch and scanlines*/
+/*neon theme counters: a colour fringe, scanlines and a passing band, glitching now and then*/
+/*a glitch's shift, cut and hue come from shell/glitches.js each time*/
 :global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave'])) .root {
-  animation: lcdGlitch 5.3s steps(1, end) infinite;
+  filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
+}
+
+:global(:root[data-glitch~='lcd']) .root {
+  transform: var(--lcd-move);
+  clip-path: var(--lcd-clip);
+  filter: drop-shadow(var(--lcd-fringe) 0 var(--fringe-a))
+    drop-shadow(calc(var(--lcd-fringe) * -1) 0 var(--fringe-b)) hue-rotate(var(--lcd-hue));
 }
 
 :global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
@@ -68,40 +76,13 @@
     lcdFlicker 0.12s steps(2) infinite;
 }
 
-@keyframes lcdGlitch {
-  0% {
-    transform: none;
-    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
-  }
-  18% {
-    transform: translateX(-2px);
-    filter: drop-shadow(3px 0 var(--fringe-a)) drop-shadow(-3px 0 var(--fringe-b));
-  }
-  20% {
-    transform: translate(2px, 1px) skewX(-6deg);
-    clip-path: inset(0 0 55% 0);
-  }
-  22% {
-    transform: none;
-    clip-path: none;
-    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
-  }
-  57% {
-    transform: translateY(-1px);
-    clip-path: inset(40% 0 20% 0);
-    filter: drop-shadow(-3px 0 var(--fringe-a)) drop-shadow(3px 0 var(--fringe-b)) hue-rotate(60deg);
-  }
-  59% {
-    transform: none;
-    clip-path: none;
-    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
-  }
-  84% {
-    transform: translateX(3px) scaleX(1.04);
-  }
-  86% {
-    transform: none;
-  }
+/*switched off in view, glitches: flicker, and the scanlines with the window's*/
+:global(:root[data-effects-off~='flicker']) .root::after {
+  animation: lcdBand 2.2s linear infinite;
+}
+
+:global(:root[data-effects-off~='window']) .root::after {
+  display: none;
 }
 
 @keyframes lcdBand {

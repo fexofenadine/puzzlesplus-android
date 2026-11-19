@@ -98,6 +98,20 @@
   animation: flicker 0.15s steps(2) infinite;
 }
 
+/*switched off in view, glitches: the meltdown, or only its flicker*/
+:global(:root[data-effects-off~='lost']) .fieldLost {
+  animation: none;
+}
+
+:global(:root[data-effects-off~='lost']) .fieldLost::before,
+:global(:root[data-effects-off~='lost']) .fieldLost::after {
+  display: none;
+}
+
+:global(:root[data-effects-off~='flicker']) .fieldLost::after {
+  animation: none;
+}
+
 @keyframes jitter {
   0% {
     transform: none;
@@ -176,4 +190,30 @@
   50% {
     opacity: 0.4;
   }
+}
+
+/*synthwave, vaporwave and matrix lay their screen's look (--looks in app.css) over the scoreboard*/
+/*everything after it (board, clues, pad, hint) sits above that layer and stays clean*/
+:global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix'])) .root {
+  position: relative;
+}
+
+:global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']))
+  .root
+  > :not(.scoreboard) {
+  position: relative;
+  z-index: 1;
+}
+
+:global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']))
+  .root::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--looks);
+  pointer-events: none;
+  content: '';
+  animation: var(--looks-motion);
 }

@@ -35,6 +35,19 @@ try {
   if (motion !== 'system')
     document.documentElement.dataset.motion = motion === 'reduce' ? 'reduce' : 'full'
   document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
+  //screen effects switched off (view, glitches), signal drops start off
+  var effects = { drop: false }
+  try {
+    var chosen = JSON.parse(localStorage.getItem('effects')) || {}
+    for (var id in chosen) effects[id] = chosen[id]
+  } catch {
+    //nothing saved
+  }
+  document.documentElement.dataset.effectsOff = Object.keys(effects)
+    .filter(function (id) {
+      return effects[id] === false
+    })
+    .join(' ')
 } catch {
   //blocked storage keeps the defaults
 }

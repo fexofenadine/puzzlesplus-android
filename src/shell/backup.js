@@ -12,6 +12,7 @@ const plain = [
   'windowHidden',
   'fireworks',
   'motion',
+  'effects',
   'lastGame',
   'losses',
   'level',

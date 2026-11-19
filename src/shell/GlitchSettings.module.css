@@ -1,0 +1,9 @@
+/*a heading over each group of effects*/
+.group {
+  margin: 10px 0 4px;
+  opacity: 0.75;
+}
+
+.group:first-child {
+  margin-top: 0;
+}
