@@ -623,11 +623,12 @@ main::before {
 :root[data-theme='synthwave'] main::after {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")
     0 0 / 0 0;
-  animation: synth-static 6s linear infinite;
 }
 
+/*it moves only while it shows, so the screen is not painted again for nothing in between*/
 :root[data-theme='synthwave'][data-glitch~='burst'] main::after {
   background-size: 180px 180px;
+  animation: synth-static 6s linear infinite;
 }
 
 @keyframes synth-static {
@@ -740,6 +741,8 @@ main::before {
 
 /*the screen's look over everything on it, the band rolling down windows, bars and wallpaper as one*/
 /*boards and buttons sit above it (Game.module.css, Dialog.module.css), and so do open menus and dialogs*/
+/*the scanlines and vignette are painted once, the band moves by transform and the flicker is opacity,*/
+/*so the graphics card shifts them each frame and nothing is painted again*/
 #looks {
   display: none;
 }
@@ -752,79 +755,103 @@ main::before {
   left: 0;
   z-index: 6;
   display: block;
+  overflow: hidden;
+  background:
+    var(--fx-scan, var(--scanlines)),
+    var(--fx-vignette, radial-gradient(ellipse at center, transparent 55%, var(--vignette)));
   pointer-events: none;
-  animation:
-    looks-roll var(--looks-time) linear infinite,
-    var(--fx-flicker, vhs-flicker) 0.12s steps(2) infinite;
+  animation: var(--fx-flicker, vhs-flicker) 0.12s steps(2) infinite;
+  will-change: opacity;
 }
 
-:root[data-theme='synthwave'] #looks {
+:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']) #looks::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--band-height);
+  background: var(--fx-band, var(--band));
+  transform: translateY(-30vh);
+  content: '';
+  animation: looks-roll var(--looks-time) linear infinite;
+  will-change: transform;
+}
+
+/*scanlines as a soft rise and fall a whole number of the screen's pixels apart (--scan-period, set*/
+/*by prepaint.js), so a scaled screen shows even lines instead of a moire of thick and thin ones*/
+:root {
+  --scanlines: repeating-linear-gradient(
+    var(--scan-dark) 0,
+    var(--scan-dark) calc(var(--scan-period, 3px) * 0.2),
+    transparent calc(var(--scan-period, 3px) * 0.5),
+    transparent calc(var(--scan-period, 3px) * 0.8),
+    var(--scan-dark) var(--scan-period, 3px)
+  );
+}
+
+:root[data-theme='synthwave'] {
   --looks-time: 6s;
-  background:
-    var(
-        --fx-band,
-        linear-gradient(
-          transparent,
-          rgba(255, 255, 255, 0.06) 30%,
-          rgba(148, 218, 234, 0.22) 48%,
-          rgba(240, 80, 138, 0.18) 52%,
-          rgba(255, 255, 255, 0.06) 70%,
-          transparent
-        )
-      )
-      0 -30% / 100% 10% no-repeat,
-    var(--fx-scan, repeating-linear-gradient(rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px)),
-    var(--fx-vignette, radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5)));
+  --band-height: 10vh;
+  --band: linear-gradient(
+    transparent,
+    rgba(255, 255, 255, 0.06) 30%,
+    rgba(148, 218, 234, 0.22) 48%,
+    rgba(240, 80, 138, 0.18) 52%,
+    rgba(255, 255, 255, 0.06) 70%,
+    transparent
+  );
+  --scan-dark: rgba(0, 0, 0, 0.2);
+  --vignette: rgba(0, 0, 0, 0.5);
 }
 
-:root[data-theme='vaporwave'] #looks {
+:root[data-theme='vaporwave'] {
   --looks-time: 8s;
-  background:
-    var(
-        --fx-band,
-        linear-gradient(
-          transparent,
-          rgba(255, 255, 255, 0.1) 30%,
-          rgba(1, 205, 254, 0.3) 46%,
-          rgba(255, 255, 255, 0.45) 50%,
-          rgba(255, 113, 206, 0.3) 54%,
-          rgba(255, 255, 255, 0.1) 70%,
-          transparent
-        )
-      )
-      0 -30% / 100% 9% no-repeat,
-    var(--fx-scan, repeating-linear-gradient(rgba(28, 16, 56, 0.16) 0 1px, transparent 1px 3px)),
-    var(--fx-vignette, radial-gradient(ellipse at center, transparent 60%, rgba(28, 16, 56, 0.45)));
+  --band-height: 9vh;
+  --band: linear-gradient(
+    transparent,
+    rgba(255, 255, 255, 0.1) 30%,
+    rgba(1, 205, 254, 0.3) 46%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 113, 206, 0.3) 54%,
+    rgba(255, 255, 255, 0.1) 70%,
+    transparent
+  );
+  --scan-dark: rgba(28, 16, 56, 0.13);
+  --vignette: rgba(28, 16, 56, 0.45);
 }
 
 /*matrix's crt only rolls a faint green band, without the tape's flicker*/
-:root[data-theme='matrix'] #looks {
+:root[data-theme='matrix'] {
   --looks-time: 10s;
-  background:
-    var(--fx-band, linear-gradient(transparent, rgba(44, 255, 110, 0.08) 50%, transparent)) 0 -30% /
-      100% 8% no-repeat,
-    var(--fx-scan, repeating-linear-gradient(rgba(0, 0, 0, 0.45) 0 1px, transparent 1px 3px)),
-    var(--fx-vignette, radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55)));
-  animation: looks-roll var(--looks-time) linear infinite;
+  --band-height: 8vh;
+  --band: linear-gradient(transparent, rgba(44, 255, 110, 0.08) 50%, transparent);
+  --scan-dark: rgba(0, 0, 0, 0.36);
+  --vignette: rgba(0, 0, 0, 0.55);
+}
+
+:root[data-theme='matrix'] #looks {
+  animation: none;
 }
 
 @keyframes looks-roll {
+  from {
+    transform: translateY(-30vh);
+  }
   to {
-    background-position:
-      0 130%,
-      0 0,
-      0 0;
+    transform: translateY(120vh);
   }
 }
 
-/*reduced motion keeps the scanlines and parks the band*/
+/*reduced motion keeps the scanlines and parks the band off screen*/
 @media (prefers-reduced-motion: reduce) {
-  :root:not([data-motion]) #looks {
+  :root:not([data-motion]) #looks,
+  :root:not([data-motion]) #looks::before {
     animation: none;
   }
 }
 
-:root[data-motion='reduce'] #looks {
+:root[data-motion='reduce'] #looks,
+:root[data-motion='reduce'] #looks::before {
   animation: none;
 }
 

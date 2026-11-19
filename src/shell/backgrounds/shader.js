@@ -113,8 +113,10 @@ export const shaderBackground = (meta, shader) => ({
     //the first draws compile the shader on the graphics card, their time says nothing
     let warming = 2
     let lost = false
-    //only the web checks the frame rate, the app always draws
-    let rate = app ? null : frameRate()
+    //only the web checks the frame rate, the app always draws, and so do the screensaver and
+    //wallpaper pages (data-always on the root), which keep drawing at the lowest size however slow
+    const always = 'always' in (globalThis.document?.documentElement.dataset ?? {})
+    let rate = app || always ? null : frameRate()
     const pixel = new Uint8Array(4)
 
     const size = () => {
@@ -172,7 +174,7 @@ export const shaderBackground = (meta, shader) => ({
         const cost = performance.now() - began
         if (warming-- > 0) return
         gl.canvas.dataset.cost = Math.round(cost)
-        const next = adapt(quality, cost)
+        const next = adapt(quality, cost) ?? (always ? quality : null)
         if (next === null) return giveUp()
         if (next !== quality) {
           quality = next
