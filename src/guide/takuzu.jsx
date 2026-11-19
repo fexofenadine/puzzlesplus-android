@@ -99,7 +99,8 @@ export const parts = [
           </p>,
           <p>
             Each size and level keeps a best time, with and without hints. On Matrix,{' '}
-            <b>Rain Glyphs</b> in the Theme menu draws the two values as glyphs from the code rain.
+            <b>Rain Glyphs</b> in the Display menu draws the two values as glyphs from the code
+            rain.
           </p>,
         ],
       },

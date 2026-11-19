@@ -128,9 +128,18 @@
 }
 
 .menu {
-  position: absolute;
-  bottom: calc(100% + 3px);
-  left: 0;
+  position: fixed;
+  bottom: calc(var(--taskbar) + 1px);
+  left: calc(2px + env(safe-area-inset-left));
+  z-index: 10;
+  color: var(--text);
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: var(--font-smoothing);
+  line-height: 1;
+  white-space: nowrap;
+  text-shadow: var(--text-glow);
+  outline: 0;
+  user-select: none;
   display: flex;
   background: var(--face);
   border: 1px solid;

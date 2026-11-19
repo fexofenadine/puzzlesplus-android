@@ -7,7 +7,7 @@
   top: 0;
   right: 0;
   left: 0;
-  z-index: 6;
+  z-index: 11;
   display: flex;
   gap: 2px;
   align-items: center;
@@ -69,7 +69,7 @@
 .shade {
   position: fixed;
   inset: 0;
-  z-index: 7;
+  z-index: 12;
   background: rgba(0, 0, 0, 0.45);
 }
 
@@ -78,7 +78,7 @@
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 8;
+  z-index: 13;
   box-sizing: border-box;
   width: min(80%, 320px);
   overflow-y: auto;
@@ -100,7 +100,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 8;
+  z-index: 13;
   max-height: calc(100% - var(--phone-bar) - 24px);
   /*material's sheets stop at 640px, centred on tablets and phones held sideways*/
   max-width: 640px;

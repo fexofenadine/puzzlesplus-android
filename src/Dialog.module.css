@@ -121,21 +121,10 @@
     100% 0 no-repeat;
 }
 
-/*a game window's title bar (the one with window buttons) gets the theme's screen look too*/
+/*title bar buttons stay clear of the screen's look (#looks in app.css) that covers the bar*/
 :global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']))
-  .header:has(.controls) {
+  .header
+  button {
   position: relative;
-}
-
-:global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']))
-  .header:has(.controls)::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: var(--looks);
-  pointer-events: none;
-  content: '';
-  animation: var(--looks-motion);
+  z-index: 7;
 }

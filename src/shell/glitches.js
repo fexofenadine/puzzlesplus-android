@@ -18,10 +18,9 @@ export const effects = [
   { id: 'lcd', name: 'Counter glitches', themes: retro, glitch: true },
   { id: 'lost', name: 'Meltdown when a game is lost', themes: retro, glitch: true },
   { id: 'scanlines', name: 'Scanlines', themes: retro },
-  { id: 'band', name: 'Tracking band', themes: ['synthwave', 'vaporwave'] },
+  { id: 'band', name: 'Tracking band', themes: retro },
   { id: 'grain', name: 'Tape grain', themes: ['synthwave', 'vaporwave'] },
   { id: 'flicker', name: 'Flicker', themes: retro },
-  { id: 'window', name: 'Window scanlines', themes: retro },
 ]
 
 export const effectsOf = (theme) => effects.filter((effect) => effect.themes.includes(theme))

@@ -41,7 +41,7 @@
   fill: var(--lcd-off);
 }
 
-/*neon theme counters: a colour fringe, scanlines and a passing band, glitching now and then*/
+/*neon theme counters: a colour fringe under the screen's scanlines, glitching now and then*/
 /*a glitch's shift, cut and hue come from shell/glitches.js each time*/
 :global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave'])) .root {
   filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
@@ -52,47 +52,4 @@
   clip-path: var(--lcd-clip);
   filter: drop-shadow(var(--lcd-fringe) 0 var(--fringe-a))
     drop-shadow(calc(var(--lcd-fringe) * -1) 0 var(--fringe-b)) hue-rotate(var(--lcd-hue));
-}
-
-:global(:root:is([data-theme='synthwave'], [data-theme='matrix'], [data-theme='vaporwave']))
-  .root::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background:
-    linear-gradient(
-        transparent,
-        color-mix(in srgb, var(--fringe-b) 35%, transparent) 50%,
-        transparent
-      )
-      0 -40% / 100% 35% no-repeat,
-    repeating-linear-gradient(transparent 0 1px, rgba(0, 0, 0, 0.45) 1px 2px);
-  pointer-events: none;
-  content: '';
-  animation:
-    lcdBand 2.2s linear infinite,
-    lcdFlicker 0.12s steps(2) infinite;
-}
-
-/*switched off in view, glitches: flicker, and the scanlines with the window's*/
-:global(:root[data-effects-off~='flicker']) .root::after {
-  animation: lcdBand 2.2s linear infinite;
-}
-
-:global(:root[data-effects-off~='window']) .root::after {
-  display: none;
-}
-
-@keyframes lcdBand {
-  to {
-    background-position: 0 140%;
-  }
-}
-
-@keyframes lcdFlicker {
-  50% {
-    opacity: 0.6;
-  }
 }

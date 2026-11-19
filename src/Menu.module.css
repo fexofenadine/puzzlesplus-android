@@ -52,7 +52,7 @@
   top: 100%;
   left: 0;
   /*above the board's own layers: merged tiles, the paused cover, the lost field's glitch*/
-  z-index: 5;
+  z-index: 10;
   display: none;
   background: var(--face);
   border: 1px solid;
@@ -116,6 +116,43 @@
   margin: 0 6px 0 -13px;
   vertical-align: baseline;
   fill: currentColor;
+}
+
+/*an item's own menu opens beside it while pointed at or clicked, like windows 95's*/
+.arrow {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  margin-top: -4px;
+  fill: currentColor;
+}
+
+.flyout {
+  composes: menu;
+  top: -3px;
+  left: calc(100% - 3px);
+  width: max-content;
+}
+
+.item:is(:hover, :focus-within) > .flyout {
+  display: block;
+}
+
+/*pointing at another item closes one that was opened by a click*/
+.list:hover > .item:not(:hover) > .flyout {
+  display: none;
+}
+
+.item:is(:hover, :focus-within):has(> .flyout) > .option {
+  color: var(--highlight-text);
+  background: var(--highlight);
+  text-shadow: none;
+}
+
+.list:hover > .item:not(:hover):has(> .flyout) > .option {
+  color: inherit;
+  background: none;
+  text-shadow: inherit;
 }
 
 .separator {

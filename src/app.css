@@ -559,15 +559,6 @@ main::before {
   }
 }
 
-@keyframes vhs-roll {
-  to {
-    background-position:
-      0 130%,
-      0 240px,
-      0 0;
-  }
-}
-
 @keyframes vhs-flicker {
   50% {
     opacity: 0.85;
@@ -628,54 +619,20 @@ main::before {
   visibility: visible;
 }
 
-/*static comes in bursts over the scanlines*/
+/*static comes in bursts over the picture*/
 :root[data-theme='synthwave'] main::after {
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E"),
-    var(
-      --fx-band,
-      linear-gradient(
-        transparent,
-        rgba(255, 255, 255, 0.06) 30%,
-        rgba(148, 218, 234, 0.22) 48%,
-        rgba(240, 80, 138, 0.18) 52%,
-        rgba(255, 255, 255, 0.06) 70%,
-        transparent
-      )
-    ),
-    var(--fx-scan, repeating-linear-gradient(rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px)),
-    var(--fx-vignette, radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5)));
-  background-position:
-    0 0,
-    0 -30%,
-    0 0,
-    0 0;
-  background-size:
-    0 0,
-    100% 10%,
-    auto,
-    auto;
-  background-repeat: repeat, no-repeat, repeat, repeat;
-  animation:
-    synth-roll 6s linear infinite,
-    var(--fx-flicker, vhs-flicker) 0.12s steps(2) infinite;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")
+    0 0 / 0 0;
+  animation: synth-static 6s linear infinite;
 }
 
 :root[data-theme='synthwave'][data-glitch~='burst'] main::after {
-  background-size:
-    180px 180px,
-    100% 10%,
-    auto,
-    auto;
+  background-size: 180px 180px;
 }
 
-@keyframes synth-roll {
+@keyframes synth-static {
   to {
-    background-position:
-      90px 140px,
-      0 130%,
-      0 240px,
-      0 0;
+    background-position: 90px 140px;
   }
 }
 
@@ -753,30 +710,11 @@ main::before {
   }
 }
 
-/*the tape counter the lines keep, over a bright tracking band, scanlines and a vignette*/
+/*the tape counter the lines keep, the band and scanlines over it are #looks*/
 :root[data-theme='vaporwave'] main::after {
   display: flex;
   align-items: flex-end;
-  background:
-    var(
-        --fx-band,
-        linear-gradient(
-          transparent,
-          rgba(255, 255, 255, 0.1) 30%,
-          rgba(1, 205, 254, 0.3) 46%,
-          rgba(255, 255, 255, 0.45) 50%,
-          rgba(255, 113, 206, 0.3) 54%,
-          rgba(255, 255, 255, 0.1) 70%,
-          transparent
-        )
-      )
-      0 -30% / 100% 9% no-repeat,
-    var(--fx-scan, repeating-linear-gradient(rgba(28, 16, 56, 0.2) 0 1px, transparent 1px 3px)),
-    var(--fx-vignette, radial-gradient(ellipse at center, transparent 60%, rgba(28, 16, 56, 0.45)));
   content: var(--tape, 'SP  0:00:00');
-  animation:
-    vhs-roll 8s linear infinite,
-    var(--fx-flicker, vhs-flicker) 0.12s steps(2) infinite;
 }
 
 /*markus spiske's cc0 photo, shown when the rain is off*/
@@ -786,22 +724,6 @@ main::before {
 
 :root[data-theme='matrix'][data-background='animated'] main::before {
   background: none;
-}
-
-/*crt scanlines and vignette over the code rain*/
-:root[data-theme='matrix'] main::after {
-  background:
-    var(--fx-scan, repeating-linear-gradient(rgba(0, 0, 0, 0.55) 0 1px, transparent 1px 3px)),
-    var(--fx-vignette, radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55)));
-  animation: matrix-roll 10s linear infinite;
-}
-
-@keyframes matrix-roll {
-  to {
-    background-position:
-      0 300px,
-      0 0;
-  }
 }
 
 /*chris ried's code photo on unsplash, the static solarized wallpaper*/
@@ -816,70 +738,98 @@ main::before {
   background: none;
 }
 
-/*the screen's look over a game window's title bar and scoreboard, never its board or menus*/
-/*a tracking band fixed to the screen so it passes through both as one, over scanlines*/
-:root[data-theme='synthwave'] {
-  --looks:
-    linear-gradient(
-        transparent,
-        rgba(148, 218, 234, 0.16) 45%,
-        rgba(240, 80, 138, 0.14) 55%,
-        transparent
+/*the screen's look over everything on it, the band rolling down windows, bars and wallpaper as one*/
+/*boards and buttons sit above it (Game.module.css, Dialog.module.css), and so do open menus and dialogs*/
+#looks {
+  display: none;
+}
+
+:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']) #looks {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+  display: block;
+  pointer-events: none;
+  animation:
+    looks-roll var(--looks-time) linear infinite,
+    var(--fx-flicker, vhs-flicker) 0.12s steps(2) infinite;
+}
+
+:root[data-theme='synthwave'] #looks {
+  --looks-time: 6s;
+  background:
+    var(
+        --fx-band,
+        linear-gradient(
+          transparent,
+          rgba(255, 255, 255, 0.06) 30%,
+          rgba(148, 218, 234, 0.22) 48%,
+          rgba(240, 80, 138, 0.18) 52%,
+          rgba(255, 255, 255, 0.06) 70%,
+          transparent
+        )
       )
-      0 -80px / 100% 80px no-repeat fixed,
-    repeating-linear-gradient(rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+      0 -30% / 100% 10% no-repeat,
+    var(--fx-scan, repeating-linear-gradient(rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px)),
+    var(--fx-vignette, radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5)));
 }
 
-:root[data-theme='vaporwave'] {
-  --looks:
-    linear-gradient(
-        transparent,
-        rgba(1, 205, 254, 0.18) 40%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 113, 206, 0.18) 60%,
-        transparent
+:root[data-theme='vaporwave'] #looks {
+  --looks-time: 8s;
+  background:
+    var(
+        --fx-band,
+        linear-gradient(
+          transparent,
+          rgba(255, 255, 255, 0.1) 30%,
+          rgba(1, 205, 254, 0.3) 46%,
+          rgba(255, 255, 255, 0.45) 50%,
+          rgba(255, 113, 206, 0.3) 54%,
+          rgba(255, 255, 255, 0.1) 70%,
+          transparent
+        )
       )
-      0 -80px / 100% 80px no-repeat fixed,
-    repeating-linear-gradient(rgba(28, 16, 56, 0.12) 0 1px, transparent 1px 3px);
+      0 -30% / 100% 9% no-repeat,
+    var(--fx-scan, repeating-linear-gradient(rgba(28, 16, 56, 0.16) 0 1px, transparent 1px 3px)),
+    var(--fx-vignette, radial-gradient(ellipse at center, transparent 60%, rgba(28, 16, 56, 0.45)));
 }
 
-:root[data-theme='matrix'] {
-  --looks:
-    linear-gradient(transparent, rgba(44, 255, 110, 0.08) 50%, transparent) 0 -80px / 100% 80px
-      no-repeat fixed,
-    repeating-linear-gradient(rgba(0, 0, 0, 0.35) 0 1px, transparent 1px 3px);
-}
-
-:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']) {
-  --looks-motion: looks-roll 9s linear infinite;
-}
-
-/*window scanlines switched off in view, glitches*/
-:root[data-theme][data-effects-off~='window'] {
-  --looks: none;
+/*matrix's crt only rolls a faint green band, without the tape's flicker*/
+:root[data-theme='matrix'] #looks {
+  --looks-time: 10s;
+  background:
+    var(--fx-band, linear-gradient(transparent, rgba(44, 255, 110, 0.08) 50%, transparent)) 0 -30% /
+      100% 8% no-repeat,
+    var(--fx-scan, repeating-linear-gradient(rgba(0, 0, 0, 0.45) 0 1px, transparent 1px 3px)),
+    var(--fx-vignette, radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55)));
+  animation: looks-roll var(--looks-time) linear infinite;
 }
 
 @keyframes looks-roll {
   to {
     background-position:
-      0 calc(100vh + 80px),
+      0 130%,
+      0 0,
       0 0;
   }
 }
 
 /*reduced motion keeps the scanlines and parks the band*/
 @media (prefers-reduced-motion: reduce) {
-  :root:not([data-motion]) {
-    --looks-motion: none;
+  :root:not([data-motion]) #looks {
+    animation: none;
   }
 }
 
-:root[data-motion='reduce'] {
-  --looks-motion: none;
+:root[data-motion='reduce'] #looks {
+  animation: none;
 }
 
 /*the paused screen's screensaver: only the background and any fireworks, no pointer*/
-:root[data-screensaver] main > :not(#fireworks),
+:root[data-screensaver] main > :not(#fireworks, #looks),
 :root[data-screensaver] body > :not(canvas, main) {
   visibility: hidden;
 }

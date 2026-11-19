@@ -260,6 +260,8 @@ const PhoneBar = (
         if (!back) document.documentElement.dataset.sides = ''
       }}
     >
+      {/*the screen's scanlines and band, under these bars (see #looks in app.css)*/}
+      <div id="looks" />
       {back ? (
         <header class={s.bar}>
           <a class={s.button} href={pageUrl(back)} title="Back" aria-label="Back">

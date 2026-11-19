@@ -2,8 +2,7 @@ import { h } from 'hyperapp'
 import { dailyNote } from '../shell/daily'
 import m from '../Menu.module.css'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
-import ThemeMenu from '../shell/ThemeMenu'
-import ViewMenu from '../shell/ViewMenu'
+import DisplayMenu from '../shell/DisplayMenu'
 import { resumeItems } from '../shell/ResumeItems'
 import { gameLinks } from '../shell/GameLinks'
 import { HelpMenu, SizeMenu } from '../shell/GameMenus'
@@ -67,13 +66,12 @@ const Menu = ({ state, actions }) => (
       {gameLinks('nonograms')}
     </MenuItem>
     <SizeMenu state={state} actions={actions} sizes={sizes} />
-    <ViewMenu state={state} actions={actions} />
-    <ThemeMenu state={state} actions={actions}>
+    <DisplayMenu state={state} actions={actions}>
       {state.theme === 'matrix' && <Separator />}
       {state.theme === 'matrix' && (
         <SubMenuItem name="Rain Glyphs" checked={state.rain} onClick={actions.toggleRain} />
       )}
-    </ThemeMenu>
+    </DisplayMenu>
     <HelpMenu state={state} actions={actions} name="Nonograms Plus" />
   </ul>
 )

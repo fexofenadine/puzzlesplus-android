@@ -192,28 +192,14 @@
   }
 }
 
-/*synthwave, vaporwave and matrix lay their screen's look (--looks in app.css) over the scoreboard*/
-/*everything after it (board, clues, pad, hint) sits above that layer and stays clean*/
-:global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix'])) .root {
-  position: relative;
-}
-
+/*synthwave, vaporwave and matrix lay their screen's look (#looks in app.css, z-index 6) over everything*/
+/*but the board, clues, pad and hint after the scoreboard, and the scoreboard's buttons*/
 :global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']))
   .root
-  > :not(.scoreboard) {
-  position: relative;
-  z-index: 1;
-}
-
+  > :not(.scoreboard),
 :global(:root:is([data-theme='synthwave'], [data-theme='vaporwave'], [data-theme='matrix']))
-  .root::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: var(--looks);
-  pointer-events: none;
-  content: '';
-  animation: var(--looks-motion);
+  .scoreboard
+  button {
+  position: relative;
+  z-index: 7;
 }

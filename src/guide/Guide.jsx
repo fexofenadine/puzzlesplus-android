@@ -8,7 +8,7 @@ import Boss from '../shell/Boss'
 import Taskbar from '../shell/Taskbar'
 import PhoneBar from '../shell/PhoneBar'
 import { pageUrl, phone } from '../shell/phone'
-import ThemeMenu from '../shell/ThemeMenu'
+import DisplayMenu from '../shell/DisplayMenu'
 import { listen, shellActions, shellState, shortcut } from '../shell/actions'
 import { startBackgrounds } from '../shell/backgrounds'
 
@@ -89,7 +89,7 @@ export const startGuide = ({ page, root = '../../', home = '../', title, icon, p
         >
           {!phone && (
             <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>
-              <ThemeMenu state={state} actions={actions} />
+              <DisplayMenu state={state} actions={actions} />
             </ul>
           )}
           <div class={s.body}>

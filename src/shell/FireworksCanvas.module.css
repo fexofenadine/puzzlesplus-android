@@ -1,9 +1,9 @@
-/*over main's wallpaper layers and the game window (whose parts stop at 2), under menus, dialogs and bars*/
+/*over the wallpaper, the game window, its board (7), the taskbar and the screen look (6), under dialogs and menus*/
 .canvas {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 3;
+  z-index: 8;
   display: none;
   width: 100%;
   height: 100%;

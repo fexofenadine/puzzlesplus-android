@@ -29,9 +29,10 @@ const clock = (el) => {
   setInterval(show, 1000)
 }
 
-//closes the start menu when focus leaves it, like the menu bar
+//closes the start menu when focus leaves it and its button, like the menu bar
 const leave = (actions) => (event) => {
-  if (!event.currentTarget.contains(event.relatedTarget)) actions.closeMenu()
+  const to = event.relatedTarget
+  if (!(to && to.closest && to.closest('[data-start]'))) actions.closeMenu()
 }
 
 const StartItem = ({ icon, onClick }, children) => (
@@ -56,7 +57,7 @@ const Taskbar = ({ key, name, own, state, actions }) => {
   const { root } = state
   return [
     <footer key={key} class={s.root}>
-      <div class={s.start} tabindex={-1} onfocusout={leave(actions)}>
+      <div class={s.start} tabindex={-1} data-start onfocusout={leave(actions)}>
         <button
           type="button"
           class={open ? s.pressed : s.button}
@@ -67,41 +68,6 @@ const Taskbar = ({ key, name, own, state, actions }) => {
           <img class={s.avatar} src={avatar} alt="" width="16" height="16" />
           <span class={s.startLabel}>Start</span>
         </button>
-        {open && (
-          <div class={s.menu}>
-            <div class={s.banner}>
-              Puzzles <b>Plus</b>
-            </div>
-            <ul class={s.list}>
-              {games.map(([id, title]) => (
-                <StartItem icon={icons[id]} onClick={() => actions.openGame(id)}>
-                  {title}
-                </StartItem>
-              ))}
-              <li class={s.separator} />
-              <StartItem icon={help} onClick={go(actions, `${root}how-to-play/`)}>
-                How to Play
-              </StartItem>
-              {games.map(([id, title]) => (
-                <StartItem icon={book} onClick={go(actions, `${root}${id}/guide/`)}>
-                  {title} Guide
-                </StartItem>
-              ))}
-              <li class={s.separator} />
-              <StartItem onClick={() => actions.toggleBackup()}>Backup...</StartItem>
-              {name && <StartItem onClick={() => actions.toggleAbout()}>About {name}...</StartItem>}
-              <StartItem
-                icon={avatar}
-                onClick={() => {
-                  actions.closeMenu()
-                  window.open(REPO, '_blank', 'noopener')
-                }}
-              >
-                GitHub
-              </StartItem>
-            </ul>
-          </div>
-        )}
       </div>
       <div class={s.tasks}>
         {games.map(([id, title]) => (
@@ -142,6 +108,44 @@ const Taskbar = ({ key, name, own, state, actions }) => {
         <span class={s.clock} oncreate={clock} />
       </div>
     </footer>,
+    //the screen's scanlines and band over every window and bar, see #looks in app.css
+    <div key="looks" id="looks" />,
+    //out of the taskbar so it can sit above a board lifted over #looks
+    open && (
+      <div key="start" class={s.menu} tabindex={-1} data-start onfocusout={leave(actions)}>
+        <div class={s.banner}>
+          Puzzles <b>Plus</b>
+        </div>
+        <ul class={s.list}>
+          {games.map(([id, title]) => (
+            <StartItem icon={icons[id]} onClick={() => actions.openGame(id)}>
+              {title}
+            </StartItem>
+          ))}
+          <li class={s.separator} />
+          <StartItem icon={help} onClick={go(actions, `${root}how-to-play/`)}>
+            How to Play
+          </StartItem>
+          {games.map(([id, title]) => (
+            <StartItem icon={book} onClick={go(actions, `${root}${id}/guide/`)}>
+              {title} Guide
+            </StartItem>
+          ))}
+          <li class={s.separator} />
+          <StartItem onClick={() => actions.toggleBackup()}>Backup...</StartItem>
+          {name && <StartItem onClick={() => actions.toggleAbout()}>About {name}...</StartItem>}
+          <StartItem
+            icon={avatar}
+            onClick={() => {
+              actions.closeMenu()
+              window.open(REPO, '_blank', 'noopener')
+            }}
+          >
+            GitHub
+          </StartItem>
+        </ul>
+      </div>
+    ),
     state.share && <Share key="share" state={state.share} actions={actions} />,
     state.backup && <Backup key="backup" state={state.backup} actions={actions} />,
     state.glitches && <GlitchSettings key="glitches" state={state} actions={actions} />,

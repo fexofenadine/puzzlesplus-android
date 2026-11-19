@@ -1,7 +1,6 @@
 import { h } from 'hyperapp'
 import s from './Menu.module.css'
-import ThemeMenu from './shell/ThemeMenu'
-import ViewMenu from './shell/ViewMenu'
+import DisplayMenu from './shell/DisplayMenu'
 import { resumeItems } from './shell/ResumeItems'
 import { gameLinks } from './shell/GameLinks'
 import { HelpMenu } from './shell/GameMenus'
@@ -16,9 +15,14 @@ export const SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, c
       )}
       {name}
       {hotKey && <span class={s.hotKey}>{hotKey}</span>}
+      {children.length > 0 && (
+        <svg class={s.arrow} width="4" height="7">
+          <path d="M0 0L4 3.5 0 7z" />
+        </svg>
+      )}
     </button>
     {children.length > 0 && (
-      <div class={s.menu}>
+      <div class={s.flyout}>
         <ul class={s.list}>{children}</ul>
       </div>
     )}
@@ -100,8 +104,7 @@ const Menu = ({ state, actions }) => (
       {resumeItems(state, actions)}
       {gameLinks('minesweeper')}
     </MenuItem>
-    <ViewMenu state={state} actions={actions} />
-    <ThemeMenu state={state} actions={actions} />
+    <DisplayMenu state={state} actions={actions} />
     <HelpMenu state={state} actions={actions} name="Minesweeper Plus" />
   </ul>
 )

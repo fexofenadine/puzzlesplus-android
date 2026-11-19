@@ -17,9 +17,9 @@ export const desktopSection = {
         <b>Close</b> ends the game and asks which game to open next.
       </li>
       <li>
-        <b>View</b> zooms the window in steps from 50% to 400%, also with + and -. Double-clicking
-        the title bar goes back to 100%. When a board is too big for the screen the window shrinks
-        to fit, but not below about 10 pixel cells, where the page scrolls instead.
+        <b>Display</b> zooms the window in steps from 50% to 400%, also with + and -.
+        Double-clicking the title bar goes back to 100%. When a board is too big for the screen the
+        window shrinks to fit, but not below about 10 pixel cells, where the page scrolls instead.
       </li>
       <li>
         <b>Pause</b> (the title bar button, the one beside the hint on larger boards, or P) stops
@@ -58,12 +58,12 @@ export const desktopSection = {
       </li>
     </ul>,
     <p>
-      The <b>Theme</b> menu picks one of nine looks, shared by every game and remembered:
+      Display → <b>Theme</b> picks one of nine looks, shared by every game and remembered:
     </p>,
     <ul>
       <li>
         <b>Classic</b>, the Windows look, over a hill photo or, with Animated switched on in the
-        Theme menu, a blue sky of drifting clouds.
+        Display menu, a blue sky of drifting clouds.
       </li>
       <li>
         <b>Synthwave</b>, a slow flight through glowing neon triangles with VHS scanlines and
@@ -91,13 +91,14 @@ export const desktopSection = {
       </li>
     </ul>,
     <p>
-      Background Settings (in the Theme menu) has the options of the xscreensaver originals,
+      Background Settings (in the Display menu) has the options of the xscreensaver originals,
       previews them live and can switch the animation off for a still picture.
     </p>,
     <p>
-      On Synthwave, Vaporwave and Matrix, View → Glitches switches each screen effect on or off: the
-      glitches that come now and then at random, and the scanlines, grain and flicker that stay.
-      Signal drops on Matrix start off. Nothing glitches under Reduced Motion.
+      On Synthwave, Vaporwave and Matrix, Display → Glitches switches each screen effect on or off:
+      the glitches that come now and then at random, and the scanlines, tracking band, grain and
+      flicker that stay, laid over the whole screen but the boards and buttons. Signal drops on
+      Matrix start off. Nothing glitches under Reduced Motion.
     </p>,
   ],
 }
