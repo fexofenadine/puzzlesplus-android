@@ -1,6 +1,7 @@
 import { h } from 'hyperapp'
 import s from './Dialog.module.css'
 import Button from './Button'
+import { startMove } from './shell/moveWindow'
 
 const Dialog = (
   { key, hidden, title, titleHint, onTitleDoubleClick, controls, onClose, onCreate, clear },
@@ -16,7 +17,7 @@ const Dialog = (
         >
           <div class={s.container}>
             {title && (
-              <div class={s.header}>
+              <div class={s.header} onpointerdown={startMove}>
                 <h1 class={s.title} title={titleHint} ondblclick={onTitleDoubleClick}>
                   {title}
                 </h1>

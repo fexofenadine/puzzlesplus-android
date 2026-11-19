@@ -1,0 +1,13 @@
+/*windows 95's moving outline: a 4px frame of dithered dots that inverts whatever is under it*/
+.outline {
+  position: fixed;
+  z-index: 30;
+  box-sizing: border-box;
+  padding: 4px;
+  background: repeating-conic-gradient(#fff 0 25%, transparent 0 50%) 0 0 / 2px 2px;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}

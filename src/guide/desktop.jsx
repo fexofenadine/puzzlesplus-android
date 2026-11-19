@@ -22,6 +22,11 @@ export const desktopSection = {
         window shrinks to fit, but not below about 10 pixel cells, where the page scrolls instead.
       </li>
       <li>
+        <b>Moving</b>: drag a window or dialog by its title bar with the mouse. As in Windows 95, an
+        outline follows and the window jumps there when you let go (Esc lets go without moving it).
+        Windows come back to the middle when the page is opened again.
+      </li>
+      <li>
         <b>Pause</b> (the title bar button, the one beside the hint on larger boards, or P) stops
         the clock and hides the board. The game also pauses when you switch tabs or windows, and
         waits for you to press play. A game in progress is kept when you leave or reload the page,

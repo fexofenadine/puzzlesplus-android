@@ -9,7 +9,11 @@
   }
 }
 
+/*moved by its title bar (shell/moveWindow.js), never zoomed so the offset is in screen pixels*/
 .b {
+  position: relative;
+  top: var(--move-y, 0);
+  left: var(--move-x, 0);
   margin-top: env(safe-area-inset-top);
   margin-right: env(safe-area-inset-right);
   margin-bottom: env(safe-area-inset-bottom);
@@ -48,6 +52,7 @@
   align-items: center;
   background: linear-gradient(to right, var(--title-start), var(--title-end)) 100% 0 no-repeat;
   background-color: var(--title-start);
+  user-select: none;
 }
 
 .title {
