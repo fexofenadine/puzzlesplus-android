@@ -1,5 +1,6 @@
 package io.github.fexofenadine.puzzlesplus;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
@@ -32,6 +33,8 @@ public class MainActivity extends BridgeActivity {
         webView.addJavascriptInterface(new Bars(), "PuzzlesBars");
         webView.addJavascriptInterface(new Touch(), "PuzzlesTouch");
         webView.addJavascriptInterface(new Text(), "PuzzlesText");
+        //the side panel's live wallpaper item opens the wallpaper's settings
+        webView.addJavascriptInterface(new Live(), "PuzzlesLive");
         //the webview buzzes at the system's long press time, before a held cell is flagged and
         //even when let go too soon to flag, so only the page's own buzz is kept
         webView.setHapticFeedbackEnabled(false);
@@ -122,6 +125,13 @@ public class MainActivity extends BridgeActivity {
         @JavascriptInterface
         public int longPressTimeout() {
             return ViewConfiguration.getLongPressTimeout();
+        }
+    }
+
+    private class Live {
+        @JavascriptInterface
+        public void open() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, WallpaperSettings.class)));
         }
     }
 

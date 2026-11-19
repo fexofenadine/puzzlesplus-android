@@ -346,6 +346,14 @@ const PhoneBar = (
               actions={actions}
             />
             <Item d={SAVE} name="Backup" onClick={actions.toggleBackup} actions={actions} />
+            {window.PuzzlesLive && (
+              <Item
+                d={WALLPAPER}
+                name="Live wallpaper"
+                onClick={() => window.PuzzlesLive.open()}
+                actions={actions}
+              />
+            )}
             <Item d={INFO} name="About" onClick={actions.toggleAbout} actions={actions} />
           </Section>
         </nav>
