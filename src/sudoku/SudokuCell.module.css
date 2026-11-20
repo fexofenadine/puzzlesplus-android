@@ -118,3 +118,10 @@
   composes: outline from '../shell/Board.module.css';
   --hint-color: #ff3b3b;
 }
+
+/*a jigsaw cell draws the edges it shares with another region, the app sets which*/
+.region {
+  box-shadow:
+    var(--et, inset 0 0 0 0 transparent), var(--er, inset 0 0 0 0 transparent),
+    var(--eb, inset 0 0 0 0 transparent), var(--el, inset 0 0 0 0 transparent);
+}

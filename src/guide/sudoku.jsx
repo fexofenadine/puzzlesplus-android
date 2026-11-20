@@ -201,6 +201,32 @@ const technique = (id, title, text) => ({
   body: () => [<p>{text}</p>, <Example technique={id} />],
 })
 
+//a dealt jigsaw board where a hidden single in a region is the easiest step
+export const jigsawExample = {
+  rows: [
+    '...7...3.',
+    '1...23854',
+    '8...49.2.',
+    '.462.....',
+    '9.34.25.1',
+    '.....128.',
+    '.5.31...6',
+    '76215...8',
+    '.1...5...',
+  ],
+  layout:
+    '000022222' +
+    '001024452' +
+    '011144452' +
+    '031111452' +
+    '333177458' +
+    '366674458' +
+    '366675558' +
+    '366677588' +
+    '337778888',
+  technique: 'hidden-single',
+}
+
 export const parts = [
   {
     title: 'How to Play',
@@ -212,6 +238,24 @@ export const parts = [
           <Rules />,
           <p>A finished board: every row, column and box holds 1 to 9 once each.</p>,
           <SudokuExample rows={solved} />,
+        ],
+      },
+      {
+        id: 'variants',
+        title: 'Variants',
+        body: () => [
+          <p>
+            <b>Jigsaw</b> (Game menu, Jigsaw Regions) replaces the nine 3×3 boxes with nine regions
+            of nine cells in irregular shapes, drawn with heavier lines. The rules are the same:
+            every row, column and region holds 1 to 9 once each. Only the regions change, so a digit
+            can be ruled out by a cell far from the one you are looking at, and pointing and
+            claiming work with whatever shape a region has. It is dealt on the 9×9 board only, with
+            a new set of regions for every board, and keeps its own best times.
+          </p>,
+          <p>
+            The techniques below all work with regions where they say boxes. A hidden single in one:
+          </p>,
+          <SudokuExample {...jigsawExample} />,
         ],
       },
       {

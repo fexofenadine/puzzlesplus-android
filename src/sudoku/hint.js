@@ -23,9 +23,9 @@ export const guideTopic = ({ kind }) =>
 
 //the earlier step that took away what made a placement possible: a candidate of its cell, or
 //its digit from the unit it is alone in
-const enabler = (rounds, placement, n) => {
+const enabler = (rounds, placement, n, layout) => {
   const [[i, d]] = placement.place
-  const units = geometry(n).unitsOf[i]
+  const units = geometry(n, layout).unitsOf[i]
   const matters = ([c, mask]) =>
     c === i || (mask & bit(d) && units.some((unit) => unit.cells.includes(c)))
   for (let r = rounds.length - 1; r >= 0; r--) {
@@ -39,29 +39,29 @@ const lower = (text) => text[0].toLowerCase() + text.slice(1)
 
 //the next digit logic gives, with the reasoning
 //removals that come first are made silently and the one that opened the digit is explained
-const nextDigit = (board, n) => {
+const nextDigit = (board, n, layout) => {
   const work = board.slice()
-  const cands = candidatesOf(work, n)
+  const cands = candidatesOf(work, n, layout)
   const rounds = []
   for (let k = 0; k < 200; k++) {
-    const { steps } = nextSteps(work, cands, n)
+    const { steps } = nextSteps(work, cands, n, undefined, 0, layout)
     if (!steps.length) return null
     const placement = steps.find((s) => s.place.length)
     if (placement) {
       if (!rounds.length) return { placement }
-      return { placement, via: enabler(rounds, placement, n) }
+      return { placement, via: enabler(rounds, placement, n, layout) }
     }
     rounds.push(steps)
-    if (!apply(work, cands, n, steps)) return null
+    if (!apply(work, cands, n, steps, layout)) return null
   }
   return null
 }
 
 //the next thing to do: a broken rule, a wrong digit, notes missing the answer, then the easiest step
 //returns { kind, text, marks, place? }
-export const findHint = ({ board, notes, solution, n }) => {
-  if (solved(board, n)) return { kind: 'solved', text: 'The puzzle is solved.', marks: {} }
-  const broken = breaks(board, n)
+export const findHint = ({ board, notes, solution, n, layout }) => {
+  if (solved(board, n, layout)) return { kind: 'solved', text: 'The puzzle is solved.', marks: {} }
+  const broken = breaks(board, n, layout)
   if (broken.length) {
     //a repeated digit's cells are not all wrong, so the solution picks out the ones to change
     const { cells, text } = broken[0]
@@ -91,7 +91,7 @@ export const findHint = ({ board, notes, solution, n }) => {
       marks: { [missing]: 'wrong' },
     }
   }
-  const found = nextDigit(board, n)
+  const found = nextDigit(board, n, layout)
   if (!found) {
     //generated boards never get here, but a hint should never come back empty
     const i = board.indexOf(EMPTY)

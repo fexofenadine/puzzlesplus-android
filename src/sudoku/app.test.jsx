@@ -1,7 +1,7 @@
 import { beforeEach, expect, it } from 'vitest'
 import { app, h } from 'hyperapp'
 import { state, actions, view, createGame, gameOf, saved } from './app'
-import { EMPTY, bit, candidatesOf, geometry } from './rules'
+import { EMPTY, bit, breaks, candidatesOf, geometry } from './rules'
 import { makeGame, random } from './generate'
 import { apply, nextSteps } from './techniques'
 import { findHint } from './hint'
@@ -284,4 +284,73 @@ it('shares the board as a link that opens the same clues on every size', () => {
   //a board with a repeat or more than one solution is no puzzle
   expect(gameOf('4.0.0')).toBe(null)
   expect(gameOf('5.0.0')).toBe(null)
+})
+
+//a dealt jigsaw board, ready to play
+const jigsawGame = (seed = 4, level = 0) => {
+  const { givens, solution, layout } = makeGame(9, level, random(seed), 1500, true)
+  return {
+    ...createGame({ n: 9, level, jigsaw: true }),
+    layout,
+    givens,
+    solution,
+    board: givens.slice(),
+    dealing: false,
+  }
+}
+
+it('plays a jigsaw board: regions are units, a repeat in one is flagged, the hint is sound', () => {
+  const game = jigsawGame()
+  start({ game, selected: -1, picked: 0, errors: true })
+  expect(game.layout).toHaveLength(81)
+  const [i] = emptyCells()
+  //a digit already in the cell's region (not its row or column) is a repeat
+  const { units } = geometry(9, game.layout)
+  const region = units.find((u) => u.kind === 'box' && u.cells.includes(i))
+  const mate = region.cells.find(
+    (c) =>
+      c !== i &&
+      game.givens[c] !== EMPTY &&
+      c % 9 !== i % 9 &&
+      Math.floor(c / 9) !== Math.floor(i / 9),
+  )
+  wired.tap({ event: left, i })
+  wired.pad({ d: game.givens[mate] })
+  wired.hint()
+  expect(now().hint.kind).toBe('break')
+  expect(breaks(now().game.board, 9, game.layout).some((b) => b.unit.kind === 'box')).toBe(true)
+})
+
+it('shares and keeps a jigsaw board with its layout', () => {
+  const game = jigsawGame()
+  start({ game })
+  wired.share()
+  const opened = gameOf(now().share.link.split('#play=')[1])
+  expect(opened.layout).toBe(game.layout)
+  expect(opened.jigsaw).toBe(true)
+  expect(Array.from(opened.givens)).toEqual(Array.from(game.givens))
+  wired.closeShare()
+  //a layout that is not nine pieces of nine is no board
+  const [size, level, data] = now().game ? ['9', '0', '0'] : []
+  expect(gameOf(`${size}.${level}.${data}.0`)).toBe(null)
+  const [i] = [...game.board.keys()].filter((c) => game.board[c] === EMPTY)
+  wired.tap({ event: left, i })
+  wired.pad({ d: game.solution[i] })
+  saved.keep(now().game)
+  expect(saved.restore().layout).toBe(game.layout)
+})
+
+it('moves between the variants and the sizes from the Game menu', async () => {
+  localStorage.clear()
+  start({ game: dealtGame() })
+  wired.reset({ jigsaw: true })
+  expect(now().game.jigsaw).toBe(true)
+  expect(now().game.n).toBe(9)
+  expect(localStorage.getItem('sudoku.variant')).toBe('jigsaw')
+  //a smaller size is dealt with the usual boxes
+  wired.reset({ n: 6 })
+  expect(now().game.jigsaw).toBe(false)
+  expect(now().game.n).toBe(6)
+  wired.reset({ jigsaw: true })
+  expect(now().game.n).toBe(9)
 })

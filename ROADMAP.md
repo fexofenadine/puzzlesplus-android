@@ -9,7 +9,7 @@ What is planned for Puzzles Plus, the website and the [Android app](https://gith
 ### Planned
 
 - [x] A home page that lists every game, in place of the redirect to the last one played: a window of game cards with Continue for the game played last
-- [ ] Jigsaw Sudoku: the first Sudoku variant, nine irregular regions in place of the boxes, on the 9 × 9 board only. Other variants wait to see what it costs
+- [x] Jigsaw Sudoku: the first Sudoku variant, nine irregular regions in place of the boxes, on the 9 × 9 board only. Other variants wait to see what it costs
 - [x] Remove Terafox Coral, keeping Terafox Hex Trail under that full name
 - [ ] Statistics for every game: games played, won, streaks and average times
 - [ ] A calendar of past daily puzzles to go back and play
@@ -30,7 +30,7 @@ Suggestions, none of them agreed. An idea moves up to Planned once it is picked.
 **Games**
 
 - [ ] Another new game: Slitherlink, Kakuro, Hitori or Tents
-- [ ] More Sudoku variants on the 9 × 9 board, if Jigsaw turns out cheap: X (diagonals) and Killer (cages)
+- [ ] More Sudoku variants on the 9 × 9 board, now that Jigsaw is in: X (diagonals) and Killer (cages)
 - [ ] Nonograms in colour, and more pictures for the art pool
 - [ ] Keyboard play for Minesweeper, as the other games have
 

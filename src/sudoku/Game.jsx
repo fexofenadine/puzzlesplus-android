@@ -15,6 +15,7 @@ import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, digitCounts, geometry, violations } from './rules'
+import { regionEdges } from './regions'
 import { windowClear } from '../shell/actions'
 
 //the guide's section on a hint, none for a solved board
@@ -42,11 +43,14 @@ export const lookOf = (i, { selected, focus, board, peers }) => {
 //columns are the pad's own tracks where a board's cells are not on sudoku's
 export const Pad = ({ state, actions, counts, columns }) => {
   const { game, picked, noting } = state
-  const { n } = game
+  const { n, layout } = game
   const off = game.dealing || game.paused || game.win
   return (
     <div class={s.pad}>
-      <div class={s.digits} style={{ gridTemplateColumns: columns || tracks(n, geometry(n).bw) }}>
+      <div
+        class={s.digits}
+        style={{ gridTemplateColumns: columns || tracks(n, layout ? n : geometry(n).bw) }}
+      >
         {Array.from({ length: n }, (_, k) => (
           <button
             type="button"
@@ -89,9 +93,11 @@ export const Pad = ({ state, actions, counts, columns }) => {
 
 const Game = ({ key, state, actions }) => {
   const { game, hint, selected, picked } = state
-  const { n, board, givens, notes, paused } = game
-  const { bw, bh, peers } = geometry(n)
-  const errors = state.errors && !paused ? violations(board, n) : null
+  const { n, board, givens, notes, paused, layout } = game
+  const { bw, bh, peers } = geometry(n, layout)
+  const edges = layout ? regionEdges(layout, n) : null
+  const gaps = layout ? n : null
+  const errors = state.errors && !paused ? violations(board, n, layout) : null
   const marks = (!paused && hint && hint.marks) || {}
   const ghosts = (!paused && hint && hint.place && Object.fromEntries(hint.place)) || {}
   const left = board.filter((v) => v === EMPTY).length
@@ -148,7 +154,7 @@ const Game = ({ key, state, actions }) => {
         <div class={s.board}>
           <div
             class={running(game) && !paused ? s.active : s.inactive}
-            style={{ '--tracks': tracks(n, bw), '--rows': tracks(n, bh) }}
+            style={{ '--tracks': tracks(n, gaps || bw), '--rows': tracks(n, gaps || bh) }}
           >
             {[...board].map((digit, i) => (
               <Cell
@@ -163,7 +169,12 @@ const Game = ({ key, state, actions }) => {
                 error={errors && errors.has(i)}
                 mark={marks[i]}
                 ghost={ghosts[i]}
-                style={{ gridColumn: place(i % n), gridRow: place(Math.floor(i / n)) }}
+                region={Boolean(edges)}
+                style={{
+                  gridColumn: place(i % n),
+                  gridRow: place(Math.floor(i / n)),
+                  ...(edges && edges[i]),
+                }}
                 onPress={actions.tap}
               />
             ))}

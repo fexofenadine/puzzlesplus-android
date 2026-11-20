@@ -21,7 +21,8 @@ const about = {
   takuzu:
     'Fill the grid with zeros and ones: never three alike in a row, equal counts, no repeated line.',
   nonograms: 'Fill in a hidden picture from the number clues beside every row and column.',
-  sudoku: 'Every row, column and box holds each digit once, on 4x4, 6x6 and 9x9 boards.',
+  sudoku:
+    'Every row, column and box holds each digit once, on 4x4, 6x6 and 9x9 boards, or as a Jigsaw.',
   2048: 'Slide the tiles and merge equal ones to make 2048, and go on from there.',
   lightup: 'Place bulbs to light every square, never two bulbs lighting each other.',
   futoshiki: 'A Latin square with greater and less than signs between some of its cells.',

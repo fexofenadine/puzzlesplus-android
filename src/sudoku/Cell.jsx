@@ -34,6 +34,7 @@ const Cell = ({
   error,
   mark,
   ghost,
+  region,
   style,
   onPress,
 }) => (
@@ -46,6 +47,7 @@ const Cell = ({
       s.root,
       given ? s.given : s.entry,
       look && s[look],
+      region && s.region,
       error && s.error,
       mark && hintClass[mark],
     )}

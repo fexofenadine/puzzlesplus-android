@@ -46,7 +46,7 @@ const combinations = (list, k, start = 0, picked = [], out = []) => {
 }
 
 //the cell holding digit d that rules it out of cell i, for showing why
-const blocker = (board, n, i, d) => geometry(n).peers[i].find((p) => board[p] === d)
+const blocker = (board, n, i, d, layout) => geometry(n, layout).peers[i].find((p) => board[p] === d)
 
 const unique = (list) => [...new Set(list.filter((x) => x !== undefined))]
 
@@ -55,16 +55,16 @@ const removals = (cands, cells, mask, keep = []) =>
   cells.filter((i) => !keep.includes(i) && cands[i] & mask).map((i) => [i, cands[i] & mask])
 
 //the boxes first, since that is where people look first
-const unitOrder = (n) => {
-  const { units } = geometry(n)
+const unitOrder = (n, layout) => {
+  const { units } = geometry(n, layout)
   return [...units.filter((u) => u.kind === 'box'), ...units.filter((u) => u.kind !== 'box')]
 }
 
 //a digit with one place left in a row, column or box goes there
-export const hiddenSingles = (board, cands, n) => {
+export const hiddenSingles = (board, cands, n, layout) => {
   const steps = []
   const seen = new Set()
-  for (const unit of unitOrder(n)) {
+  for (const unit of unitOrder(n, layout)) {
     for (let d = 1; d <= n; d++) {
       const spots = unit.cells.filter((i) => board[i] === EMPTY && cands[i] & bit(d))
       if (spots.length !== 1 || seen.has(spots[0])) continue
@@ -75,7 +75,7 @@ export const hiddenSingles = (board, cands, n) => {
         step(
           'hidden-single',
           0,
-          { place: [[i, d]], sources: unique(others.map((c) => blocker(board, n, c, d))) },
+          { place: [[i, d]], sources: unique(others.map((c) => blocker(board, n, c, d, layout))) },
           `${d} can only go in one cell of ${unit.name}, so it goes here.`,
         ),
       )
@@ -85,14 +85,14 @@ export const hiddenSingles = (board, cands, n) => {
 }
 
 //a cell with one candidate left holds it
-export const nakedSingles = (board, cands, n) => {
+export const nakedSingles = (board, cands, n, layout) => {
   const steps = []
   for (let i = 0; i < board.length; i++) {
     const mask = cands[i]
     if (board[i] !== EMPTY || !mask || mask & (mask - 1)) continue
     const d = onlyDigit(mask)
     const others = digitsOf(all(n) & ~mask)
-    const sources = unique(others.map((o) => blocker(board, n, i, o)))
+    const sources = unique(others.map((o) => blocker(board, n, i, o, layout)))
     const plain = sources.length === others.length
     steps.push(
       step(
@@ -100,7 +100,7 @@ export const nakedSingles = (board, cands, n) => {
         0,
         { place: [[i, d]], sources },
         plain
-          ? `Every other digit is already in this cell's row, column or box, so it must be ${d}.`
+          ? `Every other digit is already in this cell's row, column or ${geometry(n, layout).word}, so it must be ${d}.`
           : `Only ${d} is left as a candidate for this cell, so it must be ${d}.`,
       ),
     )
@@ -109,8 +109,8 @@ export const nakedSingles = (board, cands, n) => {
 }
 
 //a digit kept to one line inside a box, or to one box inside a line, can't go elsewhere in the other
-export const lockedCandidates = (board, cands, n) => {
-  const { units, unitsOf } = geometry(n)
+export const lockedCandidates = (board, cands, n, layout) => {
+  const { units, unitsOf } = geometry(n, layout)
   const steps = []
   for (const unit of units) {
     for (let d = 1; d <= n; d++) {
@@ -141,9 +141,9 @@ export const lockedCandidates = (board, cands, n) => {
 }
 
 //k cells of a unit holding only k digits between them: those digits are theirs
-const nakedSubsets = (k, level) => (board, cands, n) => {
+const nakedSubsets = (k, level) => (board, cands, n, layout) => {
   const steps = []
-  for (const unit of geometry(n).units) {
+  for (const unit of geometry(n, layout).units) {
     const open = unit.cells.filter((i) => board[i] === EMPTY && countBits(cands[i]) <= k)
     for (const cells of combinations(open, k)) {
       const mask = cells.reduce((m, i) => m | cands[i], 0)
@@ -164,9 +164,9 @@ const nakedSubsets = (k, level) => (board, cands, n) => {
 }
 
 //k digits with only the same k cells of a unit to go in: those cells hold nothing else
-const hiddenSubsets = (k, level) => (board, cands, n) => {
+const hiddenSubsets = (k, level) => (board, cands, n, layout) => {
   const steps = []
-  for (const unit of geometry(n).units) {
+  for (const unit of geometry(n, layout).units) {
     const open = unit.cells.filter((i) => board[i] === EMPTY)
     const placed = unit.cells.reduce((m, i) => (board[i] ? m | bit(board[i]) : m), 0)
     const spotsOf = (d) => open.filter((i) => cands[i] & bit(d))
@@ -197,8 +197,8 @@ const fishNames = ['', '', 'x-wing', 'swordfish', 'jellyfish']
 
 //k rows where a digit fits only in the same k columns: the digit fills those columns from
 //these rows, so the columns' other cells lose it; and the same with rows and columns swapped
-const fish = (k, level) => (board, cands, n) => {
-  const { units } = geometry(n)
+const fish = (k, level) => (board, cands, n, layout) => {
+  const { units } = geometry(n, layout)
   const steps = []
   for (const [base, cover] of [
     ['row', 'column'],
@@ -234,12 +234,12 @@ const fish = (k, level) => (board, cands, n) => {
   return steps
 }
 
-const sees = (n, a, b) => a !== b && geometry(n).peers[a].includes(b)
+const sees = (n, layout, a, b) => a !== b && geometry(n, layout).peers[a].includes(b)
 
 //a two candidate pivot whose digits each pair with z in a pincer it sees: one pincer is z,
 //so no cell seeing both pincers can be
-export const xyWing = (board, cands, n) => {
-  const { peers } = geometry(n)
+export const xyWing = (board, cands, n, layout) => {
+  const { peers } = geometry(n, layout)
   const steps = []
   const pairs = [...board.keys()].filter((i) => !board[i] && countBits(cands[i]) === 2)
   for (const pivot of pairs) {
@@ -250,7 +250,7 @@ export const xyWing = (board, cands, n) => {
       const z = onlyDigit(cands[a] & ~bit(x))
       for (const b of wings) {
         if (b === a || cands[b] !== (bit(y) | bit(z))) continue
-        const targets = peers[a].filter((c) => c !== b && c !== pivot && sees(n, b, c))
+        const targets = peers[a].filter((c) => c !== b && c !== pivot && sees(n, layout, b, c))
         const remove = removals(cands, targets, bit(z))
         if (!remove.length) continue
         steps.push(
@@ -269,8 +269,8 @@ export const xyWing = (board, cands, n) => {
 
 //a three candidate pivot with pincers xz and yz: one of the three is z, so no cell seeing all
 //three can be
-export const xyzWing = (board, cands, n) => {
-  const { peers } = geometry(n)
+export const xyzWing = (board, cands, n, layout) => {
+  const { peers } = geometry(n, layout)
   const steps = []
   for (let pivot = 0; pivot < board.length; pivot++) {
     if (board[pivot] || countBits(cands[pivot]) !== 3) continue
@@ -281,7 +281,7 @@ export const xyzWing = (board, cands, n) => {
       const z = cands[a] & cands[b]
       if (countBits(z) !== 1 || (cands[a] | cands[b]) !== cands[pivot]) continue
       const targets = peers[pivot].filter(
-        (c) => c !== a && c !== b && sees(n, a, c) && sees(n, b, c),
+        (c) => c !== a && c !== b && sees(n, layout, a, c) && sees(n, layout, b, c),
       )
       const remove = removals(cands, targets, z)
       if (!remove.length) continue
@@ -302,11 +302,11 @@ export const xyzWing = (board, cands, n) => {
 
 //what if: a candidate that leads the singles into a dead end can't be right
 //tries cells with the fewest candidates first, since those settle fastest
-export const whatIf = (board, cands, n) => {
+export const whatIf = (board, cands, n, layout) => {
   const open = [...board.keys()]
     .filter((i) => !board[i])
     .sort((a, b) => countBits(cands[a]) - countBits(cands[b]))
-  const { peers } = geometry(n)
+  const { peers } = geometry(n, layout)
   for (const i of open) {
     for (const d of digitsOf(cands[i])) {
       const trialBoard = board.slice()
@@ -314,7 +314,7 @@ export const whatIf = (board, cands, n) => {
       trialBoard[i] = d
       trialCands[i] = 0
       for (const p of peers[i]) trialCands[p] &= ~bit(d)
-      if (settle(trialBoard, trialCands, n)) continue
+      if (settle(trialBoard, trialCands, n, layout)) continue
       return [
         step(
           'what-if',
@@ -347,9 +347,9 @@ const techniques = [
 ]
 
 //a cell left with no candidates, or a unit with a digit that has nowhere to go
-const broken = (board, cands, n) => {
+const broken = (board, cands, n, layout) => {
   for (let i = 0; i < board.length; i++) if (!board[i] && !cands[i]) return true
-  for (const { cells } of geometry(n).units) {
+  for (const { cells } of geometry(n, layout).units) {
     let mask = 0
     for (const i of cells) mask |= board[i] ? bit(board[i]) : cands[i]
     if (mask !== all(n)) return true
@@ -358,11 +358,11 @@ const broken = (board, cands, n) => {
 }
 
 //the easiest steps available using techniques up to a level, or a contradiction
-export const nextSteps = (board, cands, n, top = levels.length - 1, from = 0) => {
-  if (broken(board, cands, n)) return { contradiction: true, steps: [] }
+export const nextSteps = (board, cands, n, top = levels.length - 1, from = 0, layout) => {
+  if (broken(board, cands, n, layout)) return { contradiction: true, steps: [] }
   for (let level = from; level <= top; level++) {
     for (const technique of techniques[level]) {
-      const steps = technique(board, cands, n)
+      const steps = technique(board, cands, n, layout)
       if (steps.length) return { level, steps }
     }
   }
@@ -370,8 +370,8 @@ export const nextSteps = (board, cands, n, top = levels.length - 1, from = 0) =>
 }
 
 //applies steps in place, false when two placements disagree
-export const apply = (board, cands, n, steps) => {
-  const { peers } = geometry(n)
+export const apply = (board, cands, n, steps, layout) => {
+  const { peers } = geometry(n, layout)
   for (const { place, remove } of steps) {
     for (const [i, mask] of remove) cands[i] &= ~mask
     for (const [i, d] of place) {
@@ -390,18 +390,18 @@ export const apply = (board, cands, n, steps) => {
 
 //the hardest level a board needs, or null when techniques up to top cannot finish it
 //finishing by sound steps proves uniqueness, singles use the solver as a stand-in
-export const rate = (givens, n, top = levels.length - 1) => {
+export const rate = (givens, n, top = levels.length - 1, layout) => {
   const board = givens.slice()
-  const cands = candidatesOf(board, n)
+  const cands = candidatesOf(board, n, layout)
   let hardest = 0
   for (;;) {
-    if (!settle(board, cands, n)) return null
+    if (!settle(board, cands, n, layout)) return null
     if (full(board)) break
     if (top < 1) return null
-    const { contradiction, level, steps } = nextSteps(board, cands, n, top, 1)
+    const { contradiction, level, steps } = nextSteps(board, cands, n, top, 1, layout)
     if (contradiction || !steps.length) return null
     hardest = Math.max(hardest, level)
-    if (!apply(board, cands, n, steps)) return null
+    if (!apply(board, cands, n, steps, layout)) return null
   }
   return { level: hardest, solution: board }
 }

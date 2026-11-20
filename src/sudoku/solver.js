@@ -15,8 +15,8 @@ const place = (board, cands, peers, i, d) => {
 
 //placing what is forced: cells with one candidate, digits with one place left in a unit
 //works in place, false on a contradiction
-export const settle = (board, cands, n) => {
-  const { units, peers } = geometry(n)
+export const settle = (board, cands, n, layout) => {
+  const { units, peers } = geometry(n, layout)
   for (let changed = true; changed;) {
     changed = false
     for (let i = 0; i < board.length; i++) {
@@ -72,16 +72,16 @@ const narrowest = (board, cands) => {
 
 //depth first search over the narrowest cell, calling found(board) on each solution until it
 //returns true; order shuffles a cell's digits, steps counts down guesses, null when out of them
-const search = (board, cands, n, found, order, budget) => {
-  if (!settle(board, cands, n)) return false
+const search = (board, cands, n, layout, found, order, budget) => {
+  if (!settle(board, cands, n, layout)) return false
   const i = narrowest(board, cands)
   if (i < 0) return found(board)
   for (const d of order(digitsOf(cands[i]))) {
     if (--budget.steps < 0) return null
     const nextBoard = board.slice()
     const nextCands = cands.slice()
-    if (!place(nextBoard, nextCands, geometry(n).peers, i, d)) continue
-    const done = search(nextBoard, nextCands, n, found, order, budget)
+    if (!place(nextBoard, nextCands, geometry(n, layout).peers, i, d)) continue
+    const done = search(nextBoard, nextCands, n, layout, found, order, budget)
     if (done !== false) return done
   }
   return false
@@ -90,21 +90,22 @@ const search = (board, cands, n, found, order, budget) => {
 const asIs = (list) => list
 
 //how many solutions, counting no further than limit
-export const countSolutions = (board, n, limit = 2) => {
+export const countSolutions = (board, n, limit = 2, layout) => {
   let count = 0
-  search(board.slice(), candidatesOf(board, n), n, () => ++count >= limit, asIs, {
+  search(board.slice(), candidatesOf(board, n, layout), n, layout, () => ++count >= limit, asIs, {
     steps: Infinity,
   })
   return count
 }
 
 //one solution, the first the order finds, or null; steps caps the guesses
-export const solve = (board, n, order = asIs, steps = Infinity) => {
+export const solve = (board, n, order = asIs, steps = Infinity, layout) => {
   let solution = null
   const done = search(
     board.slice(),
-    candidatesOf(board, n),
+    candidatesOf(board, n, layout),
     n,
+    layout,
     (b) => {
       solution = b.slice()
       return true

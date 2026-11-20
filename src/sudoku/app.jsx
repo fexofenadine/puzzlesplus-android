@@ -37,7 +37,7 @@ import Game, { running } from './Game'
 import { celebrate, stopFireworks } from '../shell/fireworks'
 import { arrows, stepCursor } from '../shell/cursor'
 import { DAILY_BUDGET, dayOf, finish, seedOf, special } from '../shell/daily'
-import { codeOf, partsOf, sharedCode } from '../shell/share'
+import { codeOf, pack, partsOf, sharedCode, unpack } from '../shell/share'
 import FireworksCanvas from '../shell/FireworksCanvas'
 import {
   EMPTY,
@@ -48,8 +48,10 @@ import {
   emptyBoard,
   full,
   geometry,
+  jigsaw,
   sizes,
   solved,
+  validLayout,
 } from './rules'
 import { countSolutions, solve } from './solver'
 import { levels } from './techniques'
@@ -60,20 +62,24 @@ import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
 
-//the saved size and level, easy 9x9 when missing or out of range
+//the saved size, level and variant, easy 9x9 when missing or out of range
 const loadChoice = () => {
   const saved = parseInt(load('sudoku.size'), 10)
-  const n = sizes.includes(saved) ? saved : 9
+  const variant = load('sudoku.variant') === jigsaw
+  const n = variant ? 9 : sizes.includes(saved) ? saved : 9
   const level = parseInt(load('sudoku.level'), 10)
-  if (!(level >= 0 && level < levelNames.length)) return { n, level: 0 }
-  return { n, level: fallback(n, level) }
+  if (!(level >= 0 && level < levelNames.length)) return { n, level: 0, jigsaw: variant }
+  return { n, level: fallback(n, level), jigsaw: variant }
 }
 
 //an empty board until the dealer answers
 //notes are candidate masks per cell, history a list of steps of [cell, digit, notes] as they were
-export const createGame = ({ n, level }) => ({
+//a jigsaw game gets its layout (the region of each cell, as a string) from the dealer
+export const createGame = ({ n, level, jigsaw: regions = false }) => ({
   n,
   level,
+  jigsaw: regions,
+  layout: null,
   givens: emptyBoard(n),
   solution: null,
   board: emptyBoard(n),
@@ -100,11 +106,12 @@ export const createGame = ({ n, level }) => ({
 export const saved = resumable({
   key: 'sudoku.saved',
   running,
-  label: ({ n, level }) => `${n} × ${n} ${levelNames[level]}`,
+  label: ({ n, level, layout }) => `${layout ? 'Jigsaw ' : ''}${n} × ${n} ${levelNames[level]}`,
   fresh: { selected: -1, picked: 0 },
   pack: ({
     n,
     level,
+    layout,
     givens,
     solution,
     board,
@@ -118,6 +125,7 @@ export const saved = resumable({
   }) => ({
     n,
     level,
+    layout,
     givens: Array.from(givens),
     solution: Array.from(solution),
     board: Array.from(board),
@@ -132,6 +140,7 @@ export const saved = resumable({
   unpack: ({
     n,
     level,
+    layout,
     givens,
     solution,
     board,
@@ -145,8 +154,10 @@ export const saved = resumable({
   }) => {
     check(sizes.includes(n) && boxShapes[n] && level >= 0 && level < levels.length)
     check(Array.isArray(notes) && notes.length === n * n && Array.isArray(history))
+    check(!layout || (n === 9 && validLayout(layout, n)))
     return {
-      ...createGame({ n, level }),
+      ...createGame({ n, level, jigsaw: Boolean(layout) }),
+      layout: layout || null,
       givens: boardOf(givens, n, EMPTY, n),
       solution: boardOf(solution, n, EMPTY, n),
       board: boardOf(board, n, EMPTY, n),
@@ -162,26 +173,41 @@ export const saved = resumable({
   },
 })
 
-const { actions: recordActions } = records('sudoku', sizes, levelNames)
+//jigsaw boards keep their best times apart, as a size of their own
+const { actions: recordActions } = records('sudoku', [...sizes, jigsaw], levelNames)
 
 //the daily puzzle's size and level
 const DAILY = { n: 9, level: 1 }
 
 //the clues as a link's code, and a game from one: null unless it is a board with one solution
-const shareCode = ({ n, level, givens }) => codeOf(n, level, givens, n + 1)
+//a jigsaw board's code ends with its layout, one region digit a cell
+const shareCode = ({ n, level, givens, layout }) => {
+  const code = codeOf(n, level, givens, n + 1)
+  return layout ? `${code}.${pack(Array.from(layout, Number), n)}` : code
+}
 
-export const gameOf = (code) => {
+export const gameOf = (whole) => {
+  const [size, grade, data, region, ...rest] = whole.split('.')
+  if (rest.length) return null
+  const code = [size, grade, data].join('.')
   //the digits are packed in the size's own base, so the size is read first
-  const base = Number(code.split('.')[0]) + 1
+  const base = Number(size) + 1
   const parts = partsOf(code, base, (n, level) => sizes.includes(n) && allowed(n, level))
   if (!parts) return null
   const { n, level, values } = parts
+  let layout
+  if (region !== undefined) {
+    const regions = unpack(region, n * n, n)
+    layout = regions && regions.join('')
+    if (n !== 9 || !validLayout(layout, n)) return null
+  }
   const givens = Int8Array.from(values)
-  if (breaks(givens, n).length || countSolutions(givens, n, 2) !== 1) return null
+  if (breaks(givens, n, layout).length || countSolutions(givens, n, 2, layout) !== 1) return null
   return {
-    ...createGame({ n, level }),
+    ...createGame({ n, level, jigsaw: Boolean(layout) }),
+    layout: layout || null,
     givens,
-    solution: solve(givens, n),
+    solution: solve(givens, n, undefined, undefined, layout),
     board: givens.slice(),
     dealing: false,
     shared: true,
@@ -204,12 +230,14 @@ const playable = (game) => !game.dealing && !game.paused && !game.win
 //after a change: a win stops the clock, a full board that isn't one asks about a hint
 const changed = (state, board, notes, history, actions) => {
   const next = { ...startClock(state.game, actions), board, notes, history, future: [] }
-  next.win = solved(board, next.n)
+  next.win = solved(board, next.n, next.layout)
   if (next.win) {
     stopTick(next.raf)
     celebrate()
     if (!state.game.win) tally('sudoku', { won: true, clean: !next.hinted })
-    finish('sudoku', state, next, actions)
+    finish('sudoku', state, next, actions, (won) =>
+      actions.win({ ...won, n: won.layout ? jigsaw : won.n }),
+    )
   }
   return { hint: null, prompt: !next.win && full(board), game: next }
 }
@@ -237,7 +265,7 @@ const placeDigit = (state, actions, i, d) => {
   if (game.board[i] === d) return edit(state, actions, [[i, EMPTY, game.notes[i]]])
   const changes = [[i, d, game.notes[i]]]
   if (tidy) {
-    for (const p of geometry(game.n).peers[i]) {
+    for (const p of geometry(game.n, game.layout).peers[i]) {
       if (game.notes[p] & bit(d)) changes.push([p, game.board[p], game.notes[p] & ~bit(d)])
     }
   }
@@ -320,16 +348,23 @@ export const actions = {
       //and after it or a board from a link the next game goes back to that choice
       const day = payload && payload.daily ? dayOf() : null
       const base = day ? DAILY : special(game) ? loadChoice() : game
-      const n = (payload && payload.n) || base.n
+      //the jigsaw is a 9x9 variant: asking for it dealt on another size takes the size's place
+      const size = payload && payload.n
+      const regions =
+        payload && payload.jigsaw !== undefined
+          ? payload.jigsaw
+          : Boolean(base.jigsaw) && !(size && size !== 9)
+      const n = regions ? 9 : size || base.n
       const asked = payload && payload.level !== undefined ? payload.level : base.level
       const level = fallback(n, asked)
       const seed = day ? seedOf(day, 'sudoku') : Math.floor(Math.random() * 2 ** 32)
       if (!day) {
         save('sudoku.size', n)
         save('sudoku.level', level)
+        save('sudoku.variant', regions ? jigsaw : 'classic')
       }
       const id = ++deals
-      deal(n, level, seed, day ? DAILY_BUDGET : undefined).then((dealt) =>
+      deal(n, level, seed, day ? DAILY_BUDGET : undefined, regions).then((dealt) =>
         actions.dealt({ id, ...dealt }),
       )
       return {
@@ -338,15 +373,24 @@ export const actions = {
         prompt: false,
         selected: -1,
         picked: 0,
-        game: { ...createGame({ n, level }), deal: id, daily: day },
+        game: { ...createGame({ n, level, jigsaw: regions }), deal: id, daily: day },
       }
     },
   //an answer for an older deal is dropped
   dealt:
-    ({ id, givens, solution }) =>
+    ({ id, givens, solution, layout }) =>
     ({ game }) => {
       if (game.deal !== id) return null
-      return { game: { ...game, givens, solution, board: givens.slice(), dealing: false } }
+      return {
+        game: {
+          ...game,
+          givens,
+          solution,
+          layout: layout || null,
+          board: givens.slice(),
+          dealing: false,
+        },
+      }
     },
   //a tap on a cell: with a digit picked it goes in (a right click makes it a note), otherwise
   //the cell is selected, or unselected when it already was
@@ -393,7 +437,7 @@ export const actions = {
   autoNotes: () => (state, actions) => {
     const { game } = state
     if (!playable(game)) return { menu: null }
-    const cands = candidatesOf(game.board, game.n)
+    const cands = candidatesOf(game.board, game.n, game.layout)
     const changes = [...game.board.keys()]
       .filter((i) => game.board[i] === EMPTY)
       .map((i) => [i, EMPTY, cands[i]])
@@ -433,11 +477,11 @@ export const actions = {
     () =>
     ({ game }, actions) => {
       if (!playable(game)) return { menu: null }
-      const { board, notes, solution, n } = game
+      const { board, notes, solution, n, layout } = game
       return {
         menu: null,
         prompt: false,
-        hint: findHint({ board, notes, solution, n }),
+        hint: findHint({ board, notes, solution, n, layout }),
         game: { ...startClock(game, actions), hinted: true },
       }
     },
@@ -488,7 +532,7 @@ export const view = (state, actions) => (
       <BestTimes
         key="c"
         title="Fastest Sudoku Solvers"
-        sizes={sizes}
+        sizes={[...sizes, jigsaw]}
         levelNames={levelNames}
         allowed={allowed}
         state={state.bestTime}

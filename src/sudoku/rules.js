@@ -54,16 +54,53 @@ const boxName = (index, n) => {
 
 const nameOf = (kind, index, n) => (kind === 'box' ? boxName(index, n) : `${kind} ${index + 1}`)
 
-const geometries = {}
+//a jigsaw layout is a string of n * n digits, the region (0 to n - 1) each cell belongs to
+export const jigsaw = 'jigsaw'
 
-//the units every digit appears once in: rows, columns, boxes, each { kind, index, cells, name }
-//unitsOf[i] are the three a cell is in, peers[i] the cells sharing one; variants add units here
-export const geometry = (n) => {
-  if (geometries[n]) return geometries[n]
-  const [bw, bh] = boxShapes[n]
+//every region holds n connected cells
+export const validLayout = (layout, n = 9) => {
+  if (typeof layout !== 'string' || layout.length !== n * n || !/^\d+$/.test(layout)) return false
+  const regions = Array.from({ length: n }, () => [])
+  for (let i = 0; i < layout.length; i++) {
+    const r = Number(layout[i])
+    if (r >= n) return false
+    regions[r].push(i)
+  }
+  return regions.every((cells) => cells.length === n && connected(cells, n))
+}
+
+//whether cells (indices on an n wide board) form one piece, sharing edges
+export const connected = (cells, n) => {
+  const rest = new Set(cells)
+  const todo = [cells[0]]
+  rest.delete(cells[0])
+  while (todo.length) {
+    const i = todo.pop()
+    const x = i % n
+    for (const j of [i - n, i + n, x > 0 ? i - 1 : -1, x < n - 1 ? i + 1 : -1]) {
+      if (rest.delete(j)) todo.push(j)
+    }
+  }
+  return rest.size === 0
+}
+
+//a region is named by its first cell in reading order, the one thing that is easy to find
+const regionName = (cells, n) =>
+  `the region from row ${Math.floor(cells[0] / n) + 1}, column ${(cells[0] % n) + 1}`
+
+//the latest geometries kept, since every jigsaw deal makes layouts of its own
+const geometries = new Map()
+
+//the units every digit appears once in: rows, columns, boxes (or a jigsaw's regions), each
+//{ kind, index, cells, name }; unitsOf[i] are the three a cell is in, peers[i] the cells
+//sharing one; variants add units here
+export const geometry = (n, layout) => {
+  const key = `${n}${layout ? `:${layout}` : ''}`
+  if (geometries.has(key)) return geometries.get(key)
+  const [bw, bh] = layout ? [3, 3] : boxShapes[n]
   const units = []
-  const add = (kind, index, cells) =>
-    units.push({ kind, index, cells, name: nameOf(kind, index, n) })
+  const add = (kind, index, cells, name = nameOf(kind, index, n)) =>
+    units.push({ kind, index, cells, name })
   for (let r = 0; r < n; r++)
     add(
       'row',
@@ -76,12 +113,20 @@ export const geometry = (n) => {
       c,
       Array.from({ length: n }, (_, r) => r * n + c),
     )
-  for (let b = 0; b < n; b++) {
-    const top = Math.floor(b / (n / bw)) * bh
-    const left = (b % (n / bw)) * bw
-    const cells = []
-    for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) cells.push((top + y) * n + left + x)
-    add('box', b, cells)
+  if (layout) {
+    //regions go in the order their first cells come, so the names read left to right
+    const found = Array.from({ length: n }, () => [])
+    for (let i = 0; i < layout.length; i++) found[Number(layout[i])].push(i)
+    found.sort((a, b) => a[0] - b[0])
+    found.forEach((cells, b) => add('box', b, cells, regionName(cells, n)))
+  } else {
+    for (let b = 0; b < n; b++) {
+      const top = Math.floor(b / (n / bw)) * bh
+      const left = (b % (n / bw)) * bw
+      const cells = []
+      for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) cells.push((top + y) * n + left + x)
+      add('box', b, cells)
+    }
   }
   const unitsOf = Array.from({ length: n * n }, () => [])
   units.forEach((unit) => unit.cells.forEach((i) => unitsOf[i].push(unit)))
@@ -91,15 +136,18 @@ export const geometry = (n) => {
     return [...set]
   })
   const boxOf = (i) => unitsOf[i].find((unit) => unit.kind === 'box').index
-  geometries[n] = { n, bw, bh, units, unitsOf, peers, boxOf }
-  return geometries[n]
+  const word = layout ? 'region' : 'box'
+  const made = { n, bw, bh, units, unitsOf, peers, boxOf, word, layout }
+  if (geometries.size >= 12) geometries.delete(geometries.keys().next().value)
+  geometries.set(key, made)
+  return made
 }
 
 export const full = (board) => !board.includes(EMPTY)
 
 //every cell's candidates from the placed digits alone
-export const candidatesOf = (board, n) => {
-  const { peers } = geometry(n)
+export const candidatesOf = (board, n, layout) => {
+  const { peers } = geometry(n, layout)
   const cands = new Int32Array(n * n)
   for (let i = 0; i < n * n; i++) {
     if (board[i] !== EMPTY) continue
@@ -111,9 +159,9 @@ export const candidatesOf = (board, n) => {
 }
 
 //units holding a digit twice, as { cells, unit, text }
-export const breaks = (board, n) => {
+export const breaks = (board, n, layout) => {
   const found = []
-  for (const unit of geometry(n).units) {
+  for (const unit of geometry(n, layout).units) {
     const seen = new Map()
     for (const i of unit.cells) {
       const d = board[i]
@@ -129,10 +177,11 @@ export const breaks = (board, n) => {
   return found
 }
 
-//cells that clash with another of the same digit in a row, column or box
-export const violations = (board, n) => new Set(breaks(board, n).flatMap(({ cells }) => cells))
+//cells that clash with another of the same digit in a row, column or box (or region)
+export const violations = (board, n, layout) =>
+  new Set(breaks(board, n, layout).flatMap(({ cells }) => cells))
 
-export const solved = (board, n) => full(board) && breaks(board, n).length === 0
+export const solved = (board, n, layout) => full(board) && breaks(board, n, layout).length === 0
 
 //how many of each digit are on the board, index d for digit d
 export const digitCounts = (board, n) => {

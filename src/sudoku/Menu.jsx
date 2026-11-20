@@ -37,6 +37,12 @@ const Menu = ({ state, actions }) => (
         />
       ))}
       <Separator />
+      <SubMenuItem
+        name="Jigsaw Regions"
+        checked={Boolean(state.game.jigsaw)}
+        onClick={() => actions.newGame({ jigsaw: !state.game.jigsaw })}
+      />
+      <Separator />
       <SubMenuItem name="Show Errors" checked={state.errors} onClick={actions.toggleErrors} />
       <SubMenuItem name="Tidy Notes" checked={state.tidy} onClick={actions.toggleTidy} />
       <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />

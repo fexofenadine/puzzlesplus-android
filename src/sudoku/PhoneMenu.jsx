@@ -4,7 +4,8 @@ import { allowed, levelNames } from './Menu'
 import { sizes } from './rules'
 import { levels } from './techniques'
 
-//sudoku's part of the options sheet: difficulty, size while there are several, options
+//sudoku's part of the options sheet: difficulty, size while there are several, the jigsaw variant,
+//options
 
 //material symbols' edit pencil
 const NOTES =
@@ -29,6 +30,11 @@ const PhoneMenu = ({ state, actions }) => [
       />
     )}
     <div style={{ height: '6px' }} />
+    <Check
+      name="Jigsaw Regions"
+      checked={Boolean(state.game.jigsaw)}
+      onToggle={() => actions.newGame({ jigsaw: !state.game.jigsaw })}
+    />
     <Check name="Show Errors" checked={state.errors} onToggle={actions.toggleErrors} />
     <Check name="Tidy Notes" checked={state.tidy} onToggle={actions.toggleTidy} />
     <Check name="Timer" checked={state.timer} onToggle={actions.toggleTimer} />

@@ -9,7 +9,7 @@ import { examples as takuzuExamples, parts as takuzuParts } from './takuzu'
 import { lines, parts as nonogramsParts, whatIf } from './nonograms'
 import { parts as howToParts } from './howToPlay'
 import { easiest, exampleStep } from './SudokuExample'
-import { examples as sudokuExamples, parts as sudokuParts } from './sudoku'
+import { examples as sudokuExamples, jigsawExample, parts as sudokuParts } from './sudoku'
 import { guideTopic as sudokuTopic } from '../sudoku/hint'
 import { examples as twentyExamples, parts as twentyParts } from './2048'
 import { suggest } from '../2048/search'
@@ -60,6 +60,10 @@ it('finds every sudoku technique in its example, as the easiest step there', () 
     expect(easiest(example), technique).toBe(technique)
     expect(ids(sudokuParts)).toContain(sudokuTopic({ kind: technique }))
   }
+  //the jigsaw example's hidden single is in a region
+  expect(exampleStep(jigsawExample, 'hidden-single').text).toMatch(/region/)
+  expect(easiest(jigsawExample)).toBe('hidden-single')
+  expect(ids(sudokuParts)).toContain('variants')
   for (const kind of ['naked-quad', 'hidden-quad', 'jellyfish', 'break', 'wrong', 'note']) {
     expect(ids(sudokuParts)).toContain(sudokuTopic({ kind }))
   }

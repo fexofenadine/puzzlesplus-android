@@ -2,6 +2,7 @@ import { h } from 'hyperapp'
 import g from '../sudoku/Sudoku.module.css'
 import Cell from '../sudoku/Cell'
 import { place, tracks } from '../sudoku/Game'
+import { regionEdges } from '../sudoku/regions'
 import { EMPTY, bit, candidatesOf, geometry, onlyDigit } from '../sudoku/rules'
 import {
   hiddenPairs,
@@ -36,25 +37,26 @@ const finders = {
   'what-if': whatIf,
 }
 
-//rows of digits and dots, and the candidates earlier steps had already taken away
-export const positionOf = ({ rows, removed = [] }) => {
+//rows of digits and dots, the layout of a jigsaw board, and the candidates earlier steps had
+//already taken away
+export const positionOf = ({ rows, layout, removed = [] }) => {
   const n = rows.length
   const board = Int8Array.from(rows.join(''), (c) => (c === '.' ? EMPTY : Number(c)))
-  const cands = candidatesOf(board, n)
+  const cands = candidatesOf(board, n, layout)
   for (const [i, digits] of removed) for (const d of digits) cands[i] &= ~bit(Number(d))
-  return { board, cands, n }
+  return { board, cands, n, layout }
 }
 
 //the first step the technique finds in the position, as a hint would show it
 export const exampleStep = (example, technique) => {
-  const { board, cands, n } = positionOf(example)
-  return finders[technique](board, cands, n).find((step) => step.technique === technique)
+  const { board, cands, n, layout } = positionOf(example)
+  return finders[technique](board, cands, n, layout).find((step) => step.technique === technique)
 }
 
 //the technique the position's easiest step uses, which the example should be about
 export const easiest = (example) => {
-  const { board, cands, n } = positionOf(example)
-  return nextSteps(board, cands, n).steps[0]?.technique
+  const { board, cands, n, layout } = positionOf(example)
+  return nextSteps(board, cands, n, undefined, 0, layout).steps[0]?.technique
 }
 
 const marksOf = (step) =>
@@ -79,8 +81,10 @@ const focusOf = (step) => {
 //candidates show as notes once a technique works on them rather than on placed digits
 const SudokuExample = (example) => {
   const { technique } = example
-  const { board, cands, n } = positionOf(example)
-  const { bw, bh } = geometry(n)
+  const { board, cands, n, layout } = positionOf(example)
+  const { bw, bh } = geometry(n, layout)
+  const edges = layout ? regionEdges(layout, n) : null
+  const gaps = layout ? n : null
   const step = technique && exampleStep(example, technique)
   const marks = marksOf(step)
   const ghosts = step ? Object.fromEntries(step.place) : {}
@@ -88,7 +92,10 @@ const SudokuExample = (example) => {
   return (
     <Figure caption={step && step.text}>
       <div class={g.board}>
-        <div class={g.inactive} style={{ '--tracks': tracks(n, bw), '--rows': tracks(n, bh) }}>
+        <div
+          class={g.inactive}
+          style={{ '--tracks': tracks(n, gaps || bw), '--rows': tracks(n, gaps || bh) }}
+        >
           {[...board].map((digit, i) => (
             <Cell
               i={i}
@@ -100,7 +107,12 @@ const SudokuExample = (example) => {
               focus={focusOf(step)}
               mark={marks[i]}
               ghost={ghosts[i]}
-              style={{ gridColumn: place(i % n), gridRow: place(Math.floor(i / n)) }}
+              region={Boolean(edges)}
+              style={{
+                gridColumn: place(i % n),
+                gridRow: place(Math.floor(i / n)),
+                ...(edges && edges[i]),
+              }}
               onPress={noop}
             />
           ))}

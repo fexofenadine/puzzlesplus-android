@@ -1,7 +1,7 @@
 import { load, remove, save } from './storage'
 import { clearStats, readStats } from './stats'
 import { clearDaily, dayOf, readDaily, resultText } from './daily'
-import { capital } from './grid'
+import { capital, sizeName } from './grid'
 import { SITE, copy } from './share'
 
 //the name box's edits and the open tab, the same whatever a game keeps
@@ -69,10 +69,10 @@ export const records = (prefix, sizes, levelNames, withArt = false) => {
             time,
             hinted,
             board,
-            level: `${levelNames[level].toLowerCase()} ${n} × ${n}`,
+            level: `${levelNames[level].toLowerCase()} ${sizeName(n)}`,
             text:
               art &&
-              `You have the fastest art time for ${levelNames[level].toLowerCase()} ${n} × ${n}.`,
+              `You have the fastest art time for ${levelNames[level].toLowerCase()} ${sizeName(n)}.`,
             name: load(`${prefix}.name`) || '',
           },
         }

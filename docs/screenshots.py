@@ -185,14 +185,14 @@ def guide(b):
     still(pg, 'docs/screenshots/guide.jpg')
 
 @shot
-def matrix_sudoku(b):
-    pg = open_page(b, 'matrix', 'sudoku/', {'sudoku.level': '1'})
+def matrix_jigsaw(b):
+    pg = open_page(b, 'matrix', 'sudoku/', {'sudoku.level': '1', 'sudoku.variant': 'jigsaw'})
     play(pg, 'sudoku', 18)
     menu(pg, 'game', 'Auto Notes')
     pg.keyboard.press('h')
     pg.wait_for_timeout(300)
     pg.mouse.move(5, 5)
-    still(pg, 'docs/screenshots/matrix-sudoku.jpg')
+    still(pg, 'docs/screenshots/matrix-jigsaw.jpg')
 
 @shot
 def phosphor_2048(b):

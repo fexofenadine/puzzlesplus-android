@@ -7,6 +7,7 @@ import Button from '../Button'
 import Tabs, { hintTabs } from './Tabs'
 import StatsList from './StatsList'
 import DailyList from './DailyList'
+import { sizeName } from './grid'
 
 const artTab = { id: 'art', name: 'Art' }
 
@@ -32,9 +33,7 @@ const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art
           <tbody>
             {sizes.map((n) => (
               <tr>
-                <th class={s.size}>
-                  {n} × {n}
-                </th>
+                <th class={s.size}>{sizeName(n)}</th>
                 {levelNames.map((_, level) => {
                   const ok = allowed(n, level)
                   const best = ok && state[state.tab][`${n}.${level}`]

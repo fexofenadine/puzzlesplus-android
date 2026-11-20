@@ -23,6 +23,11 @@ export const Rules = () => [
     a digit that repeats in a row, column or box, and Hint explains the next digit logic gives.
     Every board has one solution that needs no guessing.
   </p>,
+  <p>
+    <b>Variants.</b> Jigsaw Regions (Game menu) swaps the 3×3 boxes for nine irregular regions of
+    nine cells, drawn with heavier lines. Every row, column and region still holds 1 to 9 once. It
+    is dealt on 9×9 only and keeps its own best times.
+  </p>,
 ]
 
 const SudokuHowToPlay = ({ key, actions }) => (

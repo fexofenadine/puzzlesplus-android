@@ -11,6 +11,7 @@ import {
   full,
   geometry,
   solved,
+  validLayout,
   violations,
 } from './rules'
 import { countSolutions, solve } from './solver'
@@ -28,7 +29,7 @@ import {
   xyWing,
 } from './techniques'
 import * as techniques from './techniques'
-import { makeGame, minGivens, random } from './generate'
+import { makeGame, makeLayout, minGivens, random } from './generate'
 
 //rows of digits, dots for empty cells
 const parse = (rows) => Int8Array.from(rows.join('').split(''), (c) => (c === '.' ? 0 : Number(c)))
@@ -305,4 +306,51 @@ it('names boxes by where they sit on each size', () => {
   expect(geometry(9).units.find((u) => u.kind === 'box' && u.index === 4).name).toBe(
     'the centre box',
   )
+})
+
+it('deals jigsaw layouts of nine connected regions of nine cells', () => {
+  const rng = random(8)
+  for (let k = 0; k < 20; k++) {
+    const layout = makeLayout(rng)
+    expect(validLayout(layout)).toBe(true)
+    expect(layout).not.toBe(
+      Array.from({ length: 81 }, (_, i) => Math.floor(i / 27) * 3 + Math.floor((i % 9) / 3)).join(
+        '',
+      ),
+    )
+  }
+  expect(validLayout('0'.repeat(81))).toBe(false)
+  expect(validLayout('x')).toBe(false)
+  //a region split in two is no region
+  const split = Array.from({ length: 81 }, (_, i) => Math.floor(i / 9))
+    .join('')
+    .split('')
+  ;[split[0], split[80]] = [split[80], split[0]]
+  expect(validLayout(split.join(''))).toBe(false)
+})
+
+it('solves and rates jigsaw boards by their regions, one solution on every level', () => {
+  for (const level of [0, 1, 2, 3]) {
+    const game = makeGame(9, level, random(20 + level), 30000, true)
+    const { givens, solution, layout } = game
+    expect(validLayout(layout)).toBe(true)
+    expect(game.level).toBe(level)
+    expect(countSolutions(givens, 9, 2, layout)).toBe(1)
+    expect(solved(solution, 9, layout)).toBe(true)
+    expect(breaks(givens, 9, layout)).toHaveLength(0)
+    expect(rate(givens, 9, level, layout).level).toBe(level)
+    //the regions are units: the solution has nine different digits in each
+    for (const unit of geometry(9, layout).units) {
+      expect(new Set(unit.cells.map((i) => solution[i])).size).toBe(9)
+    }
+  }
+}, 120000)
+
+it('names a region by its first cell and a box as before', () => {
+  const layout = makeLayout(random(2))
+  const regions = geometry(9, layout).units.filter((u) => u.kind === 'box')
+  expect(regions).toHaveLength(9)
+  regions.forEach((u) => expect(u.name).toMatch(/^the region from row \d, column \d$/))
+  expect(geometry(9, layout).word).toBe('region')
+  expect(geometry(9).word).toBe('box')
 })

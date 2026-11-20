@@ -10,6 +10,10 @@ export const cellsOf = (n) =>
 
 export const lineName = (line, n) => (line < n ? `row ${line + 1}` : `column ${line - n + 1}`)
 
+//a size's name, the number of cells along a side or a variant's own
+const variants = { jigsaw: 'Jigsaw 9 × 9' }
+export const sizeName = (n) => variants[n] || `${n} × ${n}`
+
 export const capital = (text) => text[0].toUpperCase() + text.slice(1)
 
 //a list in words: a, b and c
