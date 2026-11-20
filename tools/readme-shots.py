@@ -115,12 +115,12 @@ def nonograms_matrix(pg):
 
 @shot
 def wallpaper(pg):
-    #its settings, on vaporwave, then the wallpaper set on the home screen
+    #its settings, on synthwave, then the wallpaper set on the home screen
     d.adb('shell', 'am', 'start', '-n', SETTINGS)
     time.sleep(7)
     d.tap(830, 312)
     time.sleep(1.5)
-    where = ui('Vaporwave')
+    where = ui('Synthwave')
     if where:
         d.tap(*where)
     time.sleep(4)
