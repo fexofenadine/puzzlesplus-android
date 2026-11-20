@@ -2,7 +2,7 @@
 //apply the saved theme and window size before first paint
 try {
   //everforest became terafox coral
-  document.documentElement.dataset.theme = (localStorage.getItem('theme') || 'classic').replace(
+  document.documentElement.dataset.theme = (localStorage.getItem('theme') || 'synthwave').replace(
     /^everforest$/,
     'terafox-coral',
   )

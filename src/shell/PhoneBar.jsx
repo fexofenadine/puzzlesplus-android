@@ -47,8 +47,8 @@ const GLITCH =
 //short names and a picture of each theme for the theme picker: a piece of its background
 //under a glyph in its look, drawn by chips/source/chips.py
 const themeChips = [
-  ['classic', 'Classic', classic],
   ['synthwave', 'Synthwave', synthwave],
+  ['classic', 'Classic', classic],
   ['matrix', 'Matrix', matrix],
   ['nord', 'Nord', nord],
   ['solarized', 'Solarized', solarized],

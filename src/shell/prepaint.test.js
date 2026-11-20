@@ -19,8 +19,8 @@ const paint = (theme, backgrounds) => {
 beforeEach(() => localStorage.clear())
 
 it('paints every theme but classic as animated until told otherwise', () => {
-  expect(paint(null)).toBe(undefined)
-  expect(root.dataset.theme).toBe('classic')
+  expect(paint(null)).toBe('animated')
+  expect(root.dataset.theme).toBe('synthwave')
   for (const [theme] of themes) {
     expect(paint(theme)).toBe(theme === 'classic' ? undefined : 'animated')
   }

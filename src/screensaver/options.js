@@ -5,8 +5,8 @@ import { themes } from '../shell/themes'
 //every so many minutes, and for the wallpaper its frame rate and drift with the home screens
 export const MINUTES = { min: 1, max: 60, step: 1 }
 export const rates = [
-  [30, '30 a second'],
-  [60, '60 a second'],
+  [30, '30 fps'],
+  [60, '60 fps'],
   [0, 'As the screen allows'],
 ]
 

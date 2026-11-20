@@ -273,8 +273,16 @@ export const actions = {
   ...lossActions,
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
+    window.addEventListener('pointerdown', actions.dismissChord, true)
     listen(actions)
   },
+  dismissChord:
+    (event) =>
+    ({ hint }) =>
+      //a failed chord's highlights go at the next press anywhere but on the panel
+      hint && hint.kind === 'chord' && !event.target.closest?.('[role=status]')
+        ? { hint: null }
+        : null,
   press: (event) => (state, actions) => {
     const key = shortcut(event, state, actions)
     if (key === 113 || key === 78) {

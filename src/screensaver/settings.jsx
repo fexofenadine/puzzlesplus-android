@@ -19,7 +19,7 @@ import {
 } from '../shell/backgrounds'
 import { defaultEffects, effects, effectsOf, loadEffects, saveEffects } from '../shell/glitches'
 import { loadMotion, motions, saveMotion } from '../shell/motion'
-import { themes } from '../shell/themes'
+import { defaultTheme, themes } from '../shell/themes'
 import { load, save } from '../shell/storage'
 import { MINUTES, loadOptions, rates, saveOptions } from './options'
 
@@ -40,7 +40,7 @@ const close = () => {
 const themeName = (id) => themes.find(([theme]) => theme === id)?.[1] || id
 
 const state = {
-  theme: load('theme') || 'classic',
+  theme: load('theme') || defaultTheme,
   ...loadOptions(),
   motion: loadMotion(),
   backgrounds: loadSettings(),
