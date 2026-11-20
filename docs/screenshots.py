@@ -10,8 +10,10 @@ BASE = 'http://localhost:5173/'
 
 #shaders keep drawing and never shrink in a software renderer: pages may always draw, a draw costs nothing
 INIT = """
-document.documentElement.dataset.always = ''
 if (window.WebGL2RenderingContext) WebGL2RenderingContext.prototype.readPixels = function () {}
+//the root may not exist yet when this runs, and the shader reads the mark when it is made
+const mark = () => document.documentElement && (document.documentElement.dataset.always = '')
+if (!mark()) new MutationObserver((_, watch) => mark() && watch.disconnect()).observe(document, { childList: true })
 """
 
 def ctx(b, theme, store=None, size=(1200, 675), scale=1, touch=False):
