@@ -63,6 +63,11 @@
   }
 
   /*d: a dark plate the theme strips show round, the name in each theme's accent*/
+  /*a subtitle under the name, spaced out to the name's width by the script*/
+  .words { display: grid; justify-items: start }
+  .sub { font: 800 60px Orbitron; color: #fff; white-space: nowrap; margin-top: 10px;
+         -webkit-text-stroke: 8px #2b0f3d; paint-order: stroke fill;
+         text-shadow: 0 0 8px #fff8, 0 0 22px #1fd6ff, 0 0 40px #1fd6ff }
   .d .plate {
     position: relative; display: grid; justify-items: center; padding: 34px 56px 38px;
     background: #2e3440e6; border-radius: 28px; box-shadow: 0 0 0 3px #eceff433, 0 20px 50px #000c;
@@ -83,6 +88,7 @@
     'Classic logic puzzles, Windows style. Free, offline, no ads.',
   ]
   const blurb = blurbs[+(q.get('blurb') || 0)]
+  const sub = (q.get('sub') || '').toUpperCase()
   const card = document.getElementById('card')
   card.classList.add(look)
   if (q.has('plain')) card.classList.add('plain')
@@ -93,8 +99,18 @@
   const html = {
     a: `<div class="mark">${icon}<div class="name">Puzzles <b>Plus</b></div></div>${text}`,
     b: `<div class="mark"><div class="bar">${icon}<div class="name">Puzzles Plus</div></div>${text}</div>`,
-    c: `<div class="mark">${icon}<div class="name">PUZZLES PLUS</div></div>${text}`,
+    c: `<div class="mark">${icon}<div class="words"><div class="name">PUZZLES PLUS</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div></div>${text}`,
     d: `<div class="plate"><div class="mark">${icon}<div class="name">${[...'Puzzles Plus'].map((ch, k) => `<span style="color:${hues[k]}">${ch}</span>`).join('')}</div></div>${text}</div>`,
   }[look]
   document.getElementById('wrap').outerHTML = html
+  //the subtitle's letters spread until it is as wide as the name (the last gap is trimmed off)
+  document.fonts.ready.then(() => {
+    const name = document.querySelector('.name'), el = document.querySelector('.sub')
+    if (!el) return
+    el.style.letterSpacing = '0px'
+    const gaps = [...el.textContent].length - 1
+    const space = (name.getBoundingClientRect().width - el.getBoundingClientRect().width) / gaps
+    el.style.letterSpacing = space + 'px'
+    el.style.marginRight = -space + 'px'
+  })
 </script>
