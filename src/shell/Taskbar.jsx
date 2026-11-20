@@ -14,6 +14,7 @@ import lightup from './icons/lightup.png'
 import futoshiki from './icons/futoshiki.png'
 import help from './icons/help.svg'
 import book from './icons/book.svg'
+import home from './icons/home.svg'
 
 export const icons = { minesweeper, takuzu, nonograms, sudoku, 2048: twenty48, lightup, futoshiki }
 export { book, help }
@@ -117,6 +118,11 @@ const Taskbar = ({ key, name, own, state, actions }) => {
           Puzzles <b>Plus</b>
         </div>
         <ul class={s.list}>
+          {state.page !== 'home' && (
+            <StartItem icon={home} onClick={go(actions, root)}>
+              Home
+            </StartItem>
+          )}
           {games.map(([id, title]) => (
             <StartItem icon={icons[id]} onClick={() => actions.openGame(id)}>
               {title}

@@ -8,7 +8,7 @@ What is planned for Puzzles Plus, the website and the [Android app](https://gith
 
 ### Planned
 
-- [ ] A home page that lists every game, in place of the redirect to the last one played (the first task)
+- [x] A home page that lists every game, in place of the redirect to the last one played: a window of game cards with Continue for the game played last
 - [ ] Jigsaw Sudoku: the first Sudoku variant, nine irregular regions in place of the boxes, on the 9 × 9 board only. Other variants wait to see what it costs
 - [x] Remove Terafox Coral, keeping Terafox Hex Trail under that full name
 - [ ] Statistics for every game: games played, won, streaks and average times

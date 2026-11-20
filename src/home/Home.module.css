@@ -1,0 +1,117 @@
+/*the window fills what the taskbar leaves, scrolling its own cards*/
+.body {
+  box-sizing: border-box;
+  width: min(760px, calc(100vw - 2 * var(--gap) - 8px));
+  max-height: calc(100vh - var(--taskbar) - 2 * var(--gap) - 50px);
+  max-height: calc(100dvh - var(--taskbar) - 2 * var(--gap) - 50px);
+  padding: 4px;
+}
+
+/*a sunken panel like the guide's article*/
+.panel {
+  box-sizing: border-box;
+  max-height: inherit;
+  padding: 12px 16px 16px;
+  overflow: auto;
+  color: var(--text);
+  font:
+    13px/1.45 var(--text-font),
+    sans-serif;
+  background: var(--input);
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  box-shadow: inset 1px 1px var(--dark-shadow);
+}
+
+.heading {
+  margin: 0 0 4px;
+  font-family: var(--title-font);
+  font-size: 18px;
+}
+
+.lead {
+  margin: 0 0 12px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*a raised button holding a game, with its guide beside it*/
+.card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--light) var(--dark-shadow) var(--dark-shadow) var(--light);
+  box-shadow: inset -1px -1px var(--shadow);
+}
+
+.play {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 2px 10px;
+  align-items: center;
+  padding: 8px 10px 4px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.play img {
+  grid-row: span 2;
+  align-self: start;
+}
+
+.name {
+  font-weight: bold;
+}
+
+.text {
+  grid-column: 2;
+  font-size: 12px;
+}
+
+.links {
+  padding: 0 10px 8px 52px;
+  font-size: 12px;
+}
+
+.links a {
+  color: inherit;
+}
+
+.play:hover .name,
+.play:focus .name {
+  color: var(--highlight-text);
+  background: var(--highlight);
+  outline: 0;
+}
+
+.play:focus-visible {
+  outline: 1px dotted var(--text);
+  outline-offset: -3px;
+}
+
+/*the game played last, a step ahead of the others*/
+.continue {
+  margin: 0 0 12px;
+}
+
+.continue .card {
+  border-width: 2px;
+}
+
+.footer {
+  margin: 14px 0 0;
+  font-size: 12px;
+}
+
+.footer a {
+  color: inherit;
+}
