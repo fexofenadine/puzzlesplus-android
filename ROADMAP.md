@@ -10,7 +10,7 @@ What is planned for Puzzles Plus, the website and the [Android app](https://gith
 
 - [ ] A home page that lists every game, in place of the redirect to the last one played (the first task)
 - [ ] Jigsaw Sudoku: the first Sudoku variant, nine irregular regions in place of the boxes, on the 9 × 9 board only. Other variants wait to see what it costs
-- [ ] Remove Terafox Coral, keeping Terafox Hex Trail under that full name
+- [x] Remove Terafox Coral, keeping Terafox Hex Trail under that full name
 - [ ] Statistics for every game: games played, won, streaks and average times
 - [ ] A calendar of past daily puzzles to go back and play
 - [ ] Bridges (Hashi), an eighth game, offered before Futoshiki and not picked then

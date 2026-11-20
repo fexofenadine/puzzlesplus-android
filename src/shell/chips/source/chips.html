@@ -161,17 +161,10 @@
         background-image: url(still-terafox.jpg);
         background-size: 240%;
       }
-      /*a branch of coral over the coral*/
-      [id='terafox-coral'] {
-        background-image: url(still-terafox-coral.jpg);
-        background-size: 260%;
-      }
-      #terafox::after,
-      [id='terafox-coral']::after {
+      #terafox::after {
         background: radial-gradient(rgba(15, 28, 30, 0.6) 30%, transparent 75%);
       }
-      #terafox svg,
-      [id='terafox-coral'] svg {
+      #terafox svg {
         position: relative;
         z-index: 1;
         filter: drop-shadow(0 1px 1px rgba(6, 13, 14, 0.9));
@@ -194,18 +187,6 @@
           stroke-width="3"
           stroke-linejoin="round"
           d="M13 3l9.5 5.5v11L13 25l-9.5-5.5v-11z"
-        />
-      </svg>
-    </div>
-    <div class="chip" id="terafox-coral">
-      <svg width="26" height="28" viewBox="0 0 26 28">
-        <path
-          fill="none"
-          stroke="#7aa4a1"
-          stroke-width="3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M13 26V14M13 18l-7-5V6M13 14l6-5V3M6 10L2 8M19 9l5 2"
         />
       </svg>
     </div>

@@ -180,7 +180,7 @@ def phosphor_open_games(b):
 
 @shot
 def guide(b):
-    pg = open_page(b, 'terafox-coral', 'takuzu/guide/#gaps')
+    pg = open_page(b, 'terafox', 'takuzu/guide/#gaps')
     pg.wait_for_timeout(1500)
     still(pg, 'docs/screenshots/guide.jpg')
 

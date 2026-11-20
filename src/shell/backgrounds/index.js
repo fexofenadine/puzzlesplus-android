@@ -15,7 +15,6 @@ const loaders = {
   qix: () => import('./qix'),
   hextrail: () => import('./hextrail'),
   neon: () => import('./neon'),
-  coral: () => import('./coral'),
 }
 
 //which theme shows which background
@@ -28,7 +27,6 @@ const themeBackgrounds = {
   synthwave: 'neon',
   vaporwave: 'qix',
   terafox: 'hextrail',
-  'terafox-coral': 'coral',
 }
 
 export const backgroundFor = (theme) => themeBackgrounds[theme] || null

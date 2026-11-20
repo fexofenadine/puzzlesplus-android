@@ -1,10 +1,10 @@
 //inlined into each game's page head by vite.config.js, so it runs before first paint
 //apply the saved theme and window size before first paint
 try {
-  //everforest became terafox coral
+  //everforest and terafox coral became terafox
   document.documentElement.dataset.theme = (localStorage.getItem('theme') || 'synthwave').replace(
-    /^everforest$/,
-    'terafox-coral',
+    /^(everforest|terafox-coral)$/,
+    'terafox',
   )
   //animated off classic unless it was switched off, the script corrects the rest
   //synthwave's only counts as off since its default changed (settings version 1)
@@ -18,7 +18,6 @@ try {
     'solarized-phosphor': 'phosphor',
     vaporwave: 'qix',
     terafox: 'hextrail',
-    'terafox-coral': 'coral',
   }
   if (ids[theme]) {
     try {

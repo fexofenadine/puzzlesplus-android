@@ -34,7 +34,7 @@
   --tz-one-text: #1c1038;
 }
 
-:global(:root:is([data-theme='terafox'], [data-theme='terafox-coral'])) {
+:global(:root[data-theme='terafox']) {
   --tz-zero: #5a93aa;
   --tz-zero-text: #0f1c1e;
   --tz-one: #fda47f;

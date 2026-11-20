@@ -67,7 +67,6 @@ looks.terafox = {
   size: 2.5,
   glow: 5,
 }
-looks['terafox-coral'] = looks.terafox
 
 export const lookOf = (theme) => looks[theme] || looks.classic
 

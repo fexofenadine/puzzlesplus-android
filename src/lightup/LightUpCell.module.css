@@ -12,7 +12,7 @@
 }
 
 /*terafox's darkest tone is its open cells' neighbour, so its walls go darker still*/
-:global(:root:is([data-theme='terafox'], [data-theme='terafox-coral'])) {
+:global(:root[data-theme='terafox']) {
   --lu-wall: #060d0e;
 }
 

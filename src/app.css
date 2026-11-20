@@ -397,7 +397,7 @@
   --fringe-b: rgba(1, 205, 254, 0.85);
 }
 
-:root:is([data-theme='terafox'], [data-theme='terafox-coral']) {
+:root[data-theme='terafox'] {
   /*terafox from nightfox: deep teal grounds, sea greens and blues*/
   color-scheme: dark;
   --ui-font: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -565,14 +565,8 @@ main::before {
   }
 }
 
-/*the substrate, qix, hex trail and coral canvases show through*/
-:root:is(
-    [data-theme='nord'],
-    [data-theme='vaporwave'],
-    [data-theme='terafox'],
-    [data-theme='terafox-coral']
-  )
-  main::before {
+/*the substrate, qix and hex trail canvases show through*/
+:root:is([data-theme='nord'], [data-theme='vaporwave'], [data-theme='terafox']) main::before {
   background: none;
 }
 
@@ -1044,7 +1038,7 @@ main::before {
 }
 
 /*edeneast's terafox: bg0 to bg3, fg1, blue #5a93aa and green #7aa4a1*/
-:root[data-phone]:is([data-theme='terafox'], [data-theme='terafox-coral']) {
+:root[data-phone][data-theme='terafox'] {
   --md-bar: #1d3337;
   --md-panel: #1d3337;
   --md-high: #254147;

@@ -63,7 +63,7 @@ export const desktopSection = {
       </li>
     </ul>,
     <p>
-      Display → <b>Theme</b> picks one of nine looks, shared by every game and remembered:
+      Display → <b>Theme</b> picks one of eight looks, shared by every game and remembered:
     </p>,
     <ul>
       <li>
@@ -91,8 +91,8 @@ export const desktopSection = {
         floor, with bouncing lines that leave trails, like the Mystify screensaver, playing over it.
       </li>
       <li>
-        <b>Terafox Hex Trail</b> and <b>Terafox Coral</b>, deep teals and sea greens, over lines
-        that grow across a honeycomb or coral that grows from scattered seeds.
+        <b>Terafox Hex Trail</b>, deep teals and sea greens, over lines that grow across a
+        honeycomb.
       </li>
     </ul>,
     <p>

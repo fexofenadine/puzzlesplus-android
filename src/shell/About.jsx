@@ -43,9 +43,9 @@ const About = ({ key, name, actions, credits }, children) => (
             </li>
             <li>
               Backgrounds are canvas ports of GLMatrix, Substrate, Truchet, Phosphor and HexTrail
-              from xscreensaver, under the xscreensaver licence, Qix and Coral written after
-              xscreensaver's, the Neon Triangulator shader by mrange (CC0) and the 2D Clouds shader
-              by drift (free to use), both as xscreensaver ships them.
+              from xscreensaver, under the xscreensaver licence, Qix written after xscreensaver's,
+              the Neon Triangulator shader by mrange (CC0) and the 2D Clouds shader by drift (free
+              to use), both as xscreensaver ships them.
             </li>
             <li>Fonts are under the SIL Open Font License and LGPL 2.1.</li>
             <li>Photos are from Unsplash, and CC0 photos from Wikimedia Commons.</li>

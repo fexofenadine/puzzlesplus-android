@@ -7,7 +7,6 @@ import { pixel } from './font6x10'
 import qix, { hueAt, makeShape, stepShape, tape } from './qix'
 import { DONE, EMPTY, FADE, network } from './hextrail'
 import { adapt, frameRate, shaderBackground, tooSlow } from './shader'
-import { ramp, reef } from './coral'
 import { random } from '../random'
 
 beforeEach(() => localStorage.clear())
@@ -20,7 +19,6 @@ it('maps only the animated themes to a background', () => {
   expect(backgroundFor('classic')).toBe('driftclouds')
   expect(backgroundFor('vaporwave')).toBe('qix')
   expect(backgroundFor('terafox')).toBe('hextrail')
-  expect(backgroundFor('terafox-coral')).toBe('coral')
   expect(backgroundFor('synthwave')).toBe('neon')
   expect(backgroundFor('everforest')).toBe(null)
 })
@@ -60,7 +58,6 @@ it('stores every background together and repairs bad values', () => {
     'hextrail',
     'neon',
     'driftclouds',
-    'coral',
     'version',
   ])
 })
@@ -344,42 +341,6 @@ it('lowers the shader quality while a draw is slow and gives up only at the lowe
   //at the lowest size a slowish draw is put up with, a hopeless one is not
   expect(adapt(0.3, 30)).toBe(0.3)
   expect(adapt(0.3, 60)).toBe(null)
-})
-
-it('grows coral from its seeds: every cell that freezes touches coral, and the walkers run out', () => {
-  const cols = 40
-  const rows = 30
-  const set = new Set()
-  const plots = []
-  const growth = reef(cols, rows, { seeds: 3, density: 25 }, random(7), (x, y, shade) => {
-    plots.push([x, y, shade])
-    set.add(y * cols + x)
-  })
-  const seeds = plots.length
-  expect(seeds).toBeGreaterThan(0)
-  expect(growth.total).toBe(300)
-  let steps = 0
-  while (growth.step() && steps++ < 20000);
-  expect(growth.left()).toBe(0)
-  //nothing freezes twice, and all but the seeds joined something already there
-  expect(set.size).toBe(plots.length)
-  const seen = new Set()
-  plots.forEach(([x, y], k) => {
-    if (k >= seeds) {
-      const near = [-1, 0, 1].some((dy) =>
-        [-1, 0, 1].some((dx) => (dx || dy) && seen.has((y + dy) * cols + x + dx)),
-      )
-      expect(near).toBe(true)
-    }
-    seen.add(y * cols + x)
-  })
-  //shades only move forward as it grows
-  expect(plots.every(([, , shade], k) => k === 0 || shade >= plots[k - 1][2])).toBe(true)
-})
-
-it('fades the coral toward the ground as its strength drops', () => {
-  expect(ramp(['#ffffff', '#ffffff'], 1, 2)).toEqual(['rgb(255 255 255)', 'rgb(255 255 255)'])
-  expect(ramp(['#ffffff', '#ffffff'], 0, 2)).toEqual(['rgb(15 28 30)', 'rgb(15 28 30)'])
 })
 
 it('gives the new defaults once to settings saved before them, then keeps what is chosen', () => {

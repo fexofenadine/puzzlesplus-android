@@ -1,4 +1,4 @@
-#the same lost expert minesweeper board in all nine themes, maximised in 1280x640, for the banner's strips
+#the same lost expert minesweeper board in all eight themes, maximised in 1280x640, for the banner's strips
 #every glitch on and every background at its finest; each theme keeps the frame busiest in its own strip
 #py -3 -I docs/banner/strips.py, from the repo's root with the dev server on localhost:5173
 import json, os, random, sys
@@ -10,13 +10,13 @@ OUT = os.path.join('docs', 'banner', 'strips')
 W, H, MINES = 30, 16, 99
 #left to right as the banner has them
 THEMES = ['vaporwave', 'classic', 'solarized', 'terafox', 'nord', 'solarized-phosphor',
-          'terafox-coral', 'synthwave', 'matrix']
+          'synthwave', 'matrix']
 SIZE = (1280, 640)
 #every glitch on (signal drops are the only one off by default), finest background settings
 EFFECTS = json.dumps({'drop': True})
 BACKGROUNDS = json.dumps({'version': 2, 'neon': {'resolution': 100},
                           'driftclouds': {'animated': True, 'resolution': 100}, 'substrate': {'detail': 'sharp'}})
-WAITS = {'terafox': 25000, 'terafox-coral': 30000, 'nord': 12000, 'matrix': 20000}
+WAITS = {'terafox': 25000, 'nord': 12000, 'matrix': 20000}
 #the shader's scene and the rain change a lot over time, so they get more tries
 FRAMES = {'synthwave': 60, 'matrix': 80}
 #names given on the command line retake only those themes

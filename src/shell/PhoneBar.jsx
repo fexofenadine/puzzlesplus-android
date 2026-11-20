@@ -19,7 +19,6 @@ import solarized from './chips/solarized.webp'
 import phosphor from './chips/solarized-phosphor.webp'
 import vaporwave from './chips/vaporwave.webp'
 import terafox from './chips/terafox.webp'
-import terafoxCoral from './chips/terafox-coral.webp'
 
 //material symbols paths (apache 2.0)
 const MENU = 'M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z'
@@ -55,7 +54,6 @@ const themeChips = [
   ['solarized-phosphor', 'Phosphor', phosphor],
   ['vaporwave', 'Vaporwave', vaporwave],
   ['terafox', 'Terafox', terafox],
-  ['terafox-coral', 'Coral', terafoxCoral],
 ]
 
 //more material symbols: today, redo, link, save alt

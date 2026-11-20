@@ -25,7 +25,8 @@ it('paints every theme but classic as animated until told otherwise', () => {
     expect(paint(theme)).toBe(theme === 'classic' ? undefined : 'animated')
   }
   expect(paint('everforest')).toBe('animated')
-  expect(root.dataset.theme).toBe('terafox-coral')
+  expect(paint('terafox-coral')).toBe('animated')
+  expect(root.dataset.theme).toBe('terafox')
 })
 
 it('keeps the wallpaper for a background that was switched off', () => {

@@ -1,4 +1,4 @@
-#stitches the nine theme pictures into one 1280x640 background, each theme an equal vertical strip
+#stitches the eight theme pictures into one 1280x640 background, each theme an equal vertical strip
 #each picture is shifted and scaled a hair so its minefield lands where the others' do
 #py -3 -I docs/banner/stitch.py, from the repo's root after strips.py
 import json, os
@@ -7,7 +7,7 @@ from PIL import Image
 DIR = os.path.join('docs', 'banner')
 #left to right, look-alike themes kept apart
 THEMES = ['vaporwave', 'classic', 'solarized', 'terafox', 'nord', 'solarized-phosphor',
-          'terafox-coral', 'synthwave', 'matrix']
+          'synthwave', 'matrix']
 SIZE = (1280, 640)
 
 fields = json.load(open(os.path.join(DIR, 'strips', 'fields.json')))
