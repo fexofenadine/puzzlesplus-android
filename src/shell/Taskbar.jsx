@@ -27,7 +27,8 @@ export const icons = {
   futoshiki,
   bridges,
 }
-export { help }
+//the phone bar of the android app draws the book too
+export { book, help }
 
 const REPO = 'https://github.com/fexofenadine/puzzlesplus'
 
