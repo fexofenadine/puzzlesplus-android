@@ -1,7 +1,7 @@
 #retakes the readme's pictures (docs/screenshots) and the link previews (public/<game>/<game>.jpg)
 #from a dev server at localhost:5173, in playwright's firefox with webgl2 switched on
 #usage: py -3 -I docs/screenshots.py . [shot names...], from the repo's root with yarn start running
-import json, os, subprocess, sys
+import json, os, subprocess, sys, time
 from playwright.sync_api import sync_playwright
 
 OUT = sys.argv[1]
@@ -25,11 +25,24 @@ def ctx(b, theme, store=None, size=(1200, 675), scale=1, touch=False):
                       'sessionStorage.setItem("seeded", "1") }' + INIT)
     return c
 
+#how long an animated background runs before a picture is taken (the user's rule): the rain and the shader are
+#well under way after a minute (waited for at once), and terafox has a lot of hexagons on screen at 20 to 25
+#seconds, which until() waits for just before the picture, since they fade again later
+SETTLE = {'matrix': 60000, 'synthwave': 60000}
+
 def open_page(b, theme, path, store=None, **kw):
     pg = ctx(b, theme, store, **kw).new_page()
     pg.goto(BASE + path)
+    pg.opened = time.time()
     pg.wait_for_timeout(2500)
+    #a background switched off is a still picture, nothing to wait for
+    if 'animated\\": false' not in json.dumps(store or {}):
+        pg.wait_for_timeout(SETTLE.get(theme, 0))
     return pg
+
+#waits until the page has been open this many seconds
+def until(pg, seconds):
+    pg.wait_for_timeout(max(0, int((pg.opened + seconds - time.time()) * 1000)))
 
 def menu(pg, name, item):
     pg.locator(f'[data-name="{name}"]').first.click()
@@ -158,9 +171,7 @@ def nord_nonograms(b):
     pg = open_page(b, 'nord', 'nonograms/', {'nonograms.size': '25', 'nonograms.level': '3', 'maximised': 'yes'})
     play(pg, 'nonograms', 90)
     pg.locator('[data-name="display"]').first.click()
-    pg.wait_for_timeout(150)
-    pg.get_by_role('button', name='Theme', exact=True).first.hover()
-    pg.wait_for_timeout(200)
+    pg.wait_for_timeout(300)
     animated(pg, 'docs/screenshots/nord-nonograms.webp')
 
 @shot
@@ -189,7 +200,7 @@ def phosphor_open_games(b):
 @shot
 def guide(b):
     pg = open_page(b, 'terafox', 'takuzu/guide/#gaps')
-    pg.wait_for_timeout(1500)
+    until(pg, 22)
     still(pg, 'docs/screenshots/guide.jpg')
 
 @shot
@@ -243,11 +254,11 @@ def vaporwave_2048(b):
 @shot
 def terafox_futoshiki(b):
     pg = open_page(b, 'terafox', 'futoshiki/', {'futoshiki.size': '6'})
-    pg.wait_for_timeout(20000)
     play(pg, 'futoshiki', 12)
     pg.keyboard.press('h')
     pg.wait_for_timeout(300)
     pg.mouse.move(5, 5)
+    until(pg, 21)
     animated(pg, 'docs/screenshots/terafox-futoshiki.webp')
 
 @shot

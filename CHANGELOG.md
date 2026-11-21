@@ -6,14 +6,24 @@ Every version has its release date under it, as DD/MM/YYYY (Sydney time). Newest
 
 ## Unreleased
 
-Changes since 2.0.0, to go into the next release. Its date is added when it ships.
+Nothing yet. A version's date is added when it ships.
+
+## 2.1.0
+
+22/11/2026
+
+Themes at the top of the Display menu, a new order for the games, and a clearer Synthwave picture.
+
+### Added
 
 - The About boxes show the version, the release date and a link to this changelog
-- The Android debug app no longer claims the website's links, so the site can be tested from a phone (the release app still opens them)
-- The themes are at the top of the Display menu, in alphabetical order, each with a small picture beside it (the Android theme picker is alphabetical too)
+
+### Changed
+
+- The themes are at the top of the Display menu, in alphabetical order, each with a small picture beside it. The Android theme picker is alphabetical too
 - Synthwave's picture is a glowing neon sun over a grid on black, easier to pick out at a glance
 - The games are listed in a new order everywhere (taskbar, menus, Open Games, the home page, the guides and the README): Minesweeper, Takuzu, Sudoku, Futoshiki, Nonograms, Light Up, Bridges, 2048
-- A steadier Sudoku test on a busy machine
+- The Android debug app no longer claims the website's links, so the site can be tested from a phone (the release app still opens them)
 
 ## 2.0.0
 
