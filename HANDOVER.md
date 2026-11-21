@@ -12,7 +12,7 @@ There are two repositories, and the app is mostly the website.
 
 | Repo | Folder | What it is |
 | --- | --- | --- |
-| `fexofenadine/puzzlesplus` | `projects/puzzlesplus` | The website: seven puzzle games in a Windows 95 style, written in JavaScript with Hyperapp 1 and built with Vite. |
+| `fexofenadine/puzzlesplus` | `projects/puzzlesplus` | The website: eight puzzle games in a Windows 95 style, written in JavaScript with Hyperapp 1 and built with Vite. |
 | `fexofenadine/puzzlesplus-android` | `projects/puzzlesplus-android` | A copy of the website repo, plus a thin phone layer and the Android project that packages it. |
 
 GitHub won't fork a repo into the account that owns it, so the Android repo is a plain clone, not a
