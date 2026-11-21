@@ -29,7 +29,7 @@ def hints(pg, steps):
     for _ in range(steps):
         key(pg, 'h')
         try:
-            pg.hit('[class*=hintPlace]')
+            pg.hit('[class*=hintPlace], [class*=BridgesCell_ghost]')
         except RuntimeError:
             break
         time.sleep(0.3)
@@ -110,6 +110,16 @@ def nonograms_matrix(pg):
     key(pg, 'h')
     time.sleep(1.5)
     save('nonograms-matrix')
+    return pg
+
+
+@shot
+def bridges_vaporwave(pg):
+    pg = go(pg, 'bridges/index.html', {'theme': 'vaporwave', 'bridges.size': '7'})
+    hints(pg, 5)
+    key(pg, 'h')
+    time.sleep(1.5)
+    save('bridges-vaporwave')
     return pg
 
 

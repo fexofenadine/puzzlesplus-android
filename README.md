@@ -6,11 +6,11 @@
 
 **[Download the latest release](https://github.com/fexofenadine/puzzlesplus-android/releases/latest)**
 
-| Minesweeper on Classic                                          | Synthwave, with a hint                                              | Nonograms on Matrix, with a hint                                 | The menu                             |
-| --------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------ |
-| ![Minesweeper on Classic](docs/android/minesweeper-classic.jpg) | ![Minesweeper on Synthwave](docs/android/minesweeper-synthwave.jpg) | ![Nonograms on Matrix](docs/android/nonograms-matrix.jpg)        | ![The menu](docs/android/drawer.jpg) |
-| **Options**                                                     | **The live wallpaper, Synthwave, on the home screen**               | **The wallpaper's settings**                                     |                                      |
-| ![Options](docs/android/options.jpg)                            | ![The live wallpaper](docs/android/wallpaper-home.jpg)              | ![The wallpaper's settings](docs/android/wallpaper-settings.jpg) |                                      |
+| Minesweeper on Classic                                          | Synthwave, with a hint                                              | Nonograms on Matrix, with a hint                                 | The menu                                                    |
+| --------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------- |
+| ![Minesweeper on Classic](docs/android/minesweeper-classic.jpg) | ![Minesweeper on Synthwave](docs/android/minesweeper-synthwave.jpg) | ![Nonograms on Matrix](docs/android/nonograms-matrix.jpg)        | ![The menu](docs/android/drawer.jpg)                        |
+| **Options**                                                     | **The live wallpaper, Synthwave, on the home screen**               | **The wallpaper's settings**                                     | **Bridges on Vaporwave, with a hint**                       |
+| ![Options](docs/android/options.jpg)                            | ![The live wallpaper](docs/android/wallpaper-home.jpg)              | ![The wallpaper's settings](docs/android/wallpaper-settings.jpg) | ![Bridges on Vaporwave](docs/android/bridges-vaporwave.jpg) |
 
 ## Installing
 
