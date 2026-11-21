@@ -54,23 +54,16 @@
         color: #0000ff;
       }
 
-      /*neon outline with the chromatic split and vhs scanlines*/
+      /*a striped neon sun over a horizon and a grid floor, glowing against black, under vhs scanlines*/
       #synthwave {
-        background-image: url(../../../synthwave.webp);
-        background-size: 300%;
-        background-position: 50% 45%;
+        background: #000;
       }
-      #synthwave span {
-        font: 900 22px sans-serif;
-        color: #fff;
-        text-shadow:
-          0 0 2px #ff7edb,
-          0 0 5px #f92aad,
-          -1px 0 0 #36f9f6,
-          1px 0 0 #f92aad;
+      #synthwave svg {
+        width: 40px;
+        height: 40px;
       }
       #synthwave::after {
-        background: repeating-linear-gradient(rgba(0, 0, 0, 0.3) 0 1px, transparent 1px 3px);
+        background: repeating-linear-gradient(rgba(0, 0, 0, 0.35) 0 1px, transparent 1px 3px);
       }
 
       /*a rain glyph, mirrored and glowing like the rain's own, under crt scanlines*/
@@ -173,7 +166,37 @@
   </head>
   <body>
     <div class="chip" id="classic"><span>1</span></div>
-    <div class="chip" id="synthwave"><span>△</span></div>
+    <svg width="0" height="0">
+      <defs>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.1" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ff9a3c" />
+          <stop offset=".55" stop-color="#ff2e97" />
+          <stop offset="1" stop-color="#8a1fff" />
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="chip" id="synthwave">
+      <svg viewBox="0 0 40 40">
+        <g filter="url(#glow)">
+          <path d="M8 24 A12 12 0 0 1 32 24 Z" fill="url(#sun)" opacity=".92" />
+          <path d="M6 20 H34 M6 22.2 H34 M6 24 H34" stroke="#000" stroke-width="1.1" />
+          <path d="M2 24 H38" stroke="#25f4ee" stroke-width="1.5" />
+          <path
+            d="M1 29 H39 M0 34 H40 M20 24 V40 M20 24 L10 40 M20 24 L30 40 M20 24 L0 38 M20 24 L40 38"
+            stroke="#a45cff"
+            stroke-width=".9"
+          />
+        </g>
+      </svg>
+    </div>
     <div class="chip" id="matrix"><span>ｼ</span></div>
     <div class="chip" id="nord"><span>ᚾ</span></div>
     <div class="chip" id="solarized"><span>☼</span></div>
