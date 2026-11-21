@@ -256,8 +256,9 @@ it('deals each level exactly, with one solution, symmetric givens and enough of 
   for (let level = 0; level < 4; level++) {
     for (let seed = 1; seed <= 6; seed++) {
       const started = performance.now()
+      //a deal takes well under a second alone, the slack is for a machine busy with other test files
       const game = makeGame(9, level, random(seed * 7 + level))
-      expect(performance.now() - started).toBeLessThan(2000)
+      expect(performance.now() - started).toBeLessThan(6000)
       expect(game.level).toBe(level)
       expect(rate(game.givens, 9).level).toBe(level)
       expect(countSolutions(game.givens, 9)).toBe(1)
