@@ -6,7 +6,9 @@ Every version has its release date under it, as DD/MM/YYYY (Sydney time). Newest
 
 ## Unreleased
 
-Nothing yet. A version's date is added when it ships.
+A version's date is added when it ships.
+
+- The Android live wallpaper no longer drifts with the home screens at first. It is the **Drift with the home screens** switch in the wallpaper's settings, and a copy that already has it on keeps it until it is switched off
 
 ## 2.1.0
 

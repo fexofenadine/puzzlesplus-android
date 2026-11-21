@@ -10,7 +10,8 @@ export const rates = [
   [0, 'As the screen allows'],
 ]
 
-const defaultOptions = () => ({ random: false, minutes: 5, fps: 60, drift: true })
+//drift is off at first: the background staying put as the home screens slide was found distracting
+const defaultOptions = () => ({ random: false, minutes: 5, fps: 60, drift: false })
 
 export const loadOptions = () => {
   const options = defaultOptions()

@@ -1,6 +1,33 @@
 # Roadmap
 
-What is planned for Puzzles Plus, the website and the [Android app](https://github.com/fexofenadine/puzzlesplus-android). The website, the app and the [screensaver](https://github.com/fexofenadine/puzzlesplus-screensaver) are all at 2.0.0 (released 2026-11-21). Nothing is planned for the next milestone yet.
+What is planned for Puzzles Plus, the website and the [Android app](https://github.com/fexofenadine/puzzlesplus-android). The website, the app and the [screensaver](https://github.com/fexofenadine/puzzlesplus-screensaver) are all at 2.1.0 (released 2026-11-22). The next milestone is 2.5.0, sound and music.
+
+## 2.5.0 (planned)
+
+**Theme of the release:** sound and music, mostly music: background music, and music for wins and losses.
+
+Off by default, so the games stay as quiet as they are now until someone turns it on.
+
+### Planned
+
+- [ ] **Background music (BGM)**: looping music while a game is open, one track per theme or a shared playlist, starting after the first press (browsers do not allow sound before one)
+- [ ] **Win music** and **loss music** for every game, short and in the theme's style (2048's target tile and Minesweeper's loss included)
+- [ ] **Sound settings**: music on or off and its volume, in the Display menu on the web and the options sheet on Android, saved like the other settings. Quiet under the pause cover, the boss key and a hidden tab, and it follows the phone's silent mode on Android
+- [ ] The music files are **bundled with the app and the page** and play offline
+
+### To decide
+
+- Where the music comes from. Settled limits below; within them it could be composed by the owner or taken from a source whose licence allows it (CC0, or one that only needs a credit line, which goes into the About box credits and the README)
+- A style for each theme (Synthwave, Vaporwave and Matrix suggest themselves), and whether Classic stays silent to match the original
+- A size budget for the music files, since the site is meant to stay small and offline (audio compresses well as Opus or MP3)
+- Whether the live wallpaper and the screensaver stay silent (suggested: yes)
+
+### Settled
+
+- No AI features, so no generated music
+- Nothing streamed or loaded from another site: every file is in the project
+- Off by default, and never starts by itself without a press
+- No version bump until 2.5.0 is ready
 
 ## 2.0.0 (released 2026-11-21)
 
@@ -39,7 +66,6 @@ Suggestions, none of them agreed. An idea moves up to Planned once it is picked.
 - [ ] A game number to type in, beside Copy Link
 - [ ] Guided lessons: a guide example that can be played through step by step
 - [ ] Printable puzzles
-- [ ] Sounds, off by default, bundled with the page
 
 **Desktop and themes**
 
