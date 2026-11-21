@@ -3,6 +3,7 @@ import s from './About.module.css'
 import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
+import { changelog, released, version } from './version'
 
 export const Link = ({ href }, children) => (
   <a class={s.link} href={href} target="_blank" rel="noopener noreferrer">
@@ -31,6 +32,9 @@ const About = ({ key, name, actions, credits }, children) => (
           <Link href="https://github.com/fexofenadine/puzzlesplus">
             github.com/fexofenadine/puzzlesplus
           </Link>
+        </p>
+        <p>
+          Version {version}, released {released}. <Link href={changelog}>Changelog</Link>
         </p>
         <details class={s.credits}>
           <summary>Credits</summary>
