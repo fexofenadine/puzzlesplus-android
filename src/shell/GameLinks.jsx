@@ -10,6 +10,7 @@ export const games = [
   ['2048', '2048'],
   ['lightup', 'Light Up'],
   ['futoshiki', 'Futoshiki'],
+  ['bridges', 'Bridges'],
 ]
 
 //every game's page for the game menu, the open one checked

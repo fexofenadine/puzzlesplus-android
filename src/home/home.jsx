@@ -26,6 +26,7 @@ const about = {
   2048: 'Slide the tiles and merge equal ones to make 2048, and go on from there.',
   lightup: 'Place bulbs to light every square, never two bulbs lighting each other.',
   futoshiki: 'A Latin square with greater and less than signs between some of its cells.',
+  bridges: 'Join the islands with bridges until every island has its number and all are connected.',
 }
 
 const Card = ({ id, title }) => (
@@ -72,7 +73,7 @@ export const startHome = () => {
             <div class={s.panel}>
               <h2 class={s.heading}>Choose a game</h2>
               <p class={s.lead}>
-                Seven puzzles with hints that explain their reasoning, in eight themes.
+                Eight puzzles with hints that explain their reasoning, in eight themes.
               </p>
               {state.last && (
                 <ul class={`${s.cards} ${s.continue}`} aria-label="Continue">

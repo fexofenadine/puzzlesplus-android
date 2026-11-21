@@ -10,7 +10,7 @@ import PhoneMenu, { look } from './PhoneMenu'
 import OpenGames from '../shell/OpenGames'
 import { load, remove, save } from '../shell/storage'
 import { records } from '../shell/records'
-import { tally } from '../shell/stats'
+import { tally, timeOf } from '../shell/stats'
 import {
   gameKey,
   historyKey,
@@ -199,7 +199,13 @@ const changed = (state, board, history, actions, settled = false) => {
   if (next.win) {
     stopTick(next.raf)
     celebrate()
-    if (!state.game.win) tally('takuzu', { won: true, clean: !next.hinted })
+    if (!state.game.win)
+      tally('takuzu', {
+        won: true,
+        clean: !next.hinted,
+        time: timeOf(state.timer, next),
+        level: saved.label(next),
+      })
     finish('takuzu', state, next, actions)
   }
   const stuck = !next.win && full(board)

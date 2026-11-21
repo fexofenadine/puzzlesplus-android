@@ -41,6 +41,12 @@ def menu(pg, name, item):
 def hint_step(pg, game):
     pg.keyboard.press('h')
     pg.wait_for_timeout(120)
+    if game == 'bridges':
+        ghost = pg.locator('[class*=BridgesCell_ghost]')
+        if not ghost.count(): return False
+        ghost.first.click()
+        pg.wait_for_timeout(40)
+        return True
     cells = pg.locator('[class*=hintPlace]')
     for k in range(cells.count()):
         cell = cells.nth(k)
@@ -262,6 +268,7 @@ PREVIEWS = {
     '2048': ('classic', {}, 0),
     'lightup': ('classic', {'lightup.size': '10', 'scale': '1.5'}, 6),
     'futoshiki': ('classic', {'futoshiki.size': '5', 'scale': '1.5'}, 6),
+    'bridges': ('classic', {'bridges.size': '10', 'scale': '1.25'}, 12),
 }
 
 for game, (theme, store, steps) in PREVIEWS.items():

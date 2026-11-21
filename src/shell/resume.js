@@ -153,7 +153,7 @@ export const resumable = ({ key, running, pack, unpack, label = () => '', fresh 
     return linked || kept
   }
 
-  return { keep, restore, open, list, actions }
+  return { keep, restore, open, list, label, actions }
 }
 
 //a check for unpack, so a save from another version is dropped instead of half used

@@ -1,0 +1,148 @@
+/*islands in each theme's darkest tone, bridges in its text colour*/
+:global(:root) {
+  --br-island: var(--dark-shadow);
+  --br-island-text: var(--title-text);
+  --br-bridge: var(--text);
+}
+
+/*matrix's islands would vanish into its black cells' lines, so they are a dim green*/
+:global(:root[data-theme='matrix']) {
+  --br-island: #145c2a;
+}
+
+/*terafox's darkest tone is its open cells' neighbour, so its islands go darker still*/
+:global(:root[data-theme='terafox']) {
+  --br-island: #060d0e;
+}
+
+.root {
+  position: relative;
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  font: bold 15px/26px var(--digit-font, var(--text-font));
+  text-align: center;
+  cursor: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*water lies flat like an opened cell in minesweeper*/
+.water {
+  composes: root;
+  background: var(--cell-open, var(--cell));
+  box-shadow: inset 1px 1px 0 var(--grid-line, var(--cell-shadow));
+}
+
+/*a disc a little smaller than its cell, the bridges meet it from every side*/
+.island {
+  composes: root;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  color: var(--br-island-text);
+  background: var(--cell-open, var(--cell));
+  background-image: radial-gradient(circle, var(--br-island) 0 11px, transparent 11.5px);
+  box-shadow: inset 1px 1px 0 var(--grid-line, var(--cell-shadow));
+}
+
+/*all its bridges: the number fades*/
+.done {
+  color: color-mix(in srgb, var(--br-island-text) 45%, var(--br-island));
+}
+
+/*too many bridges, or no way left to its number*/
+.islandError {
+  color: #fff;
+  background-image: radial-gradient(circle, #c62828 0 11px, transparent 11.5px);
+}
+
+/*the island clicked first, waiting for a second*/
+.selected {
+  outline: 2px solid var(--highlight);
+  outline-offset: -2px;
+  border-radius: 50%;
+}
+
+/*where the arrow keys are*/
+.cursor {
+  outline: 2px solid var(--highlight);
+  outline-offset: -1px;
+  border-radius: 50%;
+}
+
+.water.cursor {
+  border-radius: 0;
+}
+
+/*bridges are one or two lines through the middle of a cell*/
+.acrossOne {
+  background-image: linear-gradient(var(--br-bridge), var(--br-bridge));
+  background-position: center;
+  background-size: 100% 3px;
+  background-repeat: no-repeat;
+}
+
+.acrossTwo {
+  background-image:
+    linear-gradient(var(--br-bridge), var(--br-bridge)),
+    linear-gradient(var(--br-bridge), var(--br-bridge));
+  background-position:
+    0 7px,
+    0 16px;
+  background-size: 100% 3px;
+  background-repeat: no-repeat;
+}
+
+.downOne {
+  background-image: linear-gradient(var(--br-bridge), var(--br-bridge));
+  background-position: center;
+  background-size: 3px 100%;
+  background-repeat: no-repeat;
+}
+
+.downTwo {
+  background-image:
+    linear-gradient(var(--br-bridge), var(--br-bridge)),
+    linear-gradient(var(--br-bridge), var(--br-bridge));
+  background-position:
+    7px 0,
+    16px 0;
+  background-size: 3px 100%;
+  background-repeat: no-repeat;
+}
+
+/*a hint's bridge shows faintly until it is built*/
+.ghost {
+  --br-bridge: color-mix(in srgb, #12d12a 60%, transparent);
+}
+
+.wrongBridge {
+  --br-bridge: #ff3b3b;
+}
+
+/*a link a hint rules out: a small cross in its middle cell*/
+.none::after {
+  position: absolute;
+  inset: 8px;
+  font: bold 12px/10px var(--text-font);
+  color: #ff3b3b;
+  content: '×';
+  opacity: 0.8;
+}
+
+/*hint outlines, the same colours minesweeper uses*/
+
+.hintSource {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #2e8bff;
+}
+
+.hintWrong {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #ff3b3b;
+}

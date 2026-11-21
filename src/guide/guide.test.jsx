@@ -27,6 +27,19 @@ import {
   solved as futoshikiSolved,
 } from './futoshiki'
 import { solved as futoshikiIsSolved } from '../futoshiki/rules'
+import {
+  boardOf as bridgesBoard,
+  easiest as bridgesEasiest,
+  exampleStep as bridgesStep,
+} from './BridgesExample'
+import {
+  examples as bridgesExamples,
+  parts as bridgesParts,
+  solved as bridgesSolved,
+} from './bridges'
+import { solved as bridgesIsSolved } from '../bridges/rules'
+import { countSolutions as bridgesCount } from '../bridges/solver'
+import { guideTopic as bridgesTopic } from '../bridges/hint'
 import { countSolutions as futoshikiCount } from '../futoshiki/solver'
 import { guideTopic as futoshikiTopic } from '../futoshiki/hint'
 
@@ -100,6 +113,20 @@ it('reaches every futoshiki technique in its example before any digit can be pla
   expect(futoshikiIsSolved(puzzle.givens, puzzle)).toBe(true)
 })
 
+it('reaches every bridges technique in its example before any other bridge can be placed', () => {
+  for (const [technique, rows] of Object.entries(bridgesExamples)) {
+    expect(bridgesStep(rows, technique), technique).toBeTruthy()
+    expect(bridgesEasiest(rows), technique).toBeTruthy()
+    expect(ids(bridgesParts)).toContain(bridgesTopic({ kind: technique }))
+    //each is a real puzzle part way through: one answer
+    const { islands, n } = bridgesBoard(rows)
+    expect(bridgesCount(islands, n), technique).toBe(1)
+  }
+  expect(ids(bridgesParts)).toContain('mistakes')
+  const { islands, n, board } = bridgesBoard(bridgesSolved)
+  expect(bridgesIsSolved(islands, n, board)).toBe(true)
+})
+
 //every hint a game gives lands on a section of its guide
 it('has a section for every topic a hint can link to', () => {
   const minesTopics = ['wrong-flags', 'chording', 'guessing', 'first-click', 'mine-counter']
@@ -117,6 +144,7 @@ it('renders every guide without crashing', async () => {
     twentyParts,
     lightParts,
     futoshikiParts,
+    bridgesParts,
     howToParts,
   ]) {
     const container = document.createElement('div')

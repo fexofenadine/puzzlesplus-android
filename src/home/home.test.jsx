@@ -25,6 +25,7 @@ it('lists every game with its guide', async () => {
     '2048',
     'lightup',
     'futoshiki',
+    'bridges',
   ]) {
     expect(hrefs).toContain(`${id}/`)
     expect(hrefs).toContain(`${id}/guide/`)

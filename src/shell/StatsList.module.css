@@ -48,3 +48,22 @@
   font-size: 0.85em;
   opacity: 0.7;
 }
+
+/*average time by board, scrolling when many are played*/
+.boards {
+  display: grid;
+  gap: 1px 16px;
+  max-height: 7.5em;
+  margin: 8px 0 0;
+  overflow-y: auto;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+}
+
+.board span:not(:first-child) {
+  text-align: right;
+}

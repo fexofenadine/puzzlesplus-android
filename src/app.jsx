@@ -18,7 +18,15 @@ import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './shell/storage'
 import { listen, shellActions, shellState, shortcut } from './shell/actions'
-import { clearStats, lossActions, lossesOn, lossState, readStats, tally } from './shell/stats'
+import {
+  clearStats,
+  lossActions,
+  lossesOn,
+  lossState,
+  readStats,
+  tally,
+  timeOf,
+} from './shell/stats'
 import {
   clock,
   loadTimer,
@@ -447,7 +455,7 @@ export const actions = {
     },
   up:
     () =>
-    ({ game, safeStart, noGuess }, actions) => {
+    ({ game, safeStart, noGuess, timer }, actions) => {
       window.removeEventListener('mouseup', actions.up)
       const { width, height, pressedX, pressedY } = game
       if (game.win || game.lose || game.paused || pressedX < 0 || pressedY < 0) {
@@ -520,7 +528,12 @@ export const actions = {
       const win = left <= 0
       if (win || lose) {
         stopTick(game.raf)
-        tally('minesweeper', { won: !lose, clean: !game.hinted })
+        tally('minesweeper', {
+          won: !lose,
+          clean: !game.hinted,
+          time: timeOf(timer, { ...game, time: begin ? 1 : game.time }),
+          level: saved.label(game),
+        })
         if (!lose) {
           celebrate('minesweeper')
           actions.win()

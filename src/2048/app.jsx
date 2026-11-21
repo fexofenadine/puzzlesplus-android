@@ -234,7 +234,7 @@ export const actions = {
     if (reached) {
       next.reached = true
       celebrate()
-      tally('2048', { won: true, clean: !assistedOf(next) })
+      tally('2048', { won: true, clean: !assistedOf(next), level: `${next.n} × ${next.n}` })
     }
     let winner = null
     if (next.over) {

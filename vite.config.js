@@ -54,6 +54,7 @@ const pages = {
   2048: '2048/index.html',
   lightup: 'lightup/index.html',
   futoshiki: 'futoshiki/index.html',
+  bridges: 'bridges/index.html',
   'minesweeper-guide': 'minesweeper/guide/index.html',
   'takuzu-guide': 'takuzu/guide/index.html',
   'nonograms-guide': 'nonograms/guide/index.html',
@@ -61,6 +62,7 @@ const pages = {
   '2048-guide': '2048/guide/index.html',
   'lightup-guide': 'lightup/guide/index.html',
   'futoshiki-guide': 'futoshiki/guide/index.html',
+  'bridges-guide': 'bridges/guide/index.html',
   'how-to-play': 'how-to-play/index.html',
 }
 

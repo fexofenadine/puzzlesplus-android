@@ -6,6 +6,7 @@ import { Rules as SudokuRules } from '../sudoku/HowToPlay'
 import { Rules as TwentyRules } from '../2048/HowToPlay'
 import { Rules as LightUpRules } from '../lightup/HowToPlay'
 import { Rules as FutoshikiRules } from '../futoshiki/HowToPlay'
+import { Rules as BridgesRules } from '../bridges/HowToPlay'
 import { Page } from './Guide'
 
 //the short rules of every game on one page, each with its game and full guide
@@ -32,6 +33,7 @@ export const parts = [
       game('2048', '2048', TwentyRules),
       game('lightup', 'Light Up', LightUpRules),
       game('futoshiki', 'Futoshiki', FutoshikiRules),
+      game('bridges', 'Bridges', BridgesRules),
       {
         id: 'shortcuts',
         title: 'Every game',

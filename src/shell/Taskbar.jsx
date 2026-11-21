@@ -12,11 +12,21 @@ import sudoku from './icons/sudoku.png'
 import twenty48 from './icons/2048.png'
 import lightup from './icons/lightup.png'
 import futoshiki from './icons/futoshiki.png'
+import bridges from './icons/bridges.png'
 import help from './icons/help.svg'
 import book from './icons/book.svg'
 import home from './icons/home.svg'
 
-export const icons = { minesweeper, takuzu, nonograms, sudoku, 2048: twenty48, lightup, futoshiki }
+export const icons = {
+  minesweeper,
+  takuzu,
+  nonograms,
+  sudoku,
+  2048: twenty48,
+  lightup,
+  futoshiki,
+  bridges,
+}
 export { book, help }
 
 const REPO = 'https://github.com/fexofenadine/puzzlesplus'

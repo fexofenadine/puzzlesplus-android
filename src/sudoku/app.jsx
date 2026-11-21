@@ -10,7 +10,7 @@ import PhoneMenu from './PhoneMenu'
 import OpenGames from '../shell/OpenGames'
 import { load, save } from '../shell/storage'
 import { records } from '../shell/records'
-import { tally } from '../shell/stats'
+import { tally, timeOf } from '../shell/stats'
 import BestTimes from '../shell/BestTimes'
 import Prompt from '../shell/Prompt'
 import {
@@ -234,7 +234,13 @@ const changed = (state, board, notes, history, actions) => {
   if (next.win) {
     stopTick(next.raf)
     celebrate()
-    if (!state.game.win) tally('sudoku', { won: true, clean: !next.hinted })
+    if (!state.game.win)
+      tally('sudoku', {
+        won: true,
+        clean: !next.hinted,
+        time: timeOf(state.timer, next),
+        level: saved.label(next),
+      })
     finish('sudoku', state, next, actions, (won) =>
       actions.win({ ...won, n: won.layout ? jigsaw : won.n }),
     )

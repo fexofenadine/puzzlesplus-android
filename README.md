@@ -2,7 +2,7 @@
 
 # Puzzles Plus for Android
 
-**A live wallpaper for Android, and seven puzzle games to go with it.** Puzzles Plus brings the animated themes of the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) ([source](https://github.com/fexofenadine/puzzlesplus)) to your home screen: Synthwave's neon shader under VHS scanlines and glitches, Matrix code rain, Vaporwave's worn tape and the rest of its eight themes, drifting as you swipe between home screens, with the theme, background options, glitches and frame rate set to taste. The app is also the games themselves, in a Windows 95 style with hints that explain their reasoning and boards you can solve by logic alone: Minesweeper, Takuzu, Nonograms, Sudoku, 2048, Light Up and Futoshiki, with guides, best times and everything inside the app, so it plays offline.
+**A live wallpaper for Android, and eight puzzle games to go with it.** Puzzles Plus brings the animated themes of the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) ([source](https://github.com/fexofenadine/puzzlesplus)) to your home screen: Synthwave's neon shader under VHS scanlines and glitches, Matrix code rain, Vaporwave's worn tape and the rest of its eight themes, drifting as you swipe between home screens, with the theme, background options, glitches and frame rate set to taste. The app is also the games themselves, in a Windows 95 style with hints that explain their reasoning and boards you can solve by logic alone: Minesweeper, Takuzu, Nonograms, Sudoku, 2048, Light Up, Futoshiki and Bridges, with guides, best times and everything inside the app, so it plays offline.
 
 **[Download the latest release](https://github.com/fexofenadine/puzzlesplus-android/releases/latest)**
 
@@ -23,7 +23,7 @@ Android 6 or later. Each release lists its APK's SHA-256, so you can check the d
 ## On a phone
 
 - **The game fills the screen** between a top bar in the theme's colours (the menu, the game's name and its options) and a bottom bar with new game, hint, best times and pause; held sideways the two run down the sides. Wide boards turn on their side in portrait, and two fingers pinch a board bigger, with a button to fit it again.
-- **The menu** (the button at the top left) lists the seven games, any games you saved to resume later, the game's guide, how to play every game, Backup, Live wallpaper and About.
+- **The menu** (the button at the top left) lists the eight games, any games you saved to resume later, the game's guide, how to play every game, Backup, Live wallpaper and About.
 - **Options** (the button at the top right) hold the game's difficulty, size and options (Nonograms adds Procedural, Symmetric and Choose picture), then the eight themes, **Fireworks**, **Motion** (system, reduced or full), a slider for the window's opacity, Animated background, Hide window, Board without frame, the background settings and, on Synthwave, Vaporwave and Matrix, **Glitches**, which switches each screen effect on or off. The look follows the theme: Windows 95 on Classic, material design on the others.
 - **Fireworks** in the theme's colours go up when you win, until the next game starts.
 - **Live wallpaper**: any theme's animated background on the home screen, with its scanlines, tape look and glitches. Open it from the menu, or pick Puzzles Plus among the phone's live wallpapers. Its settings choose the theme or a random one every few minutes, the background's options, each glitch, the frame rate (60 fps at first) and a drift as you swipe between home screens. It draws nothing while an app covers the home screen or the screen is off.
@@ -32,7 +32,7 @@ Android 6 or later. Each release lists its APK's SHA-256, so you can check the d
 - **Resume**: a game in progress comes back paused after the app is closed, and a **Timer** option turns the clock off (and best times with it).
 - No taskbar, Start menu, boss key or window buttons: those belong to the website's desktop.
 
-Everything else, from the rules to every solving technique, is in each game's guide, in the app's menu or on the website: [Minesweeper](https://fexofenadine.github.io/puzzlesplus/minesweeper/guide/), [Takuzu](https://fexofenadine.github.io/puzzlesplus/takuzu/guide/), [Nonograms](https://fexofenadine.github.io/puzzlesplus/nonograms/guide/), [Sudoku](https://fexofenadine.github.io/puzzlesplus/sudoku/guide/), [2048](https://fexofenadine.github.io/puzzlesplus/2048/guide/), [Light Up](https://fexofenadine.github.io/puzzlesplus/lightup/guide/) and [Futoshiki](https://fexofenadine.github.io/puzzlesplus/futoshiki/guide/).
+Everything else, from the rules to every solving technique, is in each game's guide, in the app's menu or on the website: [Minesweeper](https://fexofenadine.github.io/puzzlesplus/minesweeper/guide/), [Takuzu](https://fexofenadine.github.io/puzzlesplus/takuzu/guide/), [Nonograms](https://fexofenadine.github.io/puzzlesplus/nonograms/guide/), [Sudoku](https://fexofenadine.github.io/puzzlesplus/sudoku/guide/), [2048](https://fexofenadine.github.io/puzzlesplus/2048/guide/), [Light Up](https://fexofenadine.github.io/puzzlesplus/lightup/guide/), [Futoshiki](https://fexofenadine.github.io/puzzlesplus/futoshiki/guide/) and [Bridges](https://fexofenadine.github.io/puzzlesplus/bridges/guide/).
 
 ## Building
 
