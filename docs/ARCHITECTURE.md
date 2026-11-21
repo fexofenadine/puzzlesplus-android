@@ -3,7 +3,7 @@
 How Puzzles Plus is put together, written for whoever works on it next. It grew a section at a time and
 is dense: **a code review pass should make it readable** (see `docs/handover/code-review-pass.md`).
 
-Eight games (Minesweeper, Takuzu, Nonograms, Sudoku, 2048, Light Up, Futoshiki and Bridges) share one
+Eight games (Minesweeper, Takuzu, Sudoku, Futoshiki, Nonograms, Light Up, Bridges and 2048) share one
 shell (`src/shell/`) that provides the window, taskbar, themes, backgrounds, zoom, pause, resume,
 records and the guides. Each game is a folder in `src/` with the same shape: `rules.js`, `solver.js`,
 `techniques.js`, `generate.js`, `hint.js`, `app.jsx` (state and actions), `Game.jsx`, `Cell.jsx`, `Menu.jsx`.

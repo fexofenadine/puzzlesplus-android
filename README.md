@@ -2,7 +2,7 @@
 
 # Puzzles Plus for Android
 
-**A live wallpaper for Android, and eight puzzle games to go with it.** Puzzles Plus brings the animated themes of the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) ([source](https://github.com/fexofenadine/puzzlesplus)) to your home screen: Synthwave's neon shader under VHS scanlines and glitches, Matrix code rain, Vaporwave's worn tape and the rest of its eight themes, drifting as you swipe between home screens, with the theme, background options, glitches and frame rate set to taste. The app is also the games themselves, in a Windows 95 style with hints that explain their reasoning and boards you can solve by logic alone: Minesweeper, Takuzu, Nonograms, Sudoku, 2048, Light Up, Futoshiki and Bridges, with guides, best times and everything inside the app, so it plays offline.
+**A live wallpaper for Android, and eight puzzle games to go with it.** Puzzles Plus brings the animated themes of the [Puzzles Plus website](https://fexofenadine.github.io/puzzlesplus/) ([source](https://github.com/fexofenadine/puzzlesplus)) to your home screen: Synthwave's neon shader under VHS scanlines and glitches, Matrix code rain, Vaporwave's worn tape and the rest of its eight themes, drifting as you swipe between home screens, with the theme, background options, glitches and frame rate set to taste. The app is also the games themselves, in a Windows 95 style with hints that explain their reasoning and boards you can solve by logic alone: Minesweeper, Takuzu, Sudoku, Futoshiki, Nonograms, Light Up, Bridges and 2048, with guides, best times and everything inside the app, so it plays offline.
 
 **[Download the latest release](https://github.com/fexofenadine/puzzlesplus-android/releases/latest)**
 
