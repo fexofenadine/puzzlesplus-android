@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <activity android:name=".MainActivity">
+
+            <!--the debug app leaves the website's links to the release app and the browser, so the site can be tested from a phone-->
+            <intent-filter android:autoVerify="true" tools:node="remove">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="fexofenadine.github.io" />
+                <data android:pathPrefix="/puzzlesplus" />
+            </intent-filter>
+
+        </activity>
+    </application>
+</manifest>
