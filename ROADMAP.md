@@ -21,7 +21,7 @@ What is planned for Puzzles Plus, the website and the [Android app](https://gith
 Things that shipped on a first reading and still want a second look.
 
 - [x] Vaporwave's Qix background: kept for now, options on offer if it changes
-- [ ] README pictures: check the rest still match after the 1.8 theme work (Classic's was retaken)
+- [x] README pictures: all retaken with the current look on 2026-11-21, with a Bridges animation and guide added
 
 ### Ideas
 

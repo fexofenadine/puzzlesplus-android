@@ -251,6 +251,21 @@ def terafox_futoshiki(b):
     animated(pg, 'docs/screenshots/terafox-futoshiki.webp')
 
 @shot
+def solarized_bridges(b):
+    pg = open_page(b, 'solarized', 'bridges/', {'bridges.size': '10'})
+    play(pg, 'bridges', 24)
+    pg.keyboard.press('h')
+    pg.wait_for_timeout(300)
+    pg.mouse.move(5, 5)
+    animated(pg, 'docs/screenshots/solarized-bridges.webp')
+
+@shot
+def bridges_guide(b):
+    pg = open_page(b, 'vaporwave', 'bridges/guide/#isolate')
+    pg.wait_for_timeout(1500)
+    still(pg, 'docs/screenshots/bridges-guide.jpg')
+
+@shot
 def portrait(b):
     pg = open_page(b, 'matrix', 'minesweeper/', {'level': 'expert',
         'backgrounds': json.dumps({'version': 2, 'matrix': {'animated': False}})}, size=(390, 844), scale=2, touch=True)
