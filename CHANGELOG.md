@@ -10,6 +10,9 @@ Changes since 2.0.0, to go into the next release. Its date is added when it ship
 
 - The About boxes show the version, the release date and a link to this changelog
 - The Android debug app no longer claims the website's links, so the site can be tested from a phone (the release app still opens them)
+- The themes are at the top of the Display menu, in alphabetical order, each with a small picture beside it (the Android theme picker is alphabetical too)
+- Synthwave's picture is a glowing neon sun over a grid on black, easier to pick out at a glance
+- The games are listed in a new order everywhere (taskbar, menus, Open Games, the home page, the guides and the README): Minesweeper, Takuzu, Sudoku, Futoshiki, Nonograms, Light Up, Bridges, 2048
 - A steadier Sudoku test on a busy machine
 
 ## 2.0.0

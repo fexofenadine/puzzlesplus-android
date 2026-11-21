@@ -104,6 +104,14 @@
   cursor: default;
 }
 
+/*a small picture before an item's name, the themes' in the display menu*/
+.icon {
+  display: inline-block;
+  margin: -4px 6px -4px 0;
+  vertical-align: middle;
+  border: 1px solid var(--shadow);
+}
+
 .hotKey {
   position: absolute;
   top: 2px;

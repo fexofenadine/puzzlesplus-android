@@ -28,12 +28,12 @@ export const parts = [
     sections: [
       game('minesweeper', 'Minesweeper', MinesweeperRules),
       game('takuzu', 'Takuzu', TakuzuRules),
-      game('nonograms', 'Nonograms', NonogramsRules),
       game('sudoku', 'Sudoku', SudokuRules),
-      game('2048', '2048', TwentyRules),
-      game('lightup', 'Light Up', LightUpRules),
       game('futoshiki', 'Futoshiki', FutoshikiRules),
+      game('nonograms', 'Nonograms', NonogramsRules),
+      game('lightup', 'Light Up', LightUpRules),
       game('bridges', 'Bridges', BridgesRules),
+      game('2048', '2048', TwentyRules),
       {
         id: 'shortcuts',
         title: 'Every game',

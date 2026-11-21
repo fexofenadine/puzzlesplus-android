@@ -6,6 +6,26 @@ import { isGame } from './actions'
 import { motions } from './motion'
 import { steps } from './zoom'
 import { effectsOf } from './glitches'
+import classic from './chips/classic.webp'
+import matrix from './chips/matrix.webp'
+import nord from './chips/nord.webp'
+import solarized from './chips/solarized.webp'
+import phosphor from './chips/solarized-phosphor.webp'
+import synthwave from './chips/synthwave.webp'
+import terafox from './chips/terafox.webp'
+import vaporwave from './chips/vaporwave.webp'
+
+//a small picture of each theme, drawn by chips/source/chips.py
+const pictures = {
+  classic,
+  matrix,
+  nord,
+  solarized,
+  'solarized-phosphor': phosphor,
+  synthwave,
+  terafox,
+  vaporwave,
+}
 
 //zoom and maximise, which only game windows have
 const zoomItems = (state, actions) => {
@@ -38,15 +58,15 @@ const zoomItems = (state, actions) => {
 const DisplayMenu = ({ state, actions }, children) => (
   <MenuItem name="Display" type="display" active={state.menu} onChange={actions.toggleMenu}>
     {isGame(state.page) && zoomItems(state, actions)}
-    <SubMenuItem name="Theme">
-      {themes.map(([theme, name]) => (
-        <SubMenuItem
-          name={name}
-          checked={state.theme === theme}
-          onClick={() => actions.setTheme(theme)}
-        />
-      ))}
-    </SubMenuItem>
+    {themes.map(([theme, name]) => (
+      <SubMenuItem
+        name={name}
+        icon={pictures[theme]}
+        checked={state.theme === theme}
+        onClick={() => actions.setTheme(theme)}
+      />
+    ))}
+    <Separator />
     <SubMenuItem name="Motion">
       {motions.map(([motion, name]) => (
         <SubMenuItem

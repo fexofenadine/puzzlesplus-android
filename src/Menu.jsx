@@ -5,7 +5,7 @@ import { resumeItems } from './shell/ResumeItems'
 import { gameLinks } from './shell/GameLinks'
 import { HelpMenu } from './shell/GameMenus'
 
-export const SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, children) => (
+export const SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick, icon }, children) => (
   <li key={key} class={s.item}>
     <button type="button" class={s.option} tabindex={-1} disabled={disabled} onclick={onClick}>
       {checked && (
@@ -13,6 +13,7 @@ export const SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, c
           <path d="M0 4.5L2.5 7 7 2.5V0L2.5 4.5 0 2v2.5z" />
         </svg>
       )}
+      {icon && <img class={s.icon} src={icon} alt="" width="16" height="16" />}
       {name}
       {hotKey && <span class={s.hotKey}>{hotKey}</span>}
       {children.length > 0 && (
