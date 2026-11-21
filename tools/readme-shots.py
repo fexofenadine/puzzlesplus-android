@@ -49,6 +49,9 @@ def ui(text):
 def go(pg, path, store):
     #a page with a fresh game: a game kept from before comes back paused, so it is resumed
     pg = d.goto(pg, path, store)
+    #matrix and synthwave are only worth a picture once they have run for a minute
+    if store.get('theme') in ('synthwave', 'matrix'):
+        time.sleep(60)
     try:
         pg.hit('[title="Resume (P)"]')
     except RuntimeError:
@@ -133,7 +136,8 @@ def wallpaper(pg):
     where = ui('Synthwave')
     if where:
         d.tap(*where)
-    time.sleep(4)
+    #synthwave has run for a minute before the picture
+    time.sleep(60)
     save('wallpaper-settings')
     d.back()
     d.adb('shell', 'am', 'start', '-a', 'android.service.wallpaper.CHANGE_LIVE_WALLPAPER',
