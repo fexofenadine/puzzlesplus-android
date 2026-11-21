@@ -1,10 +1,10 @@
 # Roadmap
 
-What is planned for Puzzles Plus, the website and the [Android app](https://github.com/fexofenadine/puzzlesplus-android). The app is at 1.12.x; 2.0.0 is the next milestone for the website, the app and the [screensaver](https://github.com/fexofenadine/puzzlesplus-screensaver).
+What is planned for Puzzles Plus, the website and the [Android app](https://github.com/fexofenadine/puzzlesplus-android). The website, the app and the [screensaver](https://github.com/fexofenadine/puzzlesplus-screensaver) are all at 2.0.0 (released 2026-11-21). Nothing is planned for the next milestone yet.
 
-## 2.0.0
+## 2.0.0 (released 2026-11-21)
 
-**Theme of the release:** _to be decided_
+**Theme of the release:** more to play and more to keep track of: an eighth game, Bridges, the first Sudoku variant, a home page and statistics
 
 ### Planned
 
@@ -55,7 +55,7 @@ Suggestions, none of them agreed. An idea moves up to Planned once it is picked.
 
 ### Housekeeping
 
-- [x] The website's and the screensaver's `package.json` now match the Android app's version (1.12.0). No version bumps and no new Android apk or screensaver `.scr` builds until 2.0.0 is ready; at release all three bump to 2.0.0, and later fixes are point releases
+- [x] The website's, the app's and the screensaver's `package.json` versions are kept at parity, and all three went to 2.0.0 at release; later fixes are point releases
 
 ## Settled, not planned
 
