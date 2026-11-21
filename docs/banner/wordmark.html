@@ -68,6 +68,10 @@
   .sub { font: 800 60px Orbitron; color: #fff; white-space: nowrap; margin-top: 10px;
          -webkit-text-stroke: 8px #2b0f3d; paint-order: stroke fill;
          text-shadow: 0 0 8px #fff8, 0 0 22px #1fd6ff, 0 0 40px #1fd6ff }
+  /*a smaller tag under the name, lined up with its right hand edge (?tag=2.0)*/
+  .tag { justify-self: end; font: 900 58px Orbitron; letter-spacing: 2px; color: #fff; white-space: nowrap; margin-top: 4px;
+         -webkit-text-stroke: 3px #2b0f3d; paint-order: stroke fill;
+         text-shadow: 0 0 8px #fff, 0 0 22px #1fd6ff, 0 0 40px #1fd6ff, -4px 4px 0 #ff4fd8 }
   .d .plate {
     position: relative; display: grid; justify-items: center; padding: 34px 56px 38px;
     background: #2e3440e6; border-radius: 28px; box-shadow: 0 0 0 3px #eceff433, 0 20px 50px #000c;
@@ -89,6 +93,7 @@
   ]
   const blurb = blurbs[+(q.get('blurb') || 0)]
   const sub = (q.get('sub') || '').toUpperCase()
+  const tag = q.get('tag') || ''
   const card = document.getElementById('card')
   card.classList.add(look)
   if (q.has('plain')) card.classList.add('plain')
@@ -99,7 +104,7 @@
   const html = {
     a: `<div class="mark">${icon}<div class="name">Puzzles <b>Plus</b></div></div>${text}`,
     b: `<div class="mark"><div class="bar">${icon}<div class="name">Puzzles Plus</div></div>${text}</div>`,
-    c: `<div class="mark">${icon}<div class="words"><div class="name">PUZZLES PLUS</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div></div>${text}`,
+    c: `<div class="mark">${icon}<div class="words"><div class="name">PUZZLES PLUS</div>${sub ? `<div class="sub">${sub}</div>` : ''}${tag ? `<div class="tag">${tag}</div>` : ''}</div></div>${text}`,
     d: `<div class="plate"><div class="mark">${icon}<div class="name">${[...'Puzzles Plus'].map((ch, k) => `<span style="color:${hues[k]}">${ch}</span>`).join('')}</div></div>${text}</div>`,
   }[look]
   document.getElementById('wrap').outerHTML = html
