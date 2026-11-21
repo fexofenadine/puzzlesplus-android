@@ -1,5 +1,5 @@
 import { all, bit, countBits, digitCounts, digitsOf, onlyDigit } from '../sudoku/rules'
-import { capital } from '../shell/grid'
+import { capital, cellName } from '../shell/grid'
 
 export { all, bit, capital, countBits, digitCounts, digitsOf, onlyDigit }
 
@@ -24,7 +24,7 @@ export const fallback = (n, level) => (allowed(n, level) ? level : fallback(n, l
 
 export const emptyBoard = (n) => new Int8Array(n * n)
 
-export const cellName = (i, n) => `row ${Math.floor(i / n) + 1}, column ${(i % n) + 1}`
+export { cellName }
 
 const geometries = {}
 

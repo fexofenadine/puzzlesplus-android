@@ -1,3 +1,4 @@
+import { cellName } from '../shell/grid'
 //light up: bulbs on the white cells of a grid of walls, until every white cell is lit
 //a bulb lights its row and column as far as the next wall, no bulb may light another, and a
 //numbered wall has exactly that many bulbs in the four cells beside it
@@ -15,7 +16,7 @@ export const sizes = [7, 10, 14]
 
 export const emptyBoard = (n) => new Int8Array(n * n).fill(EMPTY)
 
-export const cellName = (i, n) => `row ${Math.floor(i / n) + 1}, column ${(i % n) + 1}`
+export { cellName }
 
 const besideCache = {}
 

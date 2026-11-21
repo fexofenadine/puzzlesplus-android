@@ -5,7 +5,7 @@ import Cell from '../nonograms/Cell'
 import { place, tracks } from '../nonograms/Game'
 import { CROSS, EMPTY, FILL, cluesOf, lineDone, cellsOf } from '../nonograms/rules'
 import { lineSteps, nextSteps } from '../nonograms/techniques'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 
 const levelOf = {
   complete: 0,
@@ -18,7 +18,7 @@ const levelOf = {
 
 //# filled, x crossed out, . empty
 const valueOf = (c) => (c === '#' ? FILL : c === 'x' ? CROSS : EMPTY)
-export const lineOf = (text) => Int8Array.from(text, valueOf)
+const lineOf = (text) => Int8Array.from(text, valueOf)
 export const boardOf = (rows) => Int8Array.from(rows.join(''), valueOf)
 
 //one row's step with the technique, worded as a hint would word it
@@ -40,8 +40,6 @@ const marksOf = (step) =>
         ...step.place.map(([i, v]) => [i, v === FILL ? 'fill' : 'cross']),
       ])
     : {}
-
-const noop = () => null
 
 const Clue = ({ clue, done, hinted, style }) => (
   <div class={cx(s.clue, done && s.done, hinted && s.hinted)} style={style}>

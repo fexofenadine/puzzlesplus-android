@@ -4,6 +4,8 @@
 // Date:   09-Jul-2025
 // Desc:   CC0: Neon triangulator
 //   Haven't done a synthwave shader in awhile so here goes.
+// Changed for this project: at most 60 march steps, and the normal from four samples instead of
+//   six, which costs a little less for a picture that is the same to the eye
 
 // CC0: Neon triangulator
 //  Haven't done a synthwave shader in awhile so here goes.
@@ -26,7 +28,7 @@ const float
   , MaxDistance   = 10.
   , Tolerance     = 3e-3
   , NormalEpsilon = 1e-3
-  , MaxIter       = 77.
+  , MaxIter       = 60.
   , LightDiv      = 3.
   , SimplexOff    = sqrt(2.)/3. 
   , MaxBounces    = 4.
@@ -180,13 +182,12 @@ float rayMarch(vec3 ro, vec3 rd, float init, out float i) {
 }
 
 vec3 normal(vec3 pos) {
-  const vec2 
-      eps = vec2(NormalEpsilon, 0.0)
-    ;
-  return normalize(vec3(
-      df(pos+eps.xyy)-df(pos-eps.xyy)
-    , df(pos+eps.yxy)-df(pos-eps.yxy)
-    , df(pos+eps.yyx)-df(pos-eps.yyx))
+  const vec2 k = vec2(1., -1.);
+  return normalize(
+      k.xyy*df(pos+k.xyy*NormalEpsilon)
+    + k.yyx*df(pos+k.yyx*NormalEpsilon)
+    + k.yxy*df(pos+k.yxy*NormalEpsilon)
+    + k.xxx*df(pos+k.xxx*NormalEpsilon)
     );
 }
 

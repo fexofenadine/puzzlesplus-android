@@ -38,7 +38,7 @@ const PHONE_SCALE = 1.5
 //a dialog keeps the game's zoom, but no more than fits the screen's width at its natural width,
 //where a phone's zoom of ~2.3 made the about box overflow; offset sizes are unzoomed everywhere
 //a big board shrunk to fit doesn't shrink its dialogs with it, they keep the zoom that was chosen
-export const fitDialog = (el) => {
+const fitDialog = (el) => {
   const dialog = el.querySelector(`.${d.dialog}`)
   if (!dialog || !dialog.offsetWidth) return
   const frame = getComputedStyle(dialog.parentElement.parentElement)

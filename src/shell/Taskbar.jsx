@@ -27,7 +27,7 @@ export const icons = {
   futoshiki,
   bridges,
 }
-export { book, help }
+export { help }
 
 const REPO = 'https://github.com/fexofenadine/puzzlesplus'
 

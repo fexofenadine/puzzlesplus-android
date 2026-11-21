@@ -63,7 +63,7 @@ export const levelOf = (art) => {
 }
 
 //what a game keeps of its picture
-export const infoOf = ({ id, name, credit, licence, source }) => ({
+const infoOf = ({ id, name, credit, licence, source }) => ({
   id,
   name,
   credit,

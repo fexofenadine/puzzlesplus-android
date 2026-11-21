@@ -10,6 +10,7 @@ import {
   litOf,
   sightsOf,
 } from './rules'
+import { plural } from '../shell/grid'
 import { settle } from './solver'
 
 //the solving techniques people use, easiest first; a board's level is the hardest it needs
@@ -27,8 +28,6 @@ const step = (technique, level, place, sources, say) => ({
     return say()
   },
 })
-
-const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`
 
 //what every technique reads off a board: the lit cells, and the free ones, where a bulb could
 //still go (white, empty and dark)

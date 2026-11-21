@@ -3,7 +3,7 @@ import { Rules } from '../2048/HowToPlay'
 import { Board } from '../2048/Game'
 import { tilesOf } from '../2048/rules'
 import { suggest } from '../2048/search'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 import { desktopSection } from './desktop'
 
 //strategy examples, each with the move the hint picks there, which a test holds it to
@@ -14,8 +14,6 @@ export const examples = {
 }
 
 const start = [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0]
-
-const noop = () => null
 
 //a board, captioned with the hint's advice when it is an example
 const TwentyExample = ({ values, hint }) => {

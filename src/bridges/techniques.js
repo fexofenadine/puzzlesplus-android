@@ -1,4 +1,5 @@
-import { cellName, degreesOf, islandCells, islandName, linksOf, plural, solved } from './rules'
+import { capital } from '../shell/grid'
+import { groupsOf, islandCells, islandName, linksOf, plural, solved } from './rules'
 import { closedGroups, copyState, settle, startState } from './solver'
 
 //the solving techniques people use, easiest first; a board's level is the hardest it needs
@@ -63,8 +64,8 @@ export const need = (islands, n, state) => {
     steps.push(
       step('need', 0, change, [i], () =>
         change.length === 1
-          ? `${cap(islandName(islands, n, i))} needs ${bridges(islands[i])}, and ${others ? `its other neighbours can take ${others} at most between them` : 'it has no other neighbour'}, so at least ${bridges(least)} must go to ${islandName(islands, n, target)}.`
-          : `${cap(islandName(islands, n, i))} needs ${bridges(islands[i])}, and its neighbours can take only ${total} between them, so each of the links shown must hold at least the bridges drawn.`,
+          ? `${capital(islandName(islands, n, i))} needs ${bridges(islands[i])}, and ${others ? `its other neighbours can take ${others} at most between them` : 'it has no other neighbour'}, so at least ${bridges(least)} must go to ${islandName(islands, n, target)}.`
+          : `${capital(islandName(islands, n, i))} needs ${bridges(islands[i])}, and its neighbours can take only ${total} between them, so each of the links shown must hold at least the bridges drawn.`,
       ),
     )
   }
@@ -85,7 +86,7 @@ export const full = (islands, n, state) => {
         0,
         change,
         [i],
-        () => `${cap(islandName(islands, n, i))} has all its bridges, so no more can reach it.`,
+        () => `${capital(islandName(islands, n, i))} has all its bridges, so no more can reach it.`,
       ),
     )
   }
@@ -132,7 +133,7 @@ export const limit = (islands, n, state) => {
     steps.push(
       step('limit', 1, change, [i], () => {
         const left = islands[i] - sumLo
-        return `${cap(islandName(islands, n, i))} has ${bridges(left)} left to place, so no neighbour can have more than ${left}.`
+        return `${capital(islandName(islands, n, i))} has ${bridges(left)} left to place, so no neighbour can have more than ${left}.`
       }),
     )
   }
@@ -170,28 +171,16 @@ export const isolate = (islands, n, state) => {
 export const exit = (islands, n, state) => {
   const { links } = linksOf(islands, n)
   const { lo, hi } = state
-  const cells = islandCells(islands)
-  const parent = new Map(cells.map((i) => [i, i]))
-  const find = (i) => {
-    while (parent.get(i) !== i) {
-      parent.set(i, parent.get(parent.get(i)))
-      i = parent.get(i)
-    }
-    return i
-  }
-  links.forEach(({ a, b }, l) => lo[l] > 0 && parent.set(find(a), find(b)))
-  const groups = new Map()
-  for (const i of cells) groups.set(find(i), [...(groups.get(find(i)) || []), i])
+  const groups = groupsOf(islands, n, lo)
   const steps = []
-  for (const group of groups.values()) {
-    if (group.length === cells.length) continue
-    const root = find(group[0])
+  for (const group of groups) {
+    if (groups.length === 1) break
+    const inside = new Set(group)
     const out = []
     links.forEach((link, l) => {
-      const inside = find(link.a) === root
-      if (hi[l] > 0 && lo[l] === 0 && inside !== (find(link.b) === root)) out.push(l)
+      if (hi[l] > 0 && lo[l] === 0 && inside.has(link.a) !== inside.has(link.b)) out.push(l)
     })
-    if (out.length !== 1 || lo[out[0]] > 0) continue
+    if (out.length !== 1) continue
     const l = out[0]
     steps.push(
       step(
@@ -240,8 +229,6 @@ export const whatIf = (islands, n, state) => {
   return []
 }
 
-const cap = (text) => text.charAt(0).toUpperCase() + text.slice(1)
-
 const techniques = [[need, full, crossed], [limit], [isolate, exit], [whatIf]]
 
 //the easiest steps a state offers, using techniques up to a level
@@ -283,5 +270,3 @@ export const rate = (islands, n, top = levels.length - 1) => {
   if (!solved(islands, n, state.lo)) return null
   return { level: hardest, solution: state.lo.slice() }
 }
-
-export { cellName, degreesOf }

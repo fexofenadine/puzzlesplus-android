@@ -3,7 +3,7 @@ import g from '../lightup/LightUp.module.css'
 import Cell from '../lightup/Cell'
 import { BLANK, BULB, CROSS, EMPTY, WHITE, litOf } from '../lightup/rules'
 import { boxed, full, lone, need, nextSteps, squeeze, starve, whatIf } from '../lightup/techniques'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 
 const finders = { need, full, boxed, lone, squeeze, starve, 'what-if': whatIf }
 
@@ -36,8 +36,6 @@ const marksOf = (step) =>
         ...step.place.map(([i, value]) => [i, value === BULB ? 'bulb' : 'cross']),
       ])
     : {}
-
-const noop = () => null
 
 //a board, and with a technique the step it finds and the hint's words for it
 const LightUpExample = ({ rows, technique }) => {

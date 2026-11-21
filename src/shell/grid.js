@@ -16,6 +16,10 @@ export const sizeName = (n) => variants[n] || `${n} × ${n}`
 
 export const capital = (text) => text[0].toUpperCase() + text.slice(1)
 
+//a cell in words, and a count with its noun
+export const cellName = (i, n) => `row ${Math.floor(i / n) + 1}, column ${(i % n) + 1}`
+export const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`
+
 //a list in words: a, b and c
 export const listOf = (items) =>
   items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`

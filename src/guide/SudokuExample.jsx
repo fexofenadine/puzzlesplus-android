@@ -19,7 +19,7 @@ import {
   xyWing,
   xyzWing,
 } from '../sudoku/techniques'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 
 const finders = {
   'hidden-single': hiddenSingles,
@@ -39,7 +39,7 @@ const finders = {
 
 //rows of digits and dots, the layout of a jigsaw board, and the candidates earlier steps had
 //already taken away
-export const positionOf = ({ rows, layout, removed = [] }) => {
+const positionOf = ({ rows, layout, removed = [] }) => {
   const n = rows.length
   const board = Int8Array.from(rows.join(''), (c) => (c === '.' ? EMPTY : Number(c)))
   const cands = candidatesOf(board, n, layout)
@@ -67,8 +67,6 @@ const marksOf = (step) =>
         ...step.place.map(([i]) => [i, 'place']),
       ])
     : {}
-
-const noop = () => null
 
 //the one digit a step takes away, stressed in the notes, or 0 when it takes several
 const focusOf = (step) => {

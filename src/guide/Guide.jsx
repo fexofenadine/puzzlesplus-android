@@ -114,6 +114,9 @@ export const startGuide = ({ page, root = '../../', home = '../', title, icon, p
 }
 
 //a worked example: the board, then what the hint would say about it
+//what a figure's cells do when pressed
+export const noop = () => null
+
 export const Figure = ({ caption }, children) => (
   <figure class={s.figure}>
     <div class={s.board}>{children}</div>

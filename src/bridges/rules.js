@@ -1,3 +1,5 @@
+import { cellName, plural } from '../shell/grid'
+
 //bridges (hashi): islands on a grid joined by bridges, one or two between a pair in line
 //an island's number is the bridges it has, bridges never cross, and every island is reachable
 //from every other
@@ -7,12 +9,10 @@ export const sizes = [7, 10, 14]
 
 export const emptyBoard = (links) => new Int8Array(links)
 
-export const cellName = (i, n) => `row ${Math.floor(i / n) + 1}, column ${(i % n) + 1}`
+export { cellName, plural }
 
 //an island's name in a sentence
 export const islandName = (islands, n, i) => `the ${islands[i]} at ${cellName(i, n)}`
-
-export const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`
 
 const cache = new WeakMap()
 
@@ -153,10 +153,6 @@ export const breaks = (islands, n, board) => {
 //the islands that take part in a broken rule
 export const violations = (islands, n, board) =>
   new Set(breaks(islands, n, board).flatMap((b) => b.cells))
-
-//the links of a broken rule
-export const brokenLinks = (islands, n, board) =>
-  new Set(breaks(islands, n, board).flatMap((b) => b.links || []))
 
 //every island has its number of bridges, none cross, and all the islands are one group
 export const solved = (islands, n, board) => {

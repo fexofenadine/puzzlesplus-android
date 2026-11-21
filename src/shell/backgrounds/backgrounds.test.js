@@ -4,9 +4,9 @@ import substrate from './substrate'
 import truchet from './truchet'
 import phosphor, { loadTexts } from './phosphor'
 import { pixel } from './font6x10'
-import qix, { hueAt, makeShape, stepShape, tape } from './qix'
+import qix, { makeShape, stepShape, tape } from './qix'
 import { DONE, EMPTY, FADE, network } from './hextrail'
-import { adapt, frameRate, shaderBackground, tooSlow } from './shader'
+import { adapt, frameRate, gapOf, shaderBackground, tooSlow } from './shader'
 import { random } from '../random'
 
 beforeEach(() => localStorage.clear())
@@ -261,13 +261,6 @@ it('bounces a shape inside the screen and keeps a trail no longer than asked', (
     }
   }
   expect(shape.trail).toHaveLength(12)
-  //colours run round the palette and meet themselves again
-  const colours = [
-    [0, 0, 0],
-    [100, 200, 50],
-  ]
-  expect(hueAt(colours, 0.5)).toEqual([50, 100, 25])
-  expect(hueAt(colours, 2)).toEqual([0, 0, 0])
 })
 
 it('draws only qix lines over the wallpaper, each with its two ghosts of colour bleed', () => {
@@ -275,7 +268,13 @@ it('draws only qix lines over the wallpaper, each with its two ghosts of colour 
   expect(defaults('qix')).toMatchObject({ animated: true, bleed: 3 })
   const strokes = (bleed) => {
     const context = counter()
-    const instance = qix.create(context, { ...defaults('qix'), count: 2, trail: 5, bleed })
+    const instance = qix.create(context, {
+      ...defaults('qix'),
+      speed: 1,
+      count: 2,
+      trail: 5,
+      bleed,
+    })
     instance.resize(400, 300, 1)
     //five steps fill the trails, the fifth is the one counted
     let counts = {}
@@ -334,13 +333,23 @@ it('grows a hex trail arm by arm into empty hexagons, then fades and starts agai
   expect(most).toBeGreaterThan(32)
 })
 
-it('lowers the shader quality while a draw is slow and gives up only at the lowest', () => {
-  expect(adapt(1, 12)).toBe(1)
-  expect(adapt(1, 30)).toBeCloseTo(0.7)
-  expect(adapt(0.4, 30)).toBe(0.3)
+it('slows the shader down before it shrinks it, and gives up only at the lowest', () => {
+  const at = (quality, gap) => ({ quality, gap })
+  expect(adapt(at(1, 33), 12)).toEqual(at(1, 33))
+  //a draw a little too long for 30 a second is given the time it needs
+  expect(adapt(at(1, 33), 30)).toEqual(at(1, 50))
+  //never fewer than 15 a second, and past that the size drops
+  expect(adapt(at(1, 33), 100)).toEqual(at(1, 66))
+  expect(adapt(at(1, 66), 100).quality).toBeCloseTo(0.7)
+  expect(adapt(at(0.4, 66), 100)).toEqual(at(0.3, 66))
   //at the lowest size a slowish draw is put up with, a hopeless one is not
-  expect(adapt(0.3, 30)).toBe(0.3)
-  expect(adapt(0.3, 60)).toBe(null)
+  expect(adapt(at(0.3, 66), 42)).toEqual(at(0.3, 66))
+  expect(adapt(at(0.3, 66), 60)).toBe(null)
+  //a lower frame rate chosen on purpose may stretch further
+  expect(adapt(at(1, 66), 100, 100)).toEqual(at(1, 100))
+  expect(gapOf(30)).toBe(33)
+  expect(gapOf(15)).toBe(67)
+  expect(gapOf(undefined)).toBe(33)
 })
 
 it('gives the new defaults once to settings saved before them, then keeps what is chosen', () => {
@@ -402,7 +411,8 @@ it('draws each shader with its own program on the context they share', () => {
   first.frame(100)
   second.resize(800, 600)
   second.frame(200)
-  expect(drawn).toEqual([1, 2])
+  //each draws its own program and then its own upscaling program
+  expect(drawn).toEqual([1, 2, 3, 4])
 })
 
 it('gives up on a shader on the web when its first frames come slower than ten a second', () => {

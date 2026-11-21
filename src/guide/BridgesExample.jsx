@@ -5,7 +5,7 @@ import { drawings } from '../bridges/Game'
 import { degreesOf, linksOf } from '../bridges/rules'
 import { startState } from '../bridges/solver'
 import { apply, nextSteps } from '../bridges/techniques'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 
 //rows of . for water and 1 to 8 for an island, with the bridges drawn in the water between them:
 //- and = for one and two across, | and : for one and two down
@@ -59,8 +59,6 @@ const marksOf = (step, board) => ({
       )
     : {},
 })
-
-const noop = () => null
 
 //a board, and with a technique the step it finds and the hint's words for it
 const BridgesExample = ({ rows, technique }) => {

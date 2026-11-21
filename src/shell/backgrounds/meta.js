@@ -316,23 +316,12 @@ export const qix = {
       min: 0.25,
       max: 3,
       step: 0.25,
-      value: 1,
+      value: 0.6,
       format: (v) => `${v}×`,
     },
-    { key: 'count', label: 'Shapes', type: 'range', min: 1, max: 5, step: 1, value: 2 },
+    { key: 'count', label: 'Shapes', type: 'range', min: 0, max: 5, step: 1, value: 2 },
     { key: 'corners', label: 'Corners', type: 'range', min: 2, max: 6, step: 1, value: 4 },
-    { key: 'trail', label: 'Trail', type: 'range', min: 2, max: 40, step: 1, value: 14 },
-    {
-      key: 'palette',
-      label: 'Colours',
-      type: 'select',
-      choices: [
-        ['pastel', 'Pastels'],
-        ['sunset', 'Sunset'],
-        ['sea', 'Sea'],
-      ],
-      value: 'pastel',
-    },
+    { key: 'trail', label: 'Trail', type: 'range', min: 2, max: 40, step: 1, value: 18 },
     {
       key: 'bleed',
       label: 'Colour bleed',
@@ -432,6 +421,19 @@ const speed = (value) => ({
   format: (v) => `${v}×`,
 })
 
+//how many frames a second at most; a slow draw may still stretch the gap, and fewer frames a second
+//leave time for a larger picture
+const fps = {
+  key: 'fps',
+  label: 'Frame rate',
+  type: 'range',
+  min: 10,
+  max: 30,
+  step: 5,
+  value: 30,
+  format: (v) => `${v} fps`,
+}
+
 export const neon = {
   name: 'Neon Triangulator',
   credit: 'Neon Triangulator by mrange (CC0, shadertoy.com/view/tXGGRD), as in xscreensaver',
@@ -442,6 +444,7 @@ export const neon = {
   options: [
     speed(0.2),
     resolution(65),
+    fps,
     {
       key: 'brightness',
       label: 'Brightness',
@@ -464,5 +467,5 @@ export const driftclouds = {
   wallpaper: true,
   animated: false,
   ratio: () => 1,
-  options: [speed(1), resolution(50)],
+  options: [speed(1), resolution(50), fps],
 }

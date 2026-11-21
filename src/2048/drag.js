@@ -1,7 +1,7 @@
 import { move } from './rules'
 
 //a drag settles on a direction after this many pixels and keeps it until the finger lifts
-export const LOCK = 10
+const LOCK = 10
 
 //how far the tiles nudge, in cells, when the direction can't move anything
 const NUDGE = 0.12

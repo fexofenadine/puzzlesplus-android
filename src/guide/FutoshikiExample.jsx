@@ -4,7 +4,7 @@ import Cell from '../sudoku/Cell'
 import { Signs, noteColumns, place, tracks } from '../futoshiki/Game'
 import { EMPTY, LESS, MORE, NONE, candidatesOf } from '../futoshiki/rules'
 import { apply, nextSteps } from '../futoshiki/techniques'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 
 //an example is { rows, right, down }: rows of digits and . for empty, right of < > and spaces
 //for the signs after each cell, down of ^ v and spaces for the signs under each cell
@@ -36,8 +36,6 @@ export const exampleStep = (example, technique) => {
   }
   return null
 }
-
-const noop = () => null
 
 //a board, and with a technique the step it finds and the hint's words for it; the candidates
 //the step works on show as notes

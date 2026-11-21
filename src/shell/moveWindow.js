@@ -12,7 +12,7 @@ const EDGE = 40
 const TITLE = 18
 
 //the screen a window may go on: the page above the taskbar
-export const roomOf = () => {
+const roomOf = () => {
   const main = document.querySelector('main')
   const taskbar = main ? parseFloat(getComputedStyle(main).paddingBottom) || 0 : 0
   return { width: document.documentElement.clientWidth, height: window.innerHeight - taskbar }

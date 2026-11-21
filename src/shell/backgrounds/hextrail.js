@@ -57,7 +57,7 @@ const GROUND = [15, 28, 30]
 const rgb = (hex) => [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16))
 
 //the plane of hexagons with their neighbours, each with six empty arms
-export const makePlane = (gridW, gridH, colours, rng) => {
+const makePlane = (gridW, gridH, colours, rng) => {
   const hexagons = Array.from({ length: gridW * gridH }, (_, i) => ({
     x: i % gridW,
     y: Math.floor(i / gridW),
@@ -204,7 +204,7 @@ export const network = (gridW, gridH, colours, rng) => {
   return { plane, tick }
 }
 
-export { DONE, EMPTY, FADE, IN, OUT, WAIT }
+export { DONE, EMPTY, FADE, OUT }
 
 export default {
   ...meta,

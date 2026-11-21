@@ -1,4 +1,4 @@
-import { islandCells, linksOf } from './rules'
+import { groupsOf, islandCells, linksOf } from './rules'
 
 //what a solver knows of each link: the fewest and the most bridges it can still hold
 export const startState = (islands, n) => {
@@ -8,25 +8,14 @@ export const startState = (islands, n) => {
 
 export const copyState = ({ lo, hi }) => ({ lo: lo.slice(), hi: hi.slice() })
 
-//the groups of islands the placed bridges (lo) join, each with whether every island in it has
-//all its bridges
+//the groups of islands the placed bridges (lo) join that have all their bridges but are not
+//every island
 export const closedGroups = (islands, n, lo) => {
-  const { links, at } = linksOf(islands, n)
-  const cells = islandCells(islands)
-  const parent = new Map(cells.map((i) => [i, i]))
-  const find = (i) => {
-    while (parent.get(i) !== i) {
-      parent.set(i, parent.get(parent.get(i)))
-      i = parent.get(i)
-    }
-    return i
-  }
-  links.forEach(({ a, b }, l) => lo[l] > 0 && parent.set(find(a), find(b)))
-  const groups = new Map()
-  for (const i of cells) groups.set(find(i), [...(groups.get(find(i)) || []), i])
+  const { at } = linksOf(islands, n)
+  const total = islandCells(islands).length
   const sum = (i) => (at.get(i) || []).reduce((s, l) => s + lo[l], 0)
-  return [...groups.values()].filter(
-    (group) => group.length < cells.length && group.every((i) => sum(i) === islands[i]),
+  return groupsOf(islands, n, lo).filter(
+    (group) => group.length < total && group.every((i) => sum(i) === islands[i]),
   )
 }
 

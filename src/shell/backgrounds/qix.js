@@ -4,12 +4,11 @@ import { qix as meta } from './meta'
 //screensaver of windows 95; written anew for a canvas
 //only the lines are drawn, the theme's wallpaper shows under them like a tape playing
 
-//the vaporwave pastels deepened until they read on the wallpaper's pale sky and floor
-const palettes = {
-  pastel: ['#ff2e97', '#0096d6', '#00a878', '#8a3ffc', '#ff7a3d'],
-  sunset: ['#ff2e97', '#8a3ffc', '#ff7a3d', '#d6246e'],
-  sea: ['#0096d6', '#00a878', '#3a6ff2', '#00b3c4'],
-}
+//one colour a shape, in the order the wallpaper uses them (cyan sky, pink floor, lavender haze, the sun,
+//the mint sphere), each deepened until it reads on the wallpaper's pale sky and floor
+const colours = ['#0096d6', '#ff2e97', '#8a3ffc', '#ff9a1f', '#00a878'].map((hex) =>
+  [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16)),
+)
 
 //a worn tape's colour bleed: a pink ghost to the left of each line and a cyan one to the right
 const GHOSTS = [
@@ -23,17 +22,6 @@ export const tape = (seconds) => {
   return `${Math.floor(seconds / 3600)}:${two(Math.floor(seconds / 60) % 60)}:${two(seconds % 60)}`
 }
 
-const rgb = (hex) => [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16))
-
-//a colour part way round a palette, for a position that keeps counting up
-export const hueAt = (colours, at) => {
-  const k = ((at % colours.length) + colours.length) % colours.length
-  const a = colours[Math.floor(k)]
-  const b = colours[(Math.floor(k) + 1) % colours.length]
-  const t = k - Math.floor(k)
-  return a.map((v, c) => Math.round(v + (b[c] - v) * t))
-}
-
 //a shape of corners, each with a place and a speed in pixels a step, and its past outlines
 export const makeShape = (corners, width, height, pace, rng) => ({
   points: Array.from({ length: corners }, () => ({
@@ -43,7 +31,6 @@ export const makeShape = (corners, width, height, pace, rng) => ({
     dy: (rng() < 0.5 ? -1 : 1) * pace * (0.5 + rng()),
   })),
   trail: [],
-  hue: rng() * 5,
 })
 
 //one step: every corner moves and turns back at an edge, the outline joins the trail
@@ -60,8 +47,7 @@ export const stepShape = (shape, width, height, length) => {
       p.y = Math.max(0, Math.min(height, p.y))
     }
   }
-  shape.hue += 0.004
-  shape.trail.push({ hue: shape.hue, points: shape.points.map(({ x, y }) => [x, y]) })
+  shape.trail.push(shape.points.map(({ x, y }) => [x, y]))
   while (shape.trail.length > length) shape.trail.shift()
 }
 
@@ -75,8 +61,6 @@ export default {
     let shapes = []
     let last = 0
     let owed = 0
-    //the palette is made once a setting
-    let colours = palettes[options.palette].map(rgb)
     //milliseconds played, shown by the theme's styles as a tape counter
     let played = 0
     let shown = -1
@@ -114,8 +98,9 @@ export default {
       context.lineWidth = Math.max(1, 1.5 * pixels)
       context.lineJoin = 'round'
       const bleed = options.bleed * pixels
-      for (const shape of shapes) {
-        shape.trail.forEach(({ hue, points }, k) => {
+      shapes.forEach((shape, number) => {
+        const [red, green, blue] = colours[number % colours.length]
+        shape.trail.forEach((points, k) => {
           //older outlines are fainter
           const alpha = ((k + 1) / shape.trail.length) * (options.opacity / 100)
           if (bleed) {
@@ -126,10 +111,10 @@ export default {
             }
           }
           context.globalAlpha = alpha
-          context.strokeStyle = `rgb(${hueAt(colours, hue).join(' ')})`
+          context.strokeStyle = `rgb(${red} ${green} ${blue})`
           outline(points, 0)
         })
-      }
+      })
       context.globalAlpha = 1
     }
 
@@ -137,7 +122,6 @@ export default {
       configure: (next) => {
         const rebuild = next.count !== options.count || next.corners !== options.corners
         options = next
-        colours = palettes[options.palette].map(rgb)
         if (width && rebuild) build()
       },
       resize: (w, h, scale = 1) => {

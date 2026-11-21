@@ -3,7 +3,7 @@ import g from '../takuzu/Game.module.css'
 import Cell from '../takuzu/Cell'
 import { EMPTY } from '../takuzu/rules'
 import { balance, counts, gaps, oneLeft, pairs, repeats, twins, whatIf } from '../takuzu/techniques'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 
 const finders = {
   pair: pairs,
@@ -31,8 +31,6 @@ const marksOf = (step) =>
         ...step.place.map(([i, v]) => [i, v ? 'one' : 'zero']),
       ])
     : {}
-
-const noop = () => null
 
 //a board, and with a technique the step it finds and the hint's words for it
 const TakuzuExample = ({ rows, technique }) => {

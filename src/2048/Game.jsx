@@ -18,11 +18,11 @@ import { windowClear } from '../shell/actions'
 export const running = ({ start, over }) => start >= 0 && !over
 
 //cells shrink a little as boards grow, so every size makes a similar window
-export const cellSizes = { 3: 72, 4: 60, 5: 52 }
+const cellSizes = { 3: 72, 4: 60, 5: 52 }
 
 //a tile's power of two picks its colour and text, its digit count the font size
 //it slides from script (glide) since a keyed update can cancel a css transition
-export const Tile = ({ tile, n }) => {
+const Tile = ({ tile, n }) => {
   const k = Math.log2(tile.value)
   const x = tile.cell % n
   const y = Math.floor(tile.cell / n)

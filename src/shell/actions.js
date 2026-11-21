@@ -169,7 +169,7 @@ export const undoKey = (event, state) =>
   modified(event, state) && event.keyCode === 90 && !event.shiftKey
 
 //ctrl y, or ctrl shift z
-export const redoKey = (event, state) =>
+const redoKey = (event, state) =>
   modified(event, state) && (event.keyCode === 89 || (event.keyCode === 90 && event.shiftKey))
 
 //undo and redo for a game that has both, true when the key was one of them

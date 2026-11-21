@@ -35,7 +35,7 @@ export const propagate = (board, n, clues, lines = null, trace = null, settle = 
 }
 
 //the two lines through a cell
-export const linesThrough = (i, n) => [Math.floor(i / n), n + (i % n)]
+const linesThrough = (i, n) => [Math.floor(i / n), n + (i % n)]
 
 //what-if: a value that breaks the lines is wrong, so the cell takes the other
 //returns { cell, value, line }, or null when no guess fails or time runs out

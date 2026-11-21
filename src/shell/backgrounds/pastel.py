@@ -4,7 +4,7 @@
 import numpy as np
 from PIL import Image, ImageDraw
 
-W, H, S = 1920, 1080, 2
+W, H, S = 3840, 2160, 2
 w, h = W * S, H * S
 
 
@@ -60,4 +60,4 @@ px, py, ps = w * 0.8, h * 0.74, h * 0.2
 draw.polygon([(px, py - ps), (px - ps * 0.7, py), (px + ps * 0.1, py + ps * 0.12)], fill=(185, 103, 255, 255))
 draw.polygon([(px, py - ps), (px + ps * 0.1, py + ps * 0.12), (px + ps * 0.75, py - ps * 0.05)], fill=(140, 70, 215, 255))
 
-pic.resize((W, H), Image.LANCZOS).save('src/vaporwave.webp', quality=82, method=6)
+pic.resize((W, H), Image.LANCZOS).save('src/vaporwave.webp', quality=80, method=6)

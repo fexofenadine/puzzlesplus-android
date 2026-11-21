@@ -10,7 +10,7 @@ export const rates = [
   [0, 'As the screen allows'],
 ]
 
-export const defaultOptions = () => ({ random: false, minutes: 5, fps: 60, drift: true })
+const defaultOptions = () => ({ random: false, minutes: 5, fps: 60, drift: true })
 
 export const loadOptions = () => {
   const options = defaultOptions()

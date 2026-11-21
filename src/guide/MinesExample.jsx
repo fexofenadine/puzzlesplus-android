@@ -3,11 +3,11 @@ import g from '../Game.module.css'
 import Cell from '../Cell'
 import { neighboursOf } from '../mines'
 import { explainChord, findHint } from '../hint'
-import { Figure } from './Guide'
+import { Figure, noop } from './Guide'
 
 //rows of * hidden mine, . hidden safe, F flagged mine, f wrong flag, o opened
 //numbers come from the mines, so the board always adds up
-export const fieldOf = (rows) => {
+const fieldOf = (rows) => {
   const width = rows[0].length
   const height = rows.length
   const cells = rows.join('')
@@ -36,8 +36,6 @@ export const exampleHint = ({ rows, mines, chord }) => {
   const flags = field.flat().filter((c) => c.flag).length
   return findHint({ field, width, height, minesLeft: mines - flags })
 }
-
-const noop = () => null
 
 //a board and the hint for it, the counter shown when it matters
 const MinesExample = ({ rows, mines, chord }) => {
