@@ -8,6 +8,10 @@ Every version has its release date under it, as DD/MM/YYYY (Sydney time). Newest
 
 A version's date is added when it ships.
 
+## 2.2.0
+
+25/11/2026
+
 - Bridges has **Count Down Numbers** (Game menu, on at first), as Light Up has: an island shows the bridges it still needs, dims at 0 and turns red below it
 - Light Up's and Bridges' red for a number with too many bulbs or bridges is each theme's own red
 - Every theme can show **any background** (Display, Background, and in the screensaver's settings): its own stays the default, each theme remembers its pick
