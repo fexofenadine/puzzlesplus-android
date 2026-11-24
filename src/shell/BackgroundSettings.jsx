@@ -4,6 +4,7 @@ import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
 import { backgrounds, optionsOf } from './backgrounds'
+import { keys } from './keys'
 
 //a control per option type, built from each background's options
 export const Control = ({ option, value, onChange }) => {
@@ -63,7 +64,7 @@ const BackgroundSettings = ({ key, state, actions }) => {
   return (
     <Overlay
       key={key}
-      onKeyDown={(event) => event.keyCode === 27 && actions.toggleBackgroundSettings()}
+      onKeyDown={(event) => event.keyCode === keys.esc && actions.toggleBackgroundSettings()}
     >
       <Dialog
         title={background ? `${background.name} Settings` : 'Window Settings'}

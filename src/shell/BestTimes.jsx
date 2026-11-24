@@ -8,12 +8,13 @@ import Tabs, { hintTabs } from './Tabs'
 import StatsList from './StatsList'
 import DailyList from './DailyList'
 import { sizeName } from './grid'
+import { keys } from './keys'
 
 const artTab = { id: 'art', name: 'Art' }
 
 //a size a row, a level a column, a dash for a slot with no time yet (faint when it can't be dealt)
 const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions, art = false }) => (
-  <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBestTime()}>
+  <Overlay key={key} onKeyDown={(event) => event.keyCode === keys.esc && actions.toggleBestTime()}>
     <Dialog title={title} onClose={actions.toggleBestTime}>
       <div class={b.root}>
         <Tabs

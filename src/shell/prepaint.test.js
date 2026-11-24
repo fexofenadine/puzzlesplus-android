@@ -90,3 +90,31 @@ it('spaces the scanlines a whole number of screen pixels apart at any pixel rati
   expect(periods[1]).toBe(3)
   window.devicePixelRatio = 1
 })
+
+it('follows a theme to its picked background and that background switch', () => {
+  localStorage.clear()
+  delete root.dataset.background
+  localStorage.setItem('theme', 'vaporwave')
+  localStorage.setItem('background.vaporwave', 'pastelclouds')
+  localStorage.setItem(
+    'backgrounds',
+    JSON.stringify({ version: 2, pastelclouds: { animated: false } }),
+  )
+  new Function(script)()
+  expect(root.dataset.background).toBe(undefined)
+  //qix's switch says nothing about the clouds
+  localStorage.setItem('backgrounds', JSON.stringify({ version: 2, qix: { animated: false } }))
+  delete root.dataset.background
+  new Function(script)()
+  expect(root.dataset.background).toBe('animated')
+})
+
+it('paints nord animated with matrix picked unless matrix is switched off', () => {
+  localStorage.clear()
+  delete root.dataset.background
+  localStorage.setItem('theme', 'nord')
+  localStorage.setItem('background.nord', 'matrix')
+  localStorage.setItem('backgrounds', JSON.stringify({ version: 2, matrix: { animated: false } }))
+  new Function(script)()
+  expect(root.dataset.background).toBe(undefined)
+})

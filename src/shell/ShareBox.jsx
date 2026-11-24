@@ -3,10 +3,11 @@ import s from './Transfer.module.css'
 import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
+import { keys } from './keys'
 
 //the board on screen as a link anyone can open
 const Share = ({ key, state, actions }) => (
-  <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.closeShare()}>
+  <Overlay key={key} onKeyDown={(event) => event.keyCode === keys.esc && actions.closeShare()}>
     <Dialog title="Copy Link" onClose={actions.closeShare}>
       <div class={s.root}>
         <p>

@@ -155,6 +155,66 @@ export const fireworksOn = (page, theme) =>
     ? load('fireworks') !== 'off'
     : load('minesweeper.fireworks') === 'on'
 
+//a turned phone keeps the show where it was on the screen
+const rescale = (show, sx, sy) => {
+  const move = (p) => {
+    p.x *= sx
+    p.y *= sy
+    p.trail = p.trail.map(([x, y]) => [x * sx, y * sy])
+  }
+  show.rockets.forEach((r) => {
+    move(r)
+    r.top *= sy
+  })
+  show.alive.forEach(move)
+}
+
+//the canvas follows the screen
+const fit = (show, target, context) => {
+  if (innerWidth === show.width && innerHeight === show.height) return
+  if (show.width && show.height) rescale(show, innerWidth / show.width, innerHeight / show.height)
+  show.width = innerWidth
+  show.height = innerHeight
+  const scale = Math.min(window.devicePixelRatio || 1, 2)
+  target.width = Math.round(show.width * scale)
+  target.height = Math.round(show.height * scale)
+  context.setTransform(scale, 0, 0, scale, 0, 0)
+}
+
+//new rockets while the show is open, then each climbs to its height and bursts
+const fly = (show, dt, look) => {
+  show.wait -= dt
+  while (show.open && show.wait <= 0) {
+    const next = launch(Math.random)
+    show.wait += next.wait
+    show.rockets.push({
+      x: next.x * show.width,
+      y: show.height,
+      top: next.y * show.height,
+      speed: 520 + Math.random() * 120,
+      trail: [],
+    })
+  }
+  show.rockets = show.rockets.filter((r) => {
+    r.trail.push([r.x, r.y])
+    if (r.trail.length > 2 * TRAIL) r.trail.shift()
+    r.y -= r.speed * dt
+    if (r.y > r.top) return true
+    show.alive.push(...sparks(look, r.x, r.y, Math.random))
+    return false
+  })
+  show.alive = advance(show.alive, dt, look)
+}
+
+const paint = (show, context, look) => {
+  context.clearRect(0, 0, show.width, show.height)
+  context.globalCompositeOperation = 'lighter'
+  if (look.shape === glyph) context.font = `${look.size}px monospace`
+  for (const r of show.rockets)
+    draw(context, look, { ...r, color: look.colors[0], char: look.glyphs?.[0] || '' }, 1)
+  for (const p of show.alive) draw(context, look, p, 1 - p.age / p.life)
+}
+
 //a show for a win, unless they are off, the tab is hidden, the boss key is up or motion is reduced
 //it keeps launching until a new game or five minutes, then the rockets and bursts in the air finish
 export const celebrate = (page, theme = document.documentElement.dataset.theme) => {
@@ -165,46 +225,15 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
   const context = target.getContext?.('2d')
   if (!context) return
   const look = lookOf(theme)
-  let width = 0
-  let height = 0
-  target.style.display = 'block'
-  let open = true
-  let wait = 0
-  let alive = []
-  let rockets = []
+  const show = { width: 0, height: 0, open: true, wait: 0, alive: [], rockets: [] }
   let clock = 0
   let last = null
+  target.style.display = 'block'
   running = true
-
   finish = () => {
-    open = false
+    show.open = false
   }
-
-  //the canvas follows the screen, a turned phone keeps the show where it was on it
-  const fit = () => {
-    if (innerWidth === width && innerHeight === height) return
-    if (width && height) {
-      const sx = innerWidth / width
-      const sy = innerHeight / height
-      const move = (p) => {
-        p.x *= sx
-        p.y *= sy
-        p.trail = p.trail.map(([x, y]) => [x * sx, y * sy])
-      }
-      rockets.forEach((r) => {
-        move(r)
-        r.top *= sy
-      })
-      alive.forEach(move)
-    }
-    width = innerWidth
-    height = innerHeight
-    const scale = Math.min(window.devicePixelRatio || 1, 2)
-    target.width = Math.round(width * scale)
-    target.height = Math.round(height * scale)
-    context.setTransform(scale, 0, 0, scale, 0, 0)
-  }
-  fit()
+  fit(show, target, context)
 
   const stop = () => {
     finish = () => {}
@@ -220,37 +249,11 @@ export const celebrate = (page, theme = document.documentElement.dataset.theme) 
     last = now
     clock += dt
     if (root.dataset.boss || document.hidden) return stop()
-    fit()
-    if (clock > LIMIT) open = false
-    wait -= dt
-    while (open && wait <= 0) {
-      const next = launch(Math.random)
-      wait += next.wait
-      rockets.push({
-        x: next.x * width,
-        y: height,
-        top: next.y * height,
-        speed: 520 + Math.random() * 120,
-        trail: [],
-      })
-    }
-    //a rocket climbs to its height, then bursts
-    rockets = rockets.filter((r) => {
-      r.trail.push([r.x, r.y])
-      if (r.trail.length > 2 * TRAIL) r.trail.shift()
-      r.y -= r.speed * dt
-      if (r.y > r.top) return true
-      alive.push(...sparks(look, r.x, r.y, Math.random))
-      return false
-    })
-    alive = advance(alive, dt, look)
-    context.clearRect(0, 0, width, height)
-    context.globalCompositeOperation = 'lighter'
-    if (look.shape === glyph) context.font = `${look.size}px monospace`
-    for (const r of rockets)
-      draw(context, look, { ...r, color: look.colors[0], char: look.glyphs?.[0] || '' }, 1)
-    for (const p of alive) draw(context, look, p, 1 - p.age / p.life)
-    if (open || rockets.length || alive.length) requestAnimationFrame(frame)
+    fit(show, target, context)
+    if (clock > LIMIT) show.open = false
+    fly(show, dt, look)
+    paint(show, context, look)
+    if (show.open || show.rockets.length || show.alive.length) requestAnimationFrame(frame)
     else stop()
   }
   requestAnimationFrame(frame)

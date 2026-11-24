@@ -42,6 +42,7 @@ import About from './About'
 import HowToPlay from './HowToPlay'
 import { celebrate, stopFireworks } from '../shell/fireworks'
 import FireworksCanvas from '../shell/FireworksCanvas'
+import { keys } from '../shell/keys'
 
 //the saved size, 4x4 when missing or out of range
 const loadSize = () => {
@@ -137,14 +138,14 @@ export const saved = resumable({
 
 //arrows and WASD
 const keyDirs = {
-  37: 'left',
-  65: 'left',
-  38: 'up',
-  87: 'up',
-  39: 'right',
-  68: 'right',
-  40: 'down',
-  83: 'down',
+  [keys.left]: 'left',
+  [keys.a]: 'left',
+  [keys.up]: 'up',
+  [keys.w]: 'up',
+  [keys.right]: 'right',
+  [keys.d]: 'right',
+  [keys.down]: 'down',
+  [keys.s]: 'down',
 }
 
 //the pointer since it went down on the board: start, a cell's size on screen, the plan once locked

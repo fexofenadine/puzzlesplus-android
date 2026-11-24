@@ -13,6 +13,8 @@ export const pack = (values, base) => {
 //count values back from pack's text, null when it is not one
 export const unpack = (text, count, base) => {
   if (!/^[0-9a-z]+$/.test(text)) return null
+  //longer than any board could pack to; big numbers grow slowly enough to freeze the page
+  if (text.length > Math.ceil((count * Math.log(base)) / Math.log(36)) + 1) return null
   let all = 0n
   for (const letter of text) all = all * 36n + BigInt(parseInt(letter, 36))
   const values = new Array(count)

@@ -19,6 +19,9 @@ try {
     vaporwave: 'qix',
     terafox: 'hextrail',
   }
+  //a theme may show a background picked in place of its own, with that background's switch
+  var picked = localStorage.getItem('background.' + theme)
+  if (ids[theme] && picked) ids[theme] = picked
   if (ids[theme]) {
     try {
       var saved = JSON.parse(localStorage.getItem('backgrounds'))

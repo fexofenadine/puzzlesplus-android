@@ -8,7 +8,18 @@ Every version has its release date under it, as DD/MM/YYYY (Sydney time). Newest
 
 A version's date is added when it ships.
 
+- Bridges has **Count Down Numbers** (Game menu, on at first), as Light Up has: an island shows the bridges it still needs, dims at 0 and turns red below it
+- Light Up's and Bridges' red for a number with too many bulbs or bridges is each theme's own red
+- Every theme can show **any background** (Display, Background, and in the screensaver's settings): its own stays the default, each theme remembers its pick
+- A new background, **Pastel Clouds**: Classic's Drift Clouds in Vaporwave's pastels, keeping Vaporwave's tape counter running
+- Synthwave's shader wins its sharpness back once the page has settled: a slow start up no longer leaves it at its smallest size for the rest of the visit
 - The Android live wallpaper no longer drifts with the home screens at first. It is the **Drift with the home screens** switch in the wallpaper's settings, and a copy that already has it on keeps it until it is switched off
+- The live wallpaper runs at **30 fps** at first (it was 60), and can also be set to 15 or 20 fps to save more battery
+- The live wallpaper slows to 15 fps while the phone's battery saver is on (**Slow down in battery saver**, on at first)
+- Android: the backgrounds can be the phone's **screen saver** (Settings, Display, Screen saver), sharing the live wallpaper's settings
+- Android: **Live wallpaper** and **Screen saver** are near the top of the side panel, and the options sheet has **Set as wallpaper**
+- A shared link that is far too long for its board is turned away at once instead of freezing the page
+- A shared Nonograms link with a picture that has many answers no longer freezes the page while it is checked
 
 ## 2.1.0
 

@@ -12,12 +12,13 @@ const loaders = {
   truchet: () => import('./truchet'),
   phosphor: () => import('./phosphor'),
   driftclouds: () => import('./driftclouds'),
+  pastelclouds: () => import('./pastelclouds'),
   qix: () => import('./qix'),
   hextrail: () => import('./hextrail'),
   neon: () => import('./neon'),
 }
 
-//which theme shows which background
+//which theme shows which background unless another was picked
 const themeBackgrounds = {
   classic: 'driftclouds',
   matrix: 'matrix',
@@ -29,7 +30,28 @@ const themeBackgrounds = {
   terafox: 'hextrail',
 }
 
-export const backgroundFor = (theme) => themeBackgrounds[theme] || null
+//every theme can show any background, its own first
+export const choicesOf = (theme) => {
+  const own = themeBackgrounds[theme]
+  if (!own) return []
+  const others = Object.keys(backgrounds).filter((id) => id !== own)
+  return [own, ...others.sort((a, b) => backgrounds[a].name.localeCompare(backgrounds[b].name))]
+}
+
+//the pick is kept per theme, read each time so every page and the screensaver agree
+const pickKey = (theme) => `background.${theme}`
+
+export const backgroundFor = (theme) => {
+  const choices = choicesOf(theme)
+  const picked = load(pickKey(theme))
+  return choices.includes(picked) ? picked : choices[0] || null
+}
+
+export const chooseBackground = (theme, id) => {
+  if (!choicesOf(theme).includes(id)) return
+  save(pickKey(theme), id)
+  refresh()
+}
 
 //every background can be switched off
 export const optionsOf = (id) => [

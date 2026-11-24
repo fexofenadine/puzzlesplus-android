@@ -35,10 +35,13 @@ const REPO = 'https://github.com/fexofenadine/puzzlesplus'
 //the tray clock keeps its own time, so the game never redraws for it
 const clock = (el) => {
   const show = () => {
+    //a clock taken off the page stops ticking
+    if (timer && !el.isConnected) return clearInterval(timer)
     el.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
   }
+  let timer = null
   show()
-  setInterval(show, 1000)
+  timer = setInterval(show, 1000)
 }
 
 //closes the start menu when focus leaves it and its button, like the menu bar

@@ -469,3 +469,13 @@ export const driftclouds = {
   ratio: () => 1,
   options: [speed(1), resolution(50), fps],
 }
+
+//drift clouds in vaporwave's pastels, no theme's own: any theme can pick it in the display menu
+export const pastelclouds = {
+  name: 'Pastel Clouds',
+  credit: '2D Clouds by drift (shadertoy.com/view/4tdSWr, free to use), in vaporwave pastels',
+  gl: true,
+  wallpaper: true,
+  ratio: () => 1,
+  options: [speed(1), resolution(50), fps],
+}

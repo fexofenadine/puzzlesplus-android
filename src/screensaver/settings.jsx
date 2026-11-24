@@ -10,6 +10,8 @@ import { Control } from '../shell/BackgroundSettings'
 import {
   backgroundFor,
   backgrounds,
+  chooseBackground,
+  choicesOf,
   configure,
   defaults,
   loadSettings,
@@ -28,7 +30,7 @@ import { MINUTES, loadOptions, rates, saveOptions } from './options'
 //each change shows at once on the background behind and is saved straight away
 
 const tauri = () => window.__TAURI__?.core
-//the android app's wallpaper settings screen gives the page close() and apply()
+//the android app's wallpaper settings screen gives the page close(), apply(), and dream() where dreams()
 const android = () => window.PuzzlesWallpaper
 
 const close = () => {
@@ -53,16 +55,21 @@ const actions = {
     document.documentElement.dataset.theme = theme
     return { theme }
   },
-  //random, minutes, fps or drift
+  //random, minutes, fps, drift or saver
   setOption:
     (change) =>
-    ({ random, minutes, fps, drift }) => {
-      saveOptions({ random, minutes, fps, drift, ...change })
+    ({ random, minutes, fps, drift, saver }) => {
+      saveOptions({ random, minutes, fps, drift, saver, ...change })
       return change
     },
   setMotion: (motion) => {
     saveMotion(motion)
     return { motion }
+  },
+  //the theme's background when it has two, the state's copy only redraws the page
+  pickBackground: (id) => (state) => {
+    chooseBackground(state.theme, id)
+    return { picked: id }
   },
   setBackground:
     ([id, key, value]) =>
@@ -158,6 +165,11 @@ const ThemePart = ({ state, actions }) => [
     </Row>
   ),
   android() && (
+    <Row name="Slow down in battery saver:">
+      <Check checked={state.saver} onChange={(saver) => actions.setOption({ saver })} />
+    </Row>
+  ),
+  android() && (
     <Row name="Drift with the home screens:">
       <Check checked={state.drift} onChange={(drift) => actions.setOption({ drift })} />
     </Row>
@@ -168,8 +180,18 @@ const ThemePart = ({ state, actions }) => [
 const BackgroundPart = ({ state, actions }) => {
   const id = backgroundFor(state.theme)
   if (!id) return null
+  const choices = choicesOf(state.theme)
   return [
     <p class={s.group}>{backgrounds[id].name}</p>,
+    choices.length > 1 && (
+      <Row name="Background:">
+        <Choice
+          value={id}
+          choices={choices.map((choice) => [choice, backgrounds[choice].name])}
+          onChange={actions.pickBackground}
+        />
+      </Row>
+    ),
     optionsOf(id).map((option) => (
       <Row name={`${option.label}:`}>
         <Control
@@ -241,7 +263,11 @@ const view = (state, actions) => (
     <div id="looks" />
     <div class={s.room} oncreate={grow}>
       <Dialog
-        title={android() ? 'Puzzles Plus Wallpaper' : 'Puzzles Plus Screensaver'}
+        title={
+          !android() || new URLSearchParams(location.search).has('dream')
+            ? 'Puzzles Plus Screensaver'
+            : 'Puzzles Plus Wallpaper'
+        }
         onClose={close}
       >
         <form class={`${b.root} ${s.form}`} autocomplete="off" onsubmit={(e) => e.preventDefault()}>
@@ -251,7 +277,12 @@ const view = (state, actions) => (
           <div class={b.footer}>
             {android() && (
               <Button type="button" onClick={() => android().apply()}>
-                <span class={b.button}>Apply</span>
+                <span class={b.button}>Set Wallpaper</span>
+              </Button>
+            )}
+            {android()?.dreams?.() && (
+              <Button type="button" onClick={() => android().dream()}>
+                <span class={b.button}>Screen Saver</span>
               </Button>
             )}
             {tauri() && (

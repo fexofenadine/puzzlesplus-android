@@ -211,6 +211,9 @@ const shareCode = ({ n, level, solution }) =>
     2,
   )
 
+//a link that takes more branches than this to settle is not taken for a puzzle
+const SHARED_STEPS = 1000
+
 export const gameOf = (code) => {
   const parts = partsOf(code, 2, (n, level) => sizes.includes(n) && allowed(n, level))
   if (!parts) return null
@@ -218,7 +221,7 @@ export const gameOf = (code) => {
   const solution = Int8Array.from(values, (v) => (v ? FILL : CROSS))
   const clues = cluesOf(solution, n)
   //a picture reaches every edge, like the ones dealt here
-  if (!filled(values, n) || countSolutions(clues, n, 2) !== 1) return null
+  if (!filled(values, n) || countSolutions(clues, n, 2, undefined, SHARED_STEPS) !== 1) return null
   return { ...createGame({ n, level }), clues, solution, dealing: false, shared: true }
 }
 

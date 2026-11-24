@@ -8,6 +8,7 @@ import Tabs from '../shell/Tabs'
 import StatsList from '../shell/StatsList'
 import { sizes } from './rules'
 import { PLACES } from './records'
+import { keys } from '../shell/keys'
 
 const tabs = [
   { id: 'clean', name: 'No help' },
@@ -18,7 +19,7 @@ const places = Array.from({ length: PLACES }, (_, place) => place)
 
 //a place a row, a size a column: the score, then the highest tile of that game and who made it
 const BestScores = ({ key, state, actions }) => (
-  <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBestTime()}>
+  <Overlay key={key} onKeyDown={(event) => event.keyCode === keys.esc && actions.toggleBestTime()}>
     <Dialog title="Best 2048 Scores" onClose={actions.toggleBestTime}>
       <div class={b.root}>
         <Tabs tabs={tabs} active={state.tab} onSelect={actions.setBestTimeTab} />

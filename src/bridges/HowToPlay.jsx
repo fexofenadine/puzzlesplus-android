@@ -16,9 +16,11 @@ export const Rules = () => [
   </p>,
   <p>
     The left counter shows the islands still without their number, Ctrl+Z undoes and Ctrl+Y redoes.
-    An island with all its bridges dims. Show Errors marks islands with too many bridges or no way
-    left to reach their number, bridges that cross, and groups that are complete but cut off, and
-    Hint explains the next step logic gives. Every board has one solution that needs no guessing.
+    An island with all its bridges dims. With Count Down Numbers on (Game menu), an island shows the
+    bridges it still needs instead of its number, and turns red below 0. Show Errors marks islands
+    with too many bridges or no way left to reach their number, bridges that cross, and groups that
+    are complete but cut off, and Hint explains the next step logic gives. Every board has one
+    solution that needs no guessing.
   </p>,
 ]
 

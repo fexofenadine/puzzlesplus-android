@@ -6,6 +6,7 @@ import Button from '../Button'
 import { exportData, readBackup } from './backup'
 import { copy } from './share'
 import { dayOf } from './daily'
+import { keys } from './keys'
 
 //hands the browser a file to save
 const download = (name, text) => {
@@ -28,7 +29,7 @@ const offer = (actions, text) => {
 
 //settings, best times, statistics and saved games out to a file or text, and back in
 const Backup = ({ key, state, actions }) => (
-  <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBackup()}>
+  <Overlay key={key} onKeyDown={(event) => event.keyCode === keys.esc && actions.toggleBackup()}>
     <Dialog title="Backup" onClose={actions.toggleBackup}>
       <div class={s.root}>
         <p>

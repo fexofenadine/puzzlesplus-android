@@ -40,6 +40,11 @@ const Menu = ({ state, actions }) => (
       ))}
       <Separator />
       <SubMenuItem name="Show Errors" checked={state.errors} onClick={actions.toggleErrors} />
+      <SubMenuItem
+        name="Count Down Numbers"
+        checked={state.countdown}
+        onClick={actions.toggleCountdown}
+      />
       <SubMenuItem name="Timer" checked={state.timer} onClick={actions.toggleTimer} />
       <Separator />
       <SubMenuItem name="Copy Link..." onClick={() => actions.share()} />

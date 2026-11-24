@@ -99,6 +99,7 @@ const Game = ({ key, state, actions }) => {
             <Cell
               i={i}
               island={hidden ? 0 : island}
+              number={state.countdown ? island - degree[i] : island}
               bridge={bridge.get(i)}
               ghost={ghost.get(i)}
               none={none.has(i)}

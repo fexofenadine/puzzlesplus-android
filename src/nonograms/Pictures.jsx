@@ -6,6 +6,7 @@ import Dialog from '../Dialog'
 import Button from '../Button'
 import { artFor, levelOf } from './art'
 import { levelNames } from './Menu'
+import { keys } from '../shell/keys'
 
 //one square for each filled cell, as a single path
 const outline = ({ cells, n }) =>
@@ -29,7 +30,10 @@ const Pictures = ({ key, state, actions }) => {
   const { n } = state.game
   const pool = artFor(n)
   return (
-    <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.togglePictures()}>
+    <Overlay
+      key={key}
+      onKeyDown={(event) => event.keyCode === keys.esc && actions.togglePictures()}
+    >
       <Dialog title="Choose Picture" onClose={actions.togglePictures}>
         <div class={s.root}>
           <p class={s.text}>

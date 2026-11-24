@@ -55,10 +55,10 @@
   color: color-mix(in srgb, var(--br-island-text) 45%, var(--br-island));
 }
 
-/*too many bridges, or no way left to its number*/
+/*too many bridges, or no way left to its number, in the theme's own red*/
 .islandError {
   color: #fff;
-  background-image: radial-gradient(circle, #c62828 0 11px, transparent 11.5px);
+  background-image: radial-gradient(circle, var(--wrong) 0 11px, transparent 11.5px);
 }
 
 /*the island clicked first, waiting for a second*/

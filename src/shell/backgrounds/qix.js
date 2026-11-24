@@ -1,4 +1,7 @@
 import { qix as meta } from './meta'
+import { tape, tapeCounter } from './tape'
+
+export { tape }
 
 //bouncing polygons that leave fading trails, after xscreensaver's qix and the mystify
 //screensaver of windows 95; written anew for a canvas
@@ -15,12 +18,6 @@ const GHOSTS = [
   [-1, '#ff71ce'],
   [1, '#01cdfe'],
 ]
-
-//the tape counter the theme shows in a corner, from seconds played
-export const tape = (seconds) => {
-  const two = (value) => String(value).padStart(2, '0')
-  return `${Math.floor(seconds / 3600)}:${two(Math.floor(seconds / 60) % 60)}:${two(seconds % 60)}`
-}
 
 //a shape of corners, each with a place and a speed in pixels a step, and its past outlines
 export const makeShape = (corners, width, height, pace, rng) => ({
@@ -61,17 +58,7 @@ export default {
     let shapes = []
     let last = 0
     let owed = 0
-    //milliseconds played, shown by the theme's styles as a tape counter
-    let played = 0
-    let shown = -1
-
-    const count = (passed) => {
-      played += passed
-      const seconds = Math.floor(played / 1000)
-      if (seconds === shown) return
-      shown = seconds
-      document.documentElement.style.setProperty('--tape', `'SP  ${tape(seconds)}'`)
-    }
+    const count = tapeCounter()
 
     const outline = (points, shift) => {
       context.beginPath()

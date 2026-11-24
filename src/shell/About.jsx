@@ -4,6 +4,7 @@ import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
 import { changelog, released, version } from './version'
+import { keys } from './keys'
 
 export const Link = ({ href }, children) => (
   <a class={s.link} href={href} target="_blank" rel="noopener noreferrer">
@@ -15,7 +16,7 @@ export const Link = ({ href }, children) => (
 //puzzles plus came from, the repository, then the credits folded away
 //credits are a game's own list items, shown before the shared ones
 const About = ({ key, name, actions, credits }, children) => (
-  <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleAbout()}>
+  <Overlay key={key} onKeyDown={(event) => event.keyCode === keys.esc && actions.toggleAbout()}>
     <Dialog title={`About ${name}`} onClose={actions.toggleAbout}>
       <div class={s.root}>
         <p class={s.name}>Puzzles Plus: {name}</p>

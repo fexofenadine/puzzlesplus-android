@@ -99,9 +99,18 @@ export const frameRate = () => {
 
 export const tooSlow = (fps) => fps !== null && fps < LEAST_FPS
 
+//the next size up costs about twice as much (0.7 squared), so a draw wins it back only when it
+//takes under this share of its budget, a little to spare so it does not swing back and forth
+const ROOM = 0.44
+
 //the next pace after a timed draw, as { quality, gap }: a slow draw first spreads the frames out
 //(down to 15 a second), and only when that is not enough lowers the size; null to give up
-export const adapt = ({ quality, gap }, cost, longest = LONGEST) => {
+//a quick draw wins the size back first and then the frames, so a slow start up does not last
+export const adapt = ({ quality, gap }, cost, longest = LONGEST, shortest = gapOf()) => {
+  if (cost <= gap * BUDGET * ROOM) {
+    if (quality < 1) return { quality: Math.min(1, quality / 0.7), gap }
+    if (gap > shortest) return { quality, gap: Math.max(shortest, Math.ceil(cost / BUDGET)) }
+  }
   if (cost <= gap * BUDGET) return { quality, gap }
   if (gap < longest) return { quality, gap: Math.min(longest, Math.ceil(cost / BUDGET)) }
   if (quality <= LOWEST) return cost > HOPELESS ? null : { quality, gap }
@@ -280,8 +289,12 @@ export const shaderBackground = (meta, shader) => ({
         if (warming-- > 0) return
         gl.canvas.dataset.cost = Math.round(cost)
         const next =
-          adapt({ quality, gap }, cost, Math.max(LONGEST, gapOf(options.fps))) ??
-          (always ? { quality, gap } : null)
+          adapt(
+            { quality, gap },
+            cost,
+            Math.max(LONGEST, gapOf(options.fps)),
+            gapOf(options.fps),
+          ) ?? (always ? { quality, gap } : null)
         if (next === null) return giveUp()
         if (next.quality !== quality || next.gap !== gap) {
           const resized = next.quality !== quality

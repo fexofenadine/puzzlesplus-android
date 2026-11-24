@@ -14,8 +14,22 @@ const lines = {
 }
 
 //an island: its number in a disc, dimmed once it has all its bridges
+//number is what it shows, its clue or the bridges it still needs, red below zero
 //water: a bridge across it, if any, a hint's faint bridge or its cross for a link that holds none
-const Cell = ({ i, island, bridge, ghost, none, done, error, mark, selected, cursor, onPress }) => {
+const Cell = ({
+  i,
+  island,
+  number = island,
+  bridge,
+  ghost,
+  none,
+  done,
+  error,
+  mark,
+  selected,
+  cursor,
+  onPress,
+}) => {
   if (island) {
     return (
       <div
@@ -23,14 +37,14 @@ const Cell = ({ i, island, bridge, ghost, none, done, error, mark, selected, cur
         class={cx(
           s.island,
           done && s.done,
-          error && s.islandError,
+          (error || number < 0) && s.islandError,
           selected && s.selected,
           cursor && s.cursor,
           mark && hintClass[mark],
         )}
         onpointerdown={(event) => onPress({ event, i })}
       >
-        {island}
+        {number}
       </div>
     )
   }

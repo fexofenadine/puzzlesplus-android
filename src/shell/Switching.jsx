@@ -3,10 +3,14 @@ import s from './Prompt.module.css'
 import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
+import { keys } from './keys'
 
 //a game is in play and something would end it: park it for later, drop it, or keep playing
 const Switching = ({ key, title, actions }) => (
-  <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.answerSwitch(null)}>
+  <Overlay
+    key={key}
+    onKeyDown={(event) => event.keyCode === keys.esc && actions.answerSwitch(null)}
+  >
     <Dialog title={title} onClose={() => actions.answerSwitch(null)}>
       <div class={s.root}>
         <p class={s.text}>A game is in progress. Save it to resume later, or discard it?</p>

@@ -58,6 +58,7 @@ it('stores every background together and repairs bad values', () => {
     'hextrail',
     'neon',
     'driftclouds',
+    'pastelclouds',
     'version',
   ])
 })
@@ -347,6 +348,14 @@ it('slows the shader down before it shrinks it, and gives up only at the lowest'
   expect(adapt(at(0.3, 66), 60)).toBe(null)
   //a lower frame rate chosen on purpose may stretch further
   expect(adapt(at(1, 66), 100, 100)).toEqual(at(1, 100))
+  //a quick draw takes back the size first, then the frames, never past what was chosen
+  expect(adapt(at(0.3, 33), 7).quality).toBeCloseTo(0.3 / 0.7)
+  expect(adapt(at(0.9, 33), 7)).toEqual(at(1, 33))
+  expect(adapt(at(1, 66), 10)).toEqual(at(1, 33))
+  expect(adapt(at(1, 66), 10, 100, 50)).toEqual(at(1, 50))
+  expect(adapt(at(1, 33), 7)).toEqual(at(1, 33))
+  //a draw that would not fit at the next size up keeps the one it has
+  expect(adapt(at(0.5, 33), 10)).toEqual(at(0.5, 33))
   expect(gapOf(30)).toBe(33)
   expect(gapOf(15)).toBe(67)
   expect(gapOf(undefined)).toBe(33)
@@ -437,4 +446,38 @@ it('gives up on a shader on the web when its first frames come slower than ten a
   for (let k = 0; k < 15; k++) rate((now += 16))
   rate((now += 5000))
   expect(rate(now + 16)).toBe(null)
+})
+
+it('lets every theme pick any background, its own first and by default', async () => {
+  const { chooseBackground, choicesOf } = await import('.')
+  for (const theme of ['classic', 'matrix', 'nord', 'synthwave', 'vaporwave', 'terafox']) {
+    const choices = choicesOf(theme)
+    expect(choices[0]).toBe(backgroundFor(theme))
+    expect([...choices].sort()).toEqual(Object.keys(backgrounds).sort())
+  }
+  expect(choicesOf('everforest')).toEqual([])
+  chooseBackground('vaporwave', 'pastelclouds')
+  expect(backgroundFor('vaporwave')).toBe('pastelclouds')
+  expect(localStorage.getItem('background.vaporwave')).toBe('pastelclouds')
+  //each theme keeps its own pick
+  chooseBackground('nord', 'matrix')
+  expect(backgroundFor('nord')).toBe('matrix')
+  expect(backgroundFor('vaporwave')).toBe('pastelclouds')
+  //a name that is no background is ignored, and a stored one falls back to the theme's own
+  chooseBackground('vaporwave', 'oops')
+  expect(backgroundFor('vaporwave')).toBe('pastelclouds')
+  localStorage.setItem('background.vaporwave', 'oops')
+  expect(backgroundFor('vaporwave')).toBe('qix')
+  expect(loadSettings().pastelclouds).toEqual(defaults('pastelclouds'))
+  expect(defaults('pastelclouds').animated).toBe(true)
+})
+
+it('swaps every one of the clouds colours for pastels, and says so when one is missing', async () => {
+  const { pastel } = await import('./pastelclouds')
+  const { default: source } = await import('./driftclouds.glsl?raw')
+  const swapped = pastel(source)
+  expect(swapped).not.toContain('vec3(0.2, 0.4, 0.6)')
+  expect(swapped).not.toContain('vec3(0.4, 0.7, 1.0)')
+  expect(swapped).not.toContain('vec3(1.1, 1.1, 0.9)')
+  expect(() => pastel('void mainImage() {}')).toThrow(/pastel clouds/)
 })

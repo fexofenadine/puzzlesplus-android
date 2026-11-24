@@ -3,10 +3,14 @@ import s from './Prompt.module.css'
 import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
+import { keys } from './keys'
 
 //a finished board that isn't solved, a hint or fix it alone
 const Prompt = ({ key, title, text, actions }) => (
-  <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.answerPrompt(false)}>
+  <Overlay
+    key={key}
+    onKeyDown={(event) => event.keyCode === keys.esc && actions.answerPrompt(false)}
+  >
     <Dialog title={title} onClose={() => actions.answerPrompt(false)}>
       <div class={s.root}>
         <p class={s.text}>{text}</p>

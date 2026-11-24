@@ -169,6 +169,17 @@ it('deals every size at every level it allows, needing exactly that level', () =
   }
 }, 60000)
 
+it("settles a dealt 25x25 well inside a link's step cap, and gives up quickly on a random picture", () => {
+  const { clues } = makeGame(25, 3, random(7), 30000)
+  expect(countSolutions(clues, 25, 2, undefined, 100)).toBe(1)
+  //random pictures had no cap and froze the page for minutes when sent as a link
+  const rng = random(3)
+  const cells = Int8Array.from({ length: 625 }, () => (rng() < 0.5 ? 1 : 0))
+  const started = performance.now()
+  expect(countSolutions(cluesOf(cells, 25), 25, 2, undefined, 1000)).toBe(2)
+  expect(performance.now() - started).toBeLessThan(5000)
+})
+
 it('gives up on a picture lines barely open instead of trying what-if everywhere', () => {
   //this 25x25 seed took 50 s when what-if ran over a board lines had left almost all open
   const started = performance.now()

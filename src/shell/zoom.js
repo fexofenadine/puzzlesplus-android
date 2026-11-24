@@ -90,8 +90,17 @@ export const hangBelow = {
 }
 
 //refit when the window or browser changes size
+//a second call replaces the first watch instead of adding to it
+let unwatch = () => {}
 export const watchWindow = (dialog, refit) => {
+  unwatch()
   gameWindow = dialog
-  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => refit()).observe(dialog)
-  window.addEventListener('resize', () => refit())
+  const resized = () => refit()
+  const observer = typeof ResizeObserver !== 'undefined' && new ResizeObserver(resized)
+  if (observer) observer.observe(dialog)
+  window.addEventListener('resize', resized)
+  unwatch = () => {
+    if (observer) observer.disconnect()
+    window.removeEventListener('resize', resized)
+  }
 }

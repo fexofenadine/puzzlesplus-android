@@ -70,8 +70,8 @@ export const deduce = (board, n, clues, deep = true, deadline = Infinity) => {
   return level
 }
 
-//how many solutions, counting no further than limit
-export const countSolutions = (clues, n, limit = 2, board = new Int8Array(n * n).fill(EMPTY)) => {
+const count = (clues, n, limit, board, budget) => {
+  if (--budget.steps < 0) return limit
   if (!propagate(board, n, clues)) return 0
   const i = board.indexOf(EMPTY)
   if (i < 0) return 1
@@ -79,8 +79,18 @@ export const countSolutions = (clues, n, limit = 2, board = new Int8Array(n * n)
   for (const v of [FILL, CROSS]) {
     const branch = board.slice()
     branch[i] = v
-    total += countSolutions(clues, n, limit - total, branch)
+    total += count(clues, n, limit - total, branch, budget)
     if (total >= limit) break
   }
   return total
 }
+
+//how many solutions, counting no further than limit; a search that runs out of steps counts
+//as limit, so a puzzle too hard to settle is never taken for one with a single answer
+export const countSolutions = (
+  clues,
+  n,
+  limit = 2,
+  board = new Int8Array(n * n).fill(EMPTY),
+  steps = Infinity,
+) => Math.min(limit, count(clues, n, limit, board, { steps }))

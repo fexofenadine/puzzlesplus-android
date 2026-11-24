@@ -2,7 +2,7 @@ import './seed'
 import '../app.css'
 import './screensaver.css'
 import { setFrameCap, startBackgrounds } from '../shell/backgrounds'
-import { loadOptions, randomTheme } from './options'
+import { SAVER_FPS, loadOptions, randomTheme } from './options'
 
 //the screensaver itself: fullscreen in the windows screensaver (/s), in the screen saver settings'
 //little monitor (?preview), or the android app's live wallpaper (?wallpaper), which the app's
@@ -16,7 +16,7 @@ if (wallpaper) root.dataset.wallpaper = ''
 //a slow shader keeps drawing at its lowest size rather than giving up for a still picture
 root.dataset.always = ''
 
-const { random, minutes, fps, drift } = loadOptions()
+const { random, minutes, fps, drift, saver } = loadOptions()
 if (random) {
   root.dataset.theme = randomTheme(root.dataset.theme)
   setInterval(() => (root.dataset.theme = randomTheme(root.dataset.theme)), minutes * 60000)
@@ -29,6 +29,12 @@ startBackgrounds()
 window.drift = (x) => {
   if (!drift) return
   root.style.setProperty('--drift', `${(0.5 - x) * 2}`)
+}
+
+//the app says when android's battery saver comes on or goes off
+window.saving = (on) => {
+  if (!wallpaper) return
+  setFrameCap(on && saver ? Math.min(fps || SAVER_FPS, SAVER_FPS) : fps)
 }
 
 //the settings changed underneath: the wallpaper starts again with them

@@ -63,10 +63,10 @@
   color: color-mix(in srgb, var(--lu-wall-text) 45%, var(--lu-wall));
 }
 
-/*a number with too many bulbs, or no room left for its own*/
+/*a number with too many bulbs, or no room left for its own, in the theme's own red*/
 .wallError {
   color: #fff;
-  background: #c62828;
+  background: var(--wrong);
 }
 
 /*a round bulb with a shine, glowing a little into its cell*/

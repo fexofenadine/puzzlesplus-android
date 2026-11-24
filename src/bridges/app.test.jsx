@@ -195,3 +195,38 @@ it('deals the daily puzzle at 10 x 10 medium and leaves the saved choice alone',
   expect(localStorage.getItem('bridges.size')).toBe(null)
   expect(typeof now().game.daily).toBe('string')
 })
+
+it('counts an island down as bridges reach it, red below zero, unless switched off', async () => {
+  const draw = async (shown) => {
+    const container = document.createElement('div')
+    await new Promise((resolve) => {
+      const testView = () => <div oncreate={resolve}>{view(shown, actions)}</div>
+      app(shown, actions, testView, container)
+    })
+    return [...container.querySelectorAll('[class*=island]')].map((island) => ({
+      text: island.textContent,
+      red: island.className.includes('islandError'),
+    }))
+  }
+  //a 2 and a 1 along the top row of a small board, one link between them
+  const islands = Int8Array.from([2, 0, 1, 0, 0, 0, 0, 0, 0])
+  const game = { ...createGame({ n: 3, level: 0 }), islands, board: emptyBoard(1), dealing: false }
+  expect(state.countdown).toBe(true)
+  const one = { ...game, board: Int8Array.from([1]) }
+  expect(await draw({ ...state, game: one })).toEqual([
+    { text: '1', red: false },
+    { text: '0', red: false },
+  ])
+  const two = { ...game, board: Int8Array.from([2]) }
+  expect(await draw({ ...state, game: two })).toEqual([
+    { text: '0', red: false },
+    { text: '-1', red: true },
+  ])
+  expect(await draw({ ...state, countdown: false, game: two })).toEqual([
+    { text: '2', red: false },
+    { text: '1', red: false },
+  ])
+  wired.toggleCountdown()
+  expect(now().countdown).toBe(false)
+  expect(localStorage.getItem('bridges.countdown')).toBe('off')
+})

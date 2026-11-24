@@ -61,6 +61,7 @@ import { allowed, fallback, levelNames } from './Menu'
 import Switching from '../shell/Switching'
 import About from './About'
 import HowToPlay from './HowToPlay'
+import { keys } from '../shell/keys'
 
 //the saved size, level and variant, easy 9x9 when missing or out of range
 const loadChoice = () => {
@@ -291,8 +292,8 @@ const enter = (state, actions, i, d, note) =>
 //the digit a key stands for, 1 to 9 on the main keys or the number pad, 0 for zero
 const digitOf = (event) => {
   const { keyCode } = event
-  if (keyCode >= 48 && keyCode <= 57) return keyCode - 48
-  if (keyCode >= 96 && keyCode <= 105) return keyCode - 96
+  if (keyCode >= keys.zero && keyCode <= keys.nine) return keyCode - keys.zero
+  if (keyCode >= keys.pad0 && keyCode <= keys.pad9) return keyCode - keys.pad0
   return -1
 }
 
@@ -334,10 +335,10 @@ export const actions = {
     if (arrows[key]) {
       event.preventDefault()
       actions.move(arrows[key])
-    } else if (key === 32) {
+    } else if (key === keys.space) {
       event.preventDefault()
       actions.toggleNoting()
-    } else if (key === 8 || key === 46 || digit === 0) {
+    } else if (key === keys.backspace || key === keys.del || digit === 0) {
       event.preventDefault()
       actions.erase()
     } else if (digit > 0 && digit <= state.game.n) {

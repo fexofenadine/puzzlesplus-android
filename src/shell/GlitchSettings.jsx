@@ -5,6 +5,7 @@ import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
 import { effectsOf } from './glitches'
+import { keys } from './keys'
 
 //names as a sentence starts them: "Torn bands, corrupted columns and signal drops"
 const listed = (names) =>
@@ -33,7 +34,10 @@ const GlitchSettings = ({ key, state, actions }) => {
   const always = list.filter((effect) => !effect.glitch)
   const moving = now.filter((effect) => effect.moving).map((effect) => effect.name)
   return (
-    <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleGlitches()}>
+    <Overlay
+      key={key}
+      onKeyDown={(event) => event.keyCode === keys.esc && actions.toggleGlitches()}
+    >
       <Dialog title="Glitches" onClose={actions.toggleGlitches}>
         <form
           class={s.root}

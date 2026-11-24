@@ -11,6 +11,7 @@ import { pageUrl, phone } from '../shell/phone'
 import DisplayMenu from '../shell/DisplayMenu'
 import { listen, shellActions, shellState, shortcut } from '../shell/actions'
 import { startBackgrounds } from '../shell/backgrounds'
+import { keys } from '../shell/keys'
 
 //a part of the guide: { title, sections: [{ id, title, body }] }, body is a function of nothing
 //so examples are only drawn once the page runs
@@ -73,7 +74,7 @@ export const startGuide = ({ page, root = '../../', home = '../', title, icon, p
     },
     //only esc means anything here, the zoom keys belong to the games
     press: (event) => (state, actions) => {
-      if (event.keyCode === 27) shortcut(event, state, actions)
+      if (event.keyCode === keys.esc) shortcut(event, state, actions)
     },
     pause: () => null,
     reset: () => null,

@@ -1,6 +1,6 @@
 import { h } from 'hyperapp'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
-import { backgroundFor } from './backgrounds'
+import { backgroundFor, backgrounds, choicesOf } from './backgrounds'
 import { themes } from './themes'
 import { isGame } from './actions'
 import { motions } from './motion'
@@ -77,6 +77,19 @@ const DisplayMenu = ({ state, actions }, children) => (
       ))}
     </SubMenuItem>
     {(backgroundFor(state.theme) || isGame(state.page)) && <Separator />}
+    {choicesOf(state.theme).length > 1 && (
+      <SubMenuItem name="Background">
+        {choicesOf(state.theme).map((id, k) => [
+          <SubMenuItem
+            name={backgrounds[id].name}
+            checked={backgroundFor(state.theme) === id}
+            onClick={() => actions.pickBackground(id)}
+          />,
+          //the theme's own background stands apart from the rest
+          k === 0 && <Separator />,
+        ])}
+      </SubMenuItem>
+    )}
     {backgroundFor(state.theme) ? (
       <SubMenuItem name="Background Settings..." onClick={actions.toggleBackgroundSettings} />
     ) : (

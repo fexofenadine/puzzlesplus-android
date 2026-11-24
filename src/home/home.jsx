@@ -13,6 +13,7 @@ import { games } from '../shell/GameLinks'
 import { isGame, listen, shellActions, shellState, shortcut } from '../shell/actions'
 import { startBackgrounds } from '../shell/backgrounds'
 import { load } from '../shell/storage'
+import { keys } from '../shell/keys'
 
 //what each game is, in a line, for its card
 const about = {
@@ -55,7 +56,7 @@ export const startHome = () => {
     },
     //only esc means anything here, the zoom keys belong to the games
     press: (event) => (state, actions) => {
-      if (event.keyCode === 27) shortcut(event, state, actions)
+      if (event.keyCode === keys.esc) shortcut(event, state, actions)
     },
     pause: () => null,
     reset: () => null,

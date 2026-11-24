@@ -66,6 +66,12 @@ it('packs cells into a code and back, and turns away anything else', () => {
   expect(unpack(pack([0, 0, 0, 1], 2), 4, 2)).toEqual([0, 0, 0, 1])
   expect(unpack('ZZ', 4, 2)).toBe(null)
   expect(unpack('zzzz', 4, 2)).toBe(null)
+  //the fullest board still fits, a crafted long link is turned away before any big sums
+  const full = new Array(400).fill(8)
+  expect(unpack(pack(full, 9), 400, 9)).toEqual(full)
+  const start = performance.now()
+  expect(unpack('1'.repeat(200000), 400, 9)).toBe(null)
+  expect(performance.now() - start).toBeLessThan(50)
   const code = codeOf(3, 1, cells, 3)
   expect(partsOf(code, 3, () => true)).toEqual({ n: 3, level: 1, values: cells })
   expect(partsOf(code, 3, () => false)).toBe(null)

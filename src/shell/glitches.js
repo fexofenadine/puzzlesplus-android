@@ -85,103 +85,105 @@ const band = (top, height) => [top, Math.min(100, top + height)]
 const bands = (list) =>
   `polygon(${list.map(([a, b]) => `0 ${a}%, 100% ${a}%, 100% ${b}%, 0 ${b}%`).join(', ')})`
 
-//the steps of one glitch: [css variables, milliseconds] in turn, all made fresh each time
-export const stepsOf = (id, theme, rng = Math.random) => {
-  if (id === 'jump' && theme === 'vaporwave') {
+//one step, or two in a row when chance comes up
+const oneOrTwo = (rng, chance, step, ms, alone = ms) =>
+  rng() < chance
+    ? [
+        [step(), ms],
+        [step(), ms],
+      ]
+    : [[step(), alone]]
+
+//each glitch's steps, under its id or theme:id where a theme plays it its own way
+const makers = {
+  'vaporwave:jump': (rng) => {
     const x = between(4, 9, rng) * sign(rng)
     return [
       [{ '--jump-x': px(x), '--jump-skew': deg(-x / 12) }, 70],
       [{ '--jump-x': px(-x * between(0.3, 0.7, rng)), '--jump-skew': '0deg' }, 70],
     ]
-  }
-  if (id === 'jump') {
-    const step = () => ({
-      '--jump-x': px(between(6, 16, rng) * sign(rng)),
-      '--jump-y': px(between(-3, 6, rng)),
-      '--jump-skew': deg(between(-4, 4, rng)),
-      '--jump-hue': deg(between(15, 40, rng) * sign(rng)),
-      '--jump-bright': between(0.9, 1.5, rng).toFixed(2),
-      '--jump-sat': between(0.4, 1.8, rng).toFixed(2),
-    })
-    return rng() < 0.6
-      ? [
-          [step(), 70],
-          [step(), 70],
-        ]
-      : [[step(), 70]]
-  }
-  if (id === 'tear' && theme === 'matrix') {
-    const step = () => ({
-      bands: Array.from({ length: 2 + Math.floor(rng() * 2) }, () => ({
-        top: between(0, 0.88, rng),
-        height: between(0.02, 0.11, rng),
-        dx: between(15, 70, rng) * sign(rng),
-      })),
-    })
-    return rng() < 0.7
-      ? [
-          [step(), 90],
-          [step(), 90],
-        ]
-      : [[step(), 120]]
-  }
-  if (id === 'tear') {
-    const step = () => ({
-      '--tear-clip': bands([
-        band(between(5, 80, rng), between(2, 7, rng)),
-        band(between(5, 90, rng), between(1, 3, rng)),
-      ]),
-      '--tear-hue': deg(between(120, 180, rng)),
-    })
-    return rng() < 0.7
-      ? [
-          [step(), 180],
-          [step(), 180],
-        ]
-      : [[step(), 220]]
-  }
-  if (id === 'burst') return [[{}, between(200, 450, rng)]]
-  if (id === 'corrupt') {
-    return [
-      [
-        {
-          columns: Array.from({ length: 3 + Math.floor(rng() * 3) }, () => ({
-            x: rng(),
-            top: between(0, 0.6, rng),
-            length: 6 + Math.floor(rng() * 14),
-          })),
-        },
-        between(450, 900, rng),
-      ],
-    ]
-  }
-  if (id === 'drop') {
-    return [
-      [{ dim: between(0.5, 0.8, rng) }, between(70, 130, rng)],
-      [{ roll: true }, between(250, 400, rng)],
-    ]
-  }
-  if (id === 'lcd') {
-    const step = () => {
-      const top = rng() < 0.6 ? between(0, 50, rng) : 0
-      const bottom = top ? between(10, 40, rng) : rng() < 0.4 ? 55 : 0
-      return {
-        '--lcd-move': `translate(${px(between(1, 3, rng) * sign(rng))}, ${px(between(-1, 1, rng))}) skewX(${deg(rng() < 0.4 ? between(-6, 6, rng) : 0)})`,
-        '--lcd-clip':
-          top || bottom ? `inset(${top.toFixed(0)}% 0 ${bottom.toFixed(0)}% 0)` : 'none',
-        '--lcd-fringe': px(between(2, 3.5, rng)),
-        '--lcd-hue': rng() < 0.3 ? '60deg' : '0deg',
-      }
-    }
-    return rng() < 0.5
-      ? [
-          [step(), 106],
-          [step(), 106],
-        ]
-      : [[step(), 106]]
-  }
-  return []
+  },
+  jump: (rng) =>
+    oneOrTwo(
+      rng,
+      0.6,
+      () => ({
+        '--jump-x': px(between(6, 16, rng) * sign(rng)),
+        '--jump-y': px(between(-3, 6, rng)),
+        '--jump-skew': deg(between(-4, 4, rng)),
+        '--jump-hue': deg(between(15, 40, rng) * sign(rng)),
+        '--jump-bright': between(0.9, 1.5, rng).toFixed(2),
+        '--jump-sat': between(0.4, 1.8, rng).toFixed(2),
+      }),
+      70,
+    ),
+  'matrix:tear': (rng) =>
+    oneOrTwo(
+      rng,
+      0.7,
+      () => ({
+        bands: Array.from({ length: 2 + Math.floor(rng() * 2) }, () => ({
+          top: between(0, 0.88, rng),
+          height: between(0.02, 0.11, rng),
+          dx: between(15, 70, rng) * sign(rng),
+        })),
+      }),
+      90,
+      120,
+    ),
+  tear: (rng) =>
+    oneOrTwo(
+      rng,
+      0.7,
+      () => ({
+        '--tear-clip': bands([
+          band(between(5, 80, rng), between(2, 7, rng)),
+          band(between(5, 90, rng), between(1, 3, rng)),
+        ]),
+        '--tear-hue': deg(between(120, 180, rng)),
+      }),
+      180,
+      220,
+    ),
+  burst: (rng) => [[{}, between(200, 450, rng)]],
+  corrupt: (rng) => [
+    [
+      {
+        columns: Array.from({ length: 3 + Math.floor(rng() * 3) }, () => ({
+          x: rng(),
+          top: between(0, 0.6, rng),
+          length: 6 + Math.floor(rng() * 14),
+        })),
+      },
+      between(450, 900, rng),
+    ],
+  ],
+  drop: (rng) => [
+    [{ dim: between(0.5, 0.8, rng) }, between(70, 130, rng)],
+    [{ roll: true }, between(250, 400, rng)],
+  ],
+  lcd: (rng) =>
+    oneOrTwo(
+      rng,
+      0.5,
+      () => {
+        const top = rng() < 0.6 ? between(0, 50, rng) : 0
+        const bottom = top ? between(10, 40, rng) : rng() < 0.4 ? 55 : 0
+        return {
+          '--lcd-move': `translate(${px(between(1, 3, rng) * sign(rng))}, ${px(between(-1, 1, rng))}) skewX(${deg(rng() < 0.4 ? between(-6, 6, rng) : 0)})`,
+          '--lcd-clip':
+            top || bottom ? `inset(${top.toFixed(0)}% 0 ${bottom.toFixed(0)}% 0)` : 'none',
+          '--lcd-fringe': px(between(2, 3.5, rng)),
+          '--lcd-hue': rng() < 0.3 ? '60deg' : '0deg',
+        }
+      },
+      106,
+    ),
 }
+
+//the steps of one glitch: [css variables, milliseconds] in turn, all made fresh each time
+export const stepsOf = (id, theme, rng = Math.random) =>
+  (makers[`${theme}:${id}`] || makers[id] || (() => []))(rng)
 
 //matrix's glitches draw on a canvas over the rain, copying from the rain's own canvas
 const canvasGlitches = new Set(['tear', 'corrupt', 'drop'])

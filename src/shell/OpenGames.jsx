@@ -6,15 +6,16 @@ import Dialog from '../Dialog'
 import Button from '../Button'
 import { games } from './GameLinks'
 import { icons } from './Taskbar'
+import { keys } from './keys'
 
 //arrows move the choice, enter opens it, esc brings the closed window back
 const keyDown = (state, actions) => (event) => {
   const at = games.findIndex(([id]) => id === state.openGames)
-  if (event.keyCode === 27) actions.openGame(state.page)
-  else if (event.keyCode === 13) actions.openGame(state.openGames)
-  else if (event.keyCode >= 37 && event.keyCode <= 40) {
+  if (event.keyCode === keys.esc) actions.openGame(state.page)
+  else if (event.keyCode === keys.enter) actions.openGame(state.openGames)
+  else if (event.keyCode >= keys.left && event.keyCode <= keys.down) {
     event.preventDefault()
-    const step = { 37: -1, 39: 1, 38: -4, 40: 4 }[event.keyCode]
+    const step = { [keys.left]: -1, [keys.right]: 1, [keys.up]: -4, [keys.down]: 4 }[event.keyCode]
     const row = Math.abs(step) === 4
     const next = row
       ? Math.min(Math.max(at + step, at % 4), games.length - 1)

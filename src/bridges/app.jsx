@@ -272,6 +272,8 @@ export const state = {
   //the island the arrow keys are on, -1 until they are used and again after a click
   cursor: -1,
   errors: Boolean(load('bridges.errors')),
+  //islands show the bridges they still need, on unless switched off
+  countdown: load('bridges.countdown') !== 'off',
   timer: loadTimer('bridges.timer'),
   shelf: saved.list(),
   game: opened || createGame(loadChoice()),
@@ -450,6 +452,7 @@ export const actions = {
     return { prompt: false }
   },
   toggleErrors: toggleAction('errors', 'bridges.errors', 'yes'),
+  toggleCountdown: toggleAction('countdown', 'bridges.countdown', '', 'off'),
   toggleTimer: timerAction('bridges.timer'),
   share: shareAction(shareCode),
   pause: pauseAction(running),
