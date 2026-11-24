@@ -2,7 +2,7 @@ import { h } from 'hyperapp'
 import s from './PhoneBar.module.css'
 import { games } from './GameLinks'
 import { book, help, icons } from './Taskbar'
-import { backgroundFor } from './backgrounds'
+import { backgroundFor, backgrounds, choicesOf } from './backgrounds'
 import { motions } from './motion'
 import avatar from './avatar.png'
 import { fontScale, pageUrl } from './phone'
@@ -397,6 +397,15 @@ const PhoneBar = (
               onPick={actions.setMotion}
               actions={actions}
             />
+            {choicesOf(state.theme).length > 1 && (
+              <Chips
+                label="Background"
+                options={choicesOf(state.theme).map((id) => [id, backgrounds[id].name])}
+                value={backgroundFor(state.theme)}
+                onPick={actions.pickBackground}
+                actions={actions}
+              />
+            )}
             <Range
               name="Window"
               value={state.glass.opacity}
