@@ -39,6 +39,9 @@ export const TROPHY =
   'M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z'
 const WALLPAPER =
   'M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z'
+//a moon, for the screen saver
+const DREAM =
+  'M12.34 2.02C6.59 1.82 2 6.42 2 12c0 5.52 4.48 10 10 10 3.71 0 6.93-2.02 8.66-5.02-7.51-.25-12.09-8.43-8.32-14.96z'
 //a tv, for the retro themes' screen effects
 const GLITCH =
   'M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z'
@@ -335,6 +338,24 @@ const PhoneBar = (
               ))}
             </Section>
           )}
+          {window.PuzzlesLive && (
+            <Section label="Your phone">
+              <Item
+                d={WALLPAPER}
+                name="Live wallpaper"
+                onClick={() => window.PuzzlesLive.open()}
+                actions={actions}
+              />
+              {window.PuzzlesLive.dreams?.() && (
+                <Item
+                  d={DREAM}
+                  name="Screen saver"
+                  onClick={() => window.PuzzlesLive.dream()}
+                  actions={actions}
+                />
+              )}
+            </Section>
+          )}
           <Section>
             <Item icon={book} name={`${name} guide`} onClick={go('guide/')} actions={actions} />
             <Item
@@ -344,14 +365,6 @@ const PhoneBar = (
               actions={actions}
             />
             <Item d={SAVE} name="Backup" onClick={actions.toggleBackup} actions={actions} />
-            {window.PuzzlesLive && (
-              <Item
-                d={WALLPAPER}
-                name="Live wallpaper"
-                onClick={() => window.PuzzlesLive.open()}
-                actions={actions}
-              />
-            )}
             <Item d={INFO} name="About" onClick={actions.toggleAbout} actions={actions} />
           </Section>
         </nav>
@@ -416,6 +429,14 @@ const PhoneBar = (
             />
             {effectsOf(state.theme).length > 0 && (
               <Item d={GLITCH} name="Glitches" onClick={actions.toggleGlitches} actions={actions} />
+            )}
+            {window.PuzzlesLive?.apply && (
+              <Item
+                d={WALLPAPER}
+                name="Set as wallpaper"
+                onClick={() => window.PuzzlesLive.apply()}
+                actions={actions}
+              />
             )}
           </Section>
         </div>

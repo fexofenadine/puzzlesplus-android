@@ -33,7 +33,7 @@ public class MainActivity extends BridgeActivity {
         webView.addJavascriptInterface(new Bars(), "PuzzlesBars");
         webView.addJavascriptInterface(new Touch(), "PuzzlesTouch");
         webView.addJavascriptInterface(new Text(), "PuzzlesText");
-        //the side panel's live wallpaper item opens the wallpaper's settings
+        //the side panel's live wallpaper and screen saver items, and the sheet's set as wallpaper
         webView.addJavascriptInterface(new Live(), "PuzzlesLive");
         //the webview buzzes at the system's long press time, before a held cell is flagged and
         //even when let go too soon to flag, so only the page's own buzz is kept
@@ -128,10 +128,26 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    //the wallpaper's settings, android's own screen to set it, and the screen saver settings
     private class Live {
         @JavascriptInterface
         public void open() {
             runOnUiThread(() -> startActivity(new Intent(MainActivity.this, WallpaperSettings.class)));
+        }
+
+        @JavascriptInterface
+        public void apply() {
+            runOnUiThread(() -> LiveScreens.setWallpaper(MainActivity.this));
+        }
+
+        @JavascriptInterface
+        public boolean dreams() {
+            return LiveScreens.hasScreenSaver(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void dream() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, DreamSettings.class)));
         }
     }
 

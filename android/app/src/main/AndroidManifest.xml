@@ -55,6 +55,27 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true" />
 
+        <!--the same backgrounds as the phone's screen saver, sharing the wallpaper's settings-->
+        <service
+            android:name=".PuzzlesDream"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_DREAM_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.dream"
+                android:resource="@xml/dream" />
+        </service>
+
+        <activity
+            android:name=".DreamSettings"
+            android:label="@string/dream_settings"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

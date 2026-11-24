@@ -6,4 +6,5 @@
     <string name="custom_url_scheme">io.github.fexofenadine.puzzlesplus</string>
     <string name="wallpaper_description">Animated backgrounds from the nine themes, with their scanlines, tape looks and glitches</string>
     <string name="wallpaper_settings">Wallpaper settings</string>
+    <string name="dream_settings">Screen saver settings</string>
 </resources>

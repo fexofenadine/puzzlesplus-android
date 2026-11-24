@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--the screen saver as android's screen saver settings list it-->
+<dream xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="io.github.fexofenadine.puzzlesplus.DreamSettings" />

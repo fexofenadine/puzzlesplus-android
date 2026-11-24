@@ -1,9 +1,6 @@
 package io.github.fexofenadine.puzzlesplus;
 
 import android.app.Activity;
-import android.app.WallpaperManager;
-import android.content.ComponentName;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.webkit.JavascriptInterface;
@@ -17,6 +14,10 @@ import androidx.core.view.WindowInsetsCompat;
 //the windows screensaver's settings, over the wallpaper itself running behind it
 public class WallpaperSettings extends Activity {
     private WebView web;
+
+    protected String page() {
+        return "screensaver/settings.html";
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class WallpaperSettings extends Activity {
             v.setLayoutParams(margins);
             return WindowInsetsCompat.CONSUMED;
         });
-        web.loadUrl(WallpaperPage.url("screensaver/settings.html"));
+        web.loadUrl(WallpaperPage.url(page()));
     }
 
     @Override
@@ -43,7 +44,7 @@ public class WallpaperSettings extends Activity {
         super.onDestroy();
     }
 
-    //the page's close and set wallpaper buttons
+    //the page's close, set wallpaper and screen saver buttons
     private class Bridge {
         @JavascriptInterface
         public void close() {
@@ -52,18 +53,18 @@ public class WallpaperSettings extends Activity {
 
         @JavascriptInterface
         public void apply() {
-            runOnUiThread(() -> {
-                Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-                intent.putExtra(
-                    WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                    new ComponentName(WallpaperSettings.this, PuzzlesWallpaper.class)
-                );
-                try {
-                    startActivity(intent);
-                } catch (Exception e) {
-                    startActivity(new Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER));
-                }
-            });
+            runOnUiThread(() -> LiveScreens.setWallpaper(WallpaperSettings.this));
+        }
+
+        //whether the phone has screen saver settings to open, some makers hide them
+        @JavascriptInterface
+        public boolean dreams() {
+            return LiveScreens.hasScreenSaver(WallpaperSettings.this);
+        }
+
+        @JavascriptInterface
+        public void dream() {
+            runOnUiThread(() -> LiveScreens.openScreenSaver(WallpaperSettings.this));
         }
     }
 }

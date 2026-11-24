@@ -22,8 +22,13 @@ final class WallpaperPage {
         return "https://" + HOST + "/public/" + path;
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     static WebView make(Context context) {
+        return make(context, null);
+    }
+
+    //loaded runs each time the page has finished loading, a reload after its settings change too
+    @SuppressLint("SetJavaScriptEnabled")
+    static WebView make(Context context, Runnable loaded) {
         WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
             .setDomain(HOST)
             .addPathHandler("/", new WebViewAssetLoader.AssetsPathHandler(context))
@@ -38,6 +43,11 @@ final class WallpaperPage {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 return loader.shouldInterceptRequest(request.getUrl());
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (loaded != null) loaded.run();
             }
         });
         return web;

@@ -19,6 +19,9 @@ public class PuzzlesWallpaper extends WallpaperService {
         private VirtualDisplay display;
         private Presentation presentation;
         private WebView web;
+        private final PowerSave saver = new PowerSave(PuzzlesWallpaper.this, (on) -> {
+            if (web != null) web.evaluateJavascript("window.saving && saving(" + on + ")", null);
+        });
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -40,19 +43,26 @@ public class PuzzlesWallpaper extends WallpaperService {
             DisplayManager displays = (DisplayManager) getSystemService(DISPLAY_SERVICE);
             display = displays.createVirtualDisplay("Puzzles Plus wallpaper", width, height, dpi, holder.getSurface(), 0);
             presentation = new Presentation(PuzzlesWallpaper.this, display.getDisplay());
-            web = WallpaperPage.make(presentation.getContext());
+            web = WallpaperPage.make(presentation.getContext(), saver::tell);
             presentation.setContentView(web);
             presentation.show();
             web.loadUrl(WallpaperPage.url("screensaver/index.html?wallpaper"));
-            if (!isVisible()) web.onPause();
+            if (isVisible()) saver.start();
+            else web.onPause();
         }
 
         //nothing is drawn while an app covers the home screen or the screen is off
         @Override
         public void onVisibilityChanged(boolean visible) {
             if (web == null) return;
-            if (visible) web.onResume();
-            else web.onPause();
+            //the battery saver is only listened for while the wallpaper shows
+            if (visible) {
+                web.onResume();
+                saver.start();
+            } else {
+                saver.stop();
+                web.onPause();
+            }
         }
 
         @Override
@@ -73,6 +83,7 @@ public class PuzzlesWallpaper extends WallpaperService {
         }
 
         private void release() {
+            saver.stop();
             if (presentation != null) presentation.dismiss();
             if (web != null) web.destroy();
             if (display != null) display.release();
